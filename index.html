@@ -1,64 +1,188 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
-
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title>Internal Ad hoc Builds</title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2113.4">
-  <style type="text/css">
-    p.p3 {
-      margin: 0.0px 0.0px 0.0px 0.0px;
-      font: 12.0px Times;
-      color: #000000;
-      -webkit-text-stroke: #000000
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cài đặt Hiếu Phương Technology iOS App</title>
+  <link rel="icon" type="image/jpeg" href="sample_icon_small.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-
-    p.p4 {
-      margin: 0.0px 0.0px 0.0px 0.0px;
-      font: 12.0px Times;
-      color: #0000e9;
-      -webkit-text-stroke: #00009f
+    body {
+      background: linear-gradient(135deg, #0d2824 0%, #004d40 50%, #005c53 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: #333;
     }
-
-    span.s1 {
-      font-kerning: none
+    .card {
+      background: #ffffff;
+      max-width: 440px;
+      width: 100%;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      text-align: center;
+      padding: 36px 24px 28px;
     }
-
-    span.s2 {
-      text-decoration: underline;
-      font-kerning: none
+    .icon-wrapper {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+      border-radius: 26px;
+      box-shadow: 0 10px 25px rgba(0, 92, 83, 0.25);
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.06);
     }
-
-    span.s3 {
-      font-kerning: none;
-      color: #000000;
-      -webkit-text-stroke: 0px #000000
+    .icon-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #005c53;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 16px;
+    }
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .badge {
+      background: #e0f2f1;
+      color: #005c53;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .btn-install {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      background: linear-gradient(135deg, #005c53 0%, #00897b 100%);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 20px;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0, 92, 83, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      margin-bottom: 24px;
+    }
+    .btn-install:active {
+      transform: scale(0.98);
+      box-shadow: 0 4px 10px rgba(0, 92, 83, 0.25);
+    }
+    .btn-install svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+    .instructions {
+      background: #f8faf9;
+      border: 1px solid #e0e7e5;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: left;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #555;
+    }
+    .instructions-title {
+      font-weight: 700;
+      color: #005c53;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .instructions ol {
+      padding-left: 18px;
+    }
+    .instructions li {
+      margin-bottom: 6px;
+    }
+    .instructions li:last-child {
+      margin-bottom: 0;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 11px;
+      color: #888;
     }
   </style>
 </head>
-
 <body>
-  <h1 style="margin: 0.0px 0.0px 16.1px 0.0px; font: 24.0px Times; color: #000000; -webkit-text-stroke: #000000"><span
-      class="s1"><b>Hiếu Phương Technology iOS App</b></span></h1>
-  <p class="p3"><span class="s1">Version 1.0.0 (Ad hoc)</span></p>
-  <p class="p3"><span class="s1">Publish Date: 2026/09/14</span></p>
-  <p class="p3"><span class="s2"><a
-        href="itms-services://?action=download-manifest&amp;url=https://conchonha.github.io/HieuPhuongTechNology/manifest.plist">Cài đặt ứng dụng (Install App)</a></span><span class="s3"><span class="Apple-converted-space"> </span></span></p>
-  <br></br>
-  <p class="p3"><span class="s1">Version 1.3.34 (Ad hoc)</span></p>
-  <p class="p3"><span class="s1">Publish Date: 2026/08/25</span></p>
-  <p class="p3"><span class="s2"><a
-        href="itms-services://?action=download-manifest&amp;url=https://conchonha.github.io/HieuPhuongTechNology/manifest_staging.plist">Install
-        Build (Staging)</a></span><span class="s3"><span class="Apple-converted-space"> </span></span></p>
-  <br></br>
-  <p class="p3"><span class="s1">Version 1.3.34 (Ad hoc)</span></p>
-  <p class="p3"><span class="s1">Publish Date: 2026/07/30</span></p>
-  <p class="p3"><span class="s2"><a
-        href="itms-services://?action=download-manifest&amp;url=https://conchonha.github.io/HieuPhuongTechNology/manifest_pro.plist">Install
-        Build (Product)</a></span><span class="s3"><span class="Apple-converted-space"> </span></span></p>
-</body>
-</body>
 
+  <div class="card">
+    <!-- Icon ứng dụng -->
+    <div class="icon-wrapper">
+      <img src="sample_icon_large.jpeg" alt="Hiếu Phương Technology App Icon">
+    </div>
+
+    <!-- Tiêu đề & Thông tin -->
+    <h1>Hiếu Phương Technology</h1>
+    <p class="subtitle">Ứng dụng tạo & in bảng báo giá iOS (Ad hoc)</p>
+
+    <div class="badges">
+      <span class="badge">Phiên bản 1.0.0</span>
+      <span class="badge">Phát hành: 14/09/2026</span>
+      <span class="badge">iOS 14.0+</span>
+    </div>
+
+    <!-- Nút Cài đặt duy nhất -->
+    <a href="itms-services://?action=download-manifest&amp;url=https://conchonha.github.io/HieuPhuongTechNology/manifest.plist" class="btn-install">
+      <svg viewBox="0 0 24 24">
+        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+      </svg>
+      Cài đặt ứng dụng (Install App)
+    </a>
+
+    <!-- Hướng dẫn cho người dùng iPhone/iPad -->
+    <div class="instructions">
+      <div class="instructions-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        </svg>
+        Hướng dẫn cài đặt trên iOS:
+      </div>
+      <ol>
+        <li>Mở liên kết này bằng trình duyệt <strong>Safari</strong> trên iPhone / iPad.</li>
+        <li>Bấm nút <strong>"Cài đặt ứng dụng"</strong> và chọn <strong>"Cài đặt"</strong> trong hộp thoại thông báo.</li>
+        <li>Sau khi cài xong, nếu gặp thông báo <em>"Nhà phát triển chưa tin cậy"</em>, bạn vào: <br>
+          <strong>Cài đặt</strong> &gt; <strong>Cài đặt chung</strong> &gt; <strong>Quản lý VPN &amp; Thiết bị</strong> &gt; Chọn chứng chỉ của bạn và bấm <strong>Tin cậy (Trust)</strong>.
+        </li>
+      </ol>
+    </div>
+
+    <div class="footer">
+      © 2026 CÔNG TY TNHH HIẾU PHƯƠNG TECHNOLOGY
+    </div>
+  </div>
+
+</body>
 </html>
