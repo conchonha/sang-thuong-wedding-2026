@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function buildInviteMessage(guest, linkToUse, isShortening = false) {
     const { name, side, eventChoice } = guest;
     const savedCfg = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
-    const coupleNames = (savedCfg.groomName && savedCfg.brideName) ? `${savedCfg.groomName} & ${savedCfg.brideName}` : 'Bá Sang & Thị Thương';
+    const coupleNames = (savedCfg.groomName && savedCfg.brideName) ? `${savedCfg.groomName} & ${savedCfg.brideName}` : 'Bá Sang & Kiều Thương';
     let eventText = 'Cả Hai Buổi Lễ (Lễ Nạp Tài & Lễ Vu Quy)';
     let eventTitleShort = 'Cả Hai Buổi Lễ';
     if (eventChoice === 'vuquy') {
@@ -209,13 +209,13 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     const htmlPreview = `
       <div style="font-size: 0.96rem; line-height: 1.7; color: #2e2620;">
         <p style="margin-bottom: 12px;">
-          Trân trọng kính mời <strong style="color: var(--gold-dark); font-size: 1.05rem;">${escapeHtml(name)}</strong> tới tham dự <strong style="color: #b7791f;">${escapeHtml(eventText)}</strong> của <strong style="color: var(--gold-dark); font-family: var(--font-serif); font-size: 1.1rem;">${coupleNames}</strong>!
+          Trân trọng kính mời <strong style="color: #0284c7; font-size: 1.05rem; background: rgba(2,132,199,0.08); padding: 1px 6px; border-radius: 4px;">${escapeHtml(name)}</strong> tới tham dự <strong style="color: #b7791f;">${escapeHtml(eventText)}</strong> của <strong style="color: var(--gold-dark); font-family: var(--font-serif); font-size: 1.1rem;">${coupleNames}</strong>!
         </p>
         <p style="margin-bottom: 12px; color: #4a3e35;">
-          Sự hiện diện của <strong style="color: var(--gold-dark);">${escapeHtml(name)}</strong> là niềm vinh hạnh và hạnh phúc lớn lao nhất đối với <strong>${escapeHtml(familyText)}</strong>.
+          Sự hiện diện của <strong style="color: #0284c7; background: rgba(2,132,199,0.08); padding: 1px 6px; border-radius: 4px;">${escapeHtml(name)}</strong> là niềm vinh hạnh và hạnh phúc lớn lao nhất đối với <strong>${escapeHtml(familyText)}</strong>.
         </p>
         <p style="margin-bottom: 8px; color: #4a3e35;">
-          📍 Kính mời <strong>${escapeHtml(name)}</strong> xem thiệp mời riêng và thông tin bản đồ chỉ đường tại:
+          📍 Kính mời <strong style="color: #0284c7; background: rgba(2,132,199,0.08); padding: 1px 6px; border-radius: 4px;">${escapeHtml(name)}</strong> xem thiệp mời riêng và thông tin bản đồ chỉ đường tại:
         </p>
         ${linkBoxHtml}
       </div>

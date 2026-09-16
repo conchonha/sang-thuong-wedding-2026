@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (sectionTitle) sectionTitle.innerText = 'LỊCH TRÌNH LỄ VU QUY (NHÀ TRAI)';
     if (sectionSubtitle) {
-      sectionSubtitle.innerText = guestSide === 'bride' ? 'Nhà Gái Kính Báo' : 'Nhà Trai Kính Báo';
+      sectionSubtitle.innerText = guestSide === 'bride' ? 'Nhà Gái Kính Mời' : 'Nhà Trai Kính Mời';
     }
 
     if (honorQuote) {
