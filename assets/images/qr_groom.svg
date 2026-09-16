@@ -18,8 +18,8 @@
   <rect x="10" y="10" width="380" height="460" rx="20" fill="url(#cardBg)" stroke="url(#goldGrad)" stroke-width="2" filter="url(#shadow)"/>
   
   <!-- Header Bar -->
-  <path d="M 12 30 Q 12 12 30 12 L 370 12 Q 388 12 388 30 L 388 70 L 12 70 Z" fill="#1e3c72"/>
-  <text x="200" y="44" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">VIETCOMBANK • VIETQR</text>
+  <path d="M 12 30 Q 12 12 30 12 L 370 12 Q 388 12 388 30 L 388 70 L 12 70 Z" fill="#582d82"/>
+  <text x="200" y="44" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">TPBANK • VIETQR</text>
   <text x="200" y="62" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#D4AF37" text-anchor="middle">MỪNG CƯỚI CHÚ RỂ</text>
 
   <!-- QR Pattern Box -->
@@ -39,7 +39,7 @@
 
   <!-- Center Logo Badge -->
   <circle cx="200" cy="240" r="32" fill="#FFFFFF" stroke="url(#goldGrad)" stroke-width="2.5"/>
-  <text x="200" y="246" font-family="'Alex Brush', cursive" font-size="24" font-weight="bold" fill="#B8860B" text-anchor="middle">MQ</text>
+  <text x="200" y="246" font-family="'Alex Brush', cursive" font-size="24" font-weight="bold" fill="#B8860B" text-anchor="middle">TBS</text>
 
   <!-- Data Matrix Dots Grid -->
   <g fill="#2D3748">
@@ -88,7 +88,7 @@
   </g>
 
   <!-- Bank Details Footer -->
-  <text x="200" y="416" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="700" fill="#1A202C" text-anchor="middle">NGUYỄN MINH QUÂN</text>
-  <text x="200" y="438" font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="800" fill="#B8860B" text-anchor="middle" letter-spacing="1">1029 8888 6666</text>
-  <text x="200" y="456" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#718096" text-anchor="middle">Vietcombank - Chi nhánh Sở Giao Dịch</text>
+  <text x="200" y="416" font-family="'Plus Jakarta Sans', sans-serif" font-size="14" font-weight="700" fill="#1A202C" text-anchor="middle">THÁI BÁ SANG</text>
+  <text x="200" y="438" font-family="'Plus Jakarta Sans', sans-serif" font-size="15" font-weight="800" fill="#B8860B" text-anchor="middle" letter-spacing="1">2063 7496 434</text>
+  <text x="200" y="456" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" fill="#718096" text-anchor="middle">Tiên Phong Bank (TPBank)</text>
 </svg>

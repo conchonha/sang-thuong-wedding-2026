@@ -156,7 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // ═══ TRÌNH TẠO MẪU TIN NHẮN VÀ XEM TRƯỚC THIỆP MỜI ═══
   function buildInviteMessage(guest, linkToUse, isShortening = false) {
     const { name, side, eventChoice } = guest;
-    const coupleNames = 'Minh Quân & Hoàng Yến';
+    const savedCfg = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
+    const coupleNames = (savedCfg.groomName && savedCfg.brideName) ? `${savedCfg.groomName} & ${savedCfg.brideName}` : 'Bá Sang & Thị Thương';
     let eventText = 'Cả Hai Buổi Lễ (Lễ Nạp Tài & Lễ Vu Quy)';
     let eventTitleShort = 'Cả Hai Buổi Lễ';
     if (eventChoice === 'vuquy') {

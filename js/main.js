@@ -1,6 +1,6 @@
 /**
  * LUXURY WEDDING INVITATION - INTERACTION ENGINE
- * Couple: Nguyễn Minh Quân & Lê Hoàng Yến
+ * Couple: Thái Bá Sang & Phạm Thị Thương
  * Enhanced with Dynamic Guest Personalization & Couple Config Manager
  */
 
@@ -57,7 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
       wishNameInput.title = 'Tên của bạn được tự động ghi nhận từ thiệp mời';
     }
 
-    document.title = `Thiệp Mời Cưới Trân Trọng Gửi ${guestName} | Minh Quân & Hoàng Yến`;
+    const cfg = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
+    const grName = cfg.groomName || 'Bá Sang';
+    const brName = cfg.brideName || 'Thị Thương';
+    document.title = `Thiệp Mời Cưới Trân Trọng Gửi ${guestName} | ${grName} & ${brName}`;
   } else {
     if (envelopeGuestEl) envelopeGuestEl.innerText = 'Quý Khách & Người Thương';
     if (letterGuestEl) letterGuestEl.innerText = 'Quý Khách & Người Thương';
@@ -73,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load Custom Configuration (Address, Times & Google Maps) from Couple Config
   const savedConfig = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
 
-  let targetWeddingTime = '2026-12-25T11:00:00+07:00';
+  let targetWeddingTime = '2026-12-20T10:00:00+07:00';
   if (savedConfig.weddingDate) {
     targetWeddingTime = savedConfig.weddingDate;
   }
@@ -739,7 +742,10 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast(`Cảm ơn ${name} đã xác nhận tham dự! Đôi uyên ương rất vinh hạnh được đón tiếp bạn! ❤️`);
         createConfettiCelebration();
       } else {
-        showToast(`Cảm ơn ${name} đã gửi hồi đáp và lời chúc phúc tới Minh Quân & Hoàng Yến! 💐`);
+        const cfg = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
+        const grName = cfg.groomName || 'Bá Sang';
+        const brName = cfg.brideName || 'Thị Thương';
+        showToast(`Cảm ơn ${name} đã gửi hồi đáp và lời chúc phúc tới ${grName} & ${brName}! 💐`);
       }
       rsvpForm.reset();
       if (guestName && rsvpNameInput) {
