@@ -571,141 +571,131 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
   /* ==========================================================================
      CLIENT-SIDE URL SHORTENER (Rút gọn trực tiếp trên Web, 100% Frontend)
-     Multi-Proxy & Multi-Provider Architecture (TinyURL + is.gd JSONP)
+     Native CORS Architecture (Spoo.me API + Multi-Provider Fallbacks)
      ========================================================================== */
 
-  /** Tiền tố của alias — có thể đổi cho phù hợp */
-  const SHORT_PREFIX = 'sang-thuong-wedding';
-
   /**
-   * Tạo alias TinyURL từ tên khách mời.
-   * Ví dụ: "Nguyễn Thị Lan" → "sang-thuong-wedding-lan"
-   * @param {string} guestName
-   * @returns {string} alias sạch (5-30 ký tự)
+   * Rút gọn URL bằng spoo.me API (Hỗ trợ NATIVE CORS 100%, không bị trình duyệt chặn)
    */
-  function buildGuestAlias(guestName) {
-    if (!guestName) return SHORT_PREFIX;
-    // Lấy từ cuối cùng (thường là tên gọi người Việt)
-    const firstName = guestName.trim().split(/\s+/).pop() || guestName.trim();
-    const clean = firstName
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')  // bỏ dấu
-      .replace(/[đĐ]/g, 'd')             // đ → d
-      .replace(/[^a-zA-Z0-9]/g, '')    // chỉ giữ chữ + số
-      .toLowerCase()
-      .slice(0, 10);
-    const alias = clean ? `${SHORT_PREFIX}-${clean}` : SHORT_PREFIX;
-    return alias.slice(0, 30);
-  }
-
-  /**
-   * Gọi TinyURL API qua nhiều CORS Proxy miễn phí khác nhau
-   */
-  function fetchTinyUrlMultiProxy(targetUrl, alias = '') {
-    let tinyApi = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(targetUrl)}`;
-    if (alias) tinyApi += `&alias=${encodeURIComponent(alias)}`;
-
-    const proxies = [
-      url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-      url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
-    ];
-
-    function tryProxy(idx) {
-      if (idx >= proxies.length) {
-        return Promise.reject(new Error('Tất cả proxy TinyURL đều không phản hồi'));
-      }
-
-      const proxyUrl = proxies[idx](tinyApi);
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 3500);
-
-      return fetch(proxyUrl, { signal: controller.signal })
-        .then(res => {
-          clearTimeout(timer);
-          if (!res.ok) throw new Error('Proxy HTTP ' + res.status);
-          return res.text();
-        })
-        .then(text => {
-          let result = text;
-          try {
-            const json = JSON.parse(text);
-            if (json && json.contents) result = json.contents;
-          } catch (e) {}
-
-          result = (result || '').trim();
-          if (result && result.startsWith('http') && !result.toLowerCase().includes('error')) {
-            return result;
-          }
-          throw new Error('TinyURL trả về kết quả không hợp lệ hoặc alias bị trùng');
-        })
-        .catch(err => {
-          clearTimeout(timer);
-          console.warn(`[Shortener] Proxy ${idx + 1} lỗi:`, err.message);
-          return tryProxy(idx + 1);
-        });
+  function fetchSpooMe(targetUrl, alias = '') {
+    const params = new URLSearchParams();
+    params.append('url', targetUrl);
+    if (alias) {
+      // spoo.me alias tối đa 14 ký tự (chỉ giữ chữ, số, gạch ngang)
+      const cleanAlias = alias.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 14);
+      if (cleanAlias) params.append('alias', cleanAlias);
     }
 
-    return tryProxy(0);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 7000);
+
+    return fetch('https://spoo.me/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json'
+      },
+      body: params,
+      signal: controller.signal
+    })
+      .then(res => {
+        clearTimeout(timer);
+        if (!res.ok) {
+          return res.json().then(j => {
+            throw new Error(j.AliasError || j.UrlError || ('HTTP ' + res.status));
+          }).catch(() => {
+            throw new Error('HTTP ' + res.status);
+          });
+        }
+        return res.json();
+      })
+      .then(json => {
+        if (json && json.short_url) {
+          let shortUrl = String(json.short_url).trim();
+          if (shortUrl.startsWith('http://')) {
+            shortUrl = 'https://' + shortUrl.slice(7);
+          }
+          return shortUrl;
+        }
+        throw new Error('spoo.me không trả về short_url');
+      })
+      .catch(err => {
+        clearTimeout(timer);
+        throw err;
+      });
   }
 
   /**
-   * Dự phòng rút gọn bằng is.gd JSONP script tag (bỏ qua CORS 100%)
+   * Dự phòng rút gọn TinyURL qua proxy AllOrigins (timeout 7s)
    */
-  function shortenUrlIsGdJsonp(longUrl) {
-    return new Promise((resolve, reject) => {
-      const cbName = 'isgd_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-      const script = document.createElement('script');
+  function fetchTinyUrlFallback(targetUrl, alias = '') {
+    let tinyApi = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(targetUrl)}`;
+    if (alias) tinyApi += `&alias=${encodeURIComponent(alias)}`;
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(tinyApi)}`;
 
-      const timer = setTimeout(() => {
-        cleanup();
-        reject(new Error('Hết thời gian chờ is.gd'));
-      }, 5000);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 7000);
 
-      function cleanup() {
-        if (timer) clearTimeout(timer);
-        delete window[cbName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-      }
-
-      window[cbName] = function(data) {
-        cleanup();
-        if (data && data.shorturl) {
-          resolve(data.shorturl);
-        } else {
-          reject(new Error((data && data.errormessage) || 'is.gd không trả về link'));
+    return fetch(proxyUrl, { signal: controller.signal })
+      .then(res => {
+        clearTimeout(timer);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(json => {
+        const text = (json && json.contents ? json.contents : '').trim();
+        if (text && text.startsWith('http') && !text.toLowerCase().includes('error')) {
+          return text;
         }
-      };
-
-      script.onerror = function() {
-        cleanup();
-        reject(new Error('Lỗi kết nối is.gd'));
-      };
-
-      script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}&callback=${cbName}`;
-      document.head.appendChild(script);
-    });
+        throw new Error('TinyURL lỗi hoặc alias bị trùng');
+      })
+      .catch(err => {
+        clearTimeout(timer);
+        throw err;
+      });
   }
 
   /**
    * Rút gọn URL 100% Client-Side với 4 tầng dự phòng
    */
   function shortenUrl(longUrl, guestName = '') {
-    const alias = buildGuestAlias(guestName);
+    // Nếu longUrl chứa localhost hoặc 127.0.0.1 (khi test local), chuyển sang domain public của GitHub Pages
+    // để các dịch vụ rút gọn API (spoo.me, tinyurl) chấp nhận và khách mở được trên điện thoại
+    let targetUrl = longUrl;
+    if (targetUrl.includes('localhost') || targetUrl.includes('127.0.0.1')) {
+      const publicBase = 'https://conchonha.github.io/sang-thuong-wedding-2026/index.html';
+      const queryString = targetUrl.includes('?') ? targetUrl.slice(targetUrl.indexOf('?')) : '';
+      targetUrl = `${publicBase}${queryString}`;
+    }
 
-    // Tầng 1: Thử TinyURL với custom alias đẹp (qua multi-proxy)
-    return fetchTinyUrlMultiProxy(longUrl, alias)
-      .catch(() => {
-        // Tầng 2: Thử TinyURL với fallback alias kèm số ngẫu nhiên
-        const fallbackAlias = alias + '-' + Math.floor(Math.random() * 900 + 100);
-        return fetchTinyUrlMultiProxy(longUrl, fallbackAlias);
+    const firstName = guestName.trim().split(/\s+/).pop() || guestName.trim();
+    const cleanName = firstName
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, 'd')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .toLowerCase()
+      .slice(0, 8);
+
+    const alias = cleanName ? `stw-${cleanName}` : 'stw';
+
+    // Tầng 1: Spoo.me với alias đẹp stw-[tên] (Native CORS)
+    return fetchSpooMe(targetUrl, alias)
+      .catch(err1 => {
+        console.warn('[Shortener] Spoo.me alias đẹp lỗi/trùng, thử fallback alias:', err1.message);
+        // Tầng 2: Spoo.me với fallback alias (stw-[tên]-88)
+        const fallbackAlias = `${alias.slice(0, 10)}-${Math.floor(Math.random() * 89 + 10)}`;
+        return fetchSpooMe(targetUrl, fallbackAlias);
       })
-      .catch(() => {
-        // Tầng 3: Thử TinyURL ngẫu nhiên
-        return fetchTinyUrlMultiProxy(longUrl, '');
+      .catch(err2 => {
+        console.warn('[Shortener] Spoo.me fallback alias lỗi, thử ngẫu nhiên:', err2.message);
+        // Tầng 3: Spoo.me ngẫu nhiên (không alias)
+        return fetchSpooMe(targetUrl, '');
       })
-      .catch(() => {
-        // Tầng 4: Dự phòng is.gd qua JSONP script injection
-        return shortenUrlIsGdJsonp(longUrl);
+      .catch(err3 => {
+        console.warn('[Shortener] Spoo.me lỗi hoàn toàn, thử TinyURL dự phòng:', err3.message);
+        // Tầng 4: TinyURL dự phòng qua proxy
+        return fetchTinyUrlFallback(targetUrl, '');
       })
       .catch(err => {
         console.warn('[Shortener] Tất cả giải pháp rút gọn thất bại, dùng link gốc:', err.message);
