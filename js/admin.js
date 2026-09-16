@@ -767,6 +767,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         // Cập nhật bộ nhớ liveGuests và lưu lên Google Sheet để dùng lại lần sau
         if (foundGuest) {
           foundGuest.shortUrl = shortUrl;
+          renderGuestTable(document.getElementById('search-guest-input')?.value.trim() || '');
         }
         if (guestName) {
           saveShortLinkToGoogleSheet(guestName, shortUrl);
@@ -1144,6 +1145,9 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         `;
       }
 
+      const effectiveLink = (g.shortUrl && g.shortUrl.startsWith('http')) ? g.shortUrl : g.link;
+      const isShortened = (g.shortUrl && g.shortUrl.startsWith('http'));
+
       tr.innerHTML = `
         <td>${idx + 1}</td>
         <td style="font-weight:600;">${escapeHtml(g.name)}</td>
@@ -1153,13 +1157,13 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         <td>${wishHtml}</td>
         <td>
           <div class="action-btn-group">
-            <button class="btn-small btn-small-gold btn-copy-guest-link" data-link="${encodeURI(g.link)}" title="Sao chép link đầy đủ">
+            <button class="btn-small btn-small-gold btn-copy-guest-link" data-link="${encodeURI(effectiveLink)}" data-short="${isShortened ? 'true' : 'false'}" title="${isShortened ? 'Sao chép link rút gọn: ' + escapeHtml(g.shortUrl) : 'Sao chép link thiệp'}">
               📋 Copy
             </button>
             <button class="btn-small btn-small-outline btn-shorten-guest-link" data-link="${encodeURI(g.link)}" data-name="${escapeHtml(g.name)}" title="${g.shortUrl ? 'Link rút gọn đã lưu trên Sheet: ' + escapeHtml(g.shortUrl) : 'Rút gọn link rồi sao chép'}">
               ${g.shortUrl ? '✅ Short' : '🔗 Short'}
             </button>
-            <a href="${g.link}" target="_blank" class="btn-small btn-small-outline" title="Mở thiệp">
+            <a href="${effectiveLink}" target="_blank" class="btn-small btn-small-outline" title="Mở thiệp">
               👁️
             </a>
             <button class="btn-small btn-small-danger btn-del-guest" data-id="${g.id}" title="Xóa khách này">
@@ -1175,7 +1179,8 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     document.querySelectorAll('.btn-copy-guest-link').forEach((btn) => {
       btn.addEventListener('click', () => {
         const link = decodeURIComponent(btn.getAttribute('data-link'));
-        copyText(link, 'Đã sao chép link thiệp!');
+        const isShort = btn.getAttribute('data-short') === 'true';
+        copyText(link, isShort ? 'Đã sao chép link rút gọn! 🔗' : 'Đã sao chép link thiệp! 📋');
       });
     });
 
