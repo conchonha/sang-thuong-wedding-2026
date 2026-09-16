@@ -814,7 +814,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         // 1. Tái tạo mẫu tin nhắn và cập nhật "Xem Trước Tin Nhắn Thiệp Mời" với link rút gọn
         const finalMsg = buildInviteMessage(guestObj, shortUrl, false);
         if (msgTextarea) msgTextarea.value = finalMsg.plainMsg;
-        if (invitePreviewHtml) invitePreviewHtml.innerHTML = finalMsg.htmlPreview;
+        if (previewHtml) previewHtml.innerHTML = finalMsg.htmlPreview;
 
         // 2. Cập nhật ô input link
         linkInput.value = shortUrl;
@@ -833,8 +833,6 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
           setTimeout(() => { if (badge) badge.style.display = 'none'; }, 4000);
         }
 
-        // 4. Tắt loading nút submit
-        restoreSubmitBtn();
         showToast(`🎉 Đã rút gọn link và cập nhật vào tin nhắn thiệp mời!`);
       })
       .catch(err => {
@@ -842,7 +840,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         // Fallback: giữ link đầy đủ và cập nhật tin nhắn không còn trạng thái loading
         const fallbackMsg = buildInviteMessage(guestObj, fullLink, false);
         if (msgTextarea) msgTextarea.value = fallbackMsg.plainMsg;
-        if (invitePreviewHtml) invitePreviewHtml.innerHTML = fallbackMsg.htmlPreview;
+        if (previewHtml) previewHtml.innerHTML = fallbackMsg.htmlPreview;
         linkInput.value = fullLink;
 
         if (previewStatus) {
@@ -855,8 +853,9 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
           badge.style.color = '#c62828';
           setTimeout(() => { if (badge) badge.style.display = 'none'; }, 4000);
         }
-
-        // Tắt loading nút submit
+      })
+      .finally(() => {
+        // Luôn luôn tắt loading nút submit trong mọi trường hợp
         restoreSubmitBtn();
       });
   }
