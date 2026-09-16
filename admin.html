@@ -493,12 +493,13 @@
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
           <div>
             <h3 style="margin-bottom: 2px;">📊 Danh Sách Phản Hồi Tham Dự (Toàn Bộ Khách)</h3>
-            <p class="desc" style="margin-bottom: 0;">Dữ liệu tổng hợp từ Excel — đầy đủ trạng thái và lời chúc của từng khách.</p>
+            <p class="desc" style="margin-bottom: 0;">Dữ liệu tự động đồng bộ từ Google Sheets — đầy đủ trạng thái, link rút gọn và lời chúc của từng khách.</p>
           </div>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <input type="text" id="rsvp-search-input" class="form-control" placeholder="🔍 Tìm tên khách..." style="max-width: 220px; padding: 8px 12px; font-size: 0.85rem;">
+            <input type="text" id="rsvp-search-input" class="form-control" placeholder="🔍 Tìm tên khách..." style="max-width: 200px; padding: 8px 12px; font-size: 0.85rem;">
+            <button id="btn-reload-rsvp" class="btn-small btn-small-outline" title="Tải lại dữ liệu mới nhất từ Google Sheets">🔄 Làm Mới</button>
             <button id="btn-export-rsvp-excel" class="btn-small btn-small-gold">📥 Xuất CSV</button>
-            <button id="btn-clear-rsvp" class="btn-small btn-small-danger">🗑️ Xóa Dữ Liệu Test</button>
+            <button id="btn-clear-rsvp" class="btn-small btn-small-danger">🗑️ Xóa Tất Cả</button>
           </div>
         </div>
 
@@ -526,18 +527,18 @@
         <div class="guest-table-wrap">
           <table class="guest-table" id="rsvp-full-table">
             <colgroup>
-              <col style="width: 40px;">
-              <col style="width: 160px;">
-              <col style="width: 85px;">
+              <col style="width: 45px;">
+              <col style="width: 170px;">
+              <col style="width: 90px;">
               <col style="width: 140px;">
               <col style="width: 120px;">
-              <col style="width: 50px;">
+              <col style="width: 55px;">
               <col style="width: 220px;">
-              <col style="width: 110px;">
+              <col style="width: 120px;">
             </colgroup>
             <thead>
               <tr>
-                <th>STT</th>
+                <th style="text-align:center;">STT</th>
                 <th>Tên Khách Mời</th>
                 <th>Phía Khách</th>
                 <th>Tiệc Mời</th>

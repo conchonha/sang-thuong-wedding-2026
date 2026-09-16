@@ -1527,8 +1527,8 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     // ── Cập nhật stat cards ──
     const allGuests = liveGuests;
 
-    const isAttYes  = (g) => ['Có tham dự','Có','Sẽ tham dự'].includes(g.attending);
-    const isAttNo   = (g) => ['Không tham dự','Không','Không thể đến','Rất tiếc không đến'].includes(g.attending);
+    const isAttYes  = (g) => ['Có tham dự','Có','Sẽ tham dự'].includes(g.attending) || (g.attending && g.attending.toLowerCase().includes('có'));
+    const isAttNo   = (g) => ['Không tham dự','Không','Không thể đến','Rất tiếc không đến'].includes(g.attending) || (g.attending && g.attending.toLowerCase().includes('không'));
     const isAttWait = (g) => !isAttYes(g) && !isAttNo(g);
 
     const cntYes  = allGuests.filter(isAttYes).length;
@@ -1586,6 +1586,38 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       rsvpSearch.addEventListener('input', () => renderRsvpFullTable());
     }
 
+    // ── Nút làm mới từ Google Sheets ──
+    const btnReloadRsvp = document.getElementById('btn-reload-rsvp');
+    if (btnReloadRsvp && !btnReloadRsvp.dataset.bound) {
+      btnReloadRsvp.dataset.bound = 'true';
+      btnReloadRsvp.addEventListener('click', () => {
+        loadGuestsFromGoogleSheet(true);
+      });
+    }
+
+    // ── Nút xóa dữ liệu trên Google Sheets ──
+    const btnClearRsvp = document.getElementById('btn-clear-rsvp');
+    if (btnClearRsvp && !btnClearRsvp.dataset.bound) {
+      btnClearRsvp.dataset.bound = 'true';
+      btnClearRsvp.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (liveGuests.length === 0) {
+          showToast('Danh sách khách mời hiện đang trống!');
+          return;
+        }
+        const modalClear = document.getElementById('modal-clear-guests');
+        if (modalClear) {
+          modalClear.classList.add('active');
+        } else {
+          liveGuests = [];
+          clearAllGuestsOnGoogleSheet();
+          renderGuestTable();
+          renderRsvpList();
+          showToast('Đã xóa sạch toàn bộ khách trên Google Sheet! 🗑️');
+        }
+      });
+    }
+
     // ── Render bảng toàn bộ khách từ Google Sheets ──
     renderRsvpFullTable();
 
@@ -1598,10 +1630,11 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         if (guests.length === 0) { showToast('Chưa có dữ liệu khách để xuất!'); return; }
 
         let csv = '\uFEFF';
-        csv += 'STT,Tên Khách Mời,Phía Khách,Tiệc Mời,Trạng Thái,Số Người,Lời Chúc\n';
+        csv += 'STT,Tên Khách Mời,Phía Khách,Tiệc Mời,Trạng Thái,Số Người,Lời Chúc,Link Rút Gọn\n';
         guests.forEach((g, idx) => {
           const sideText  = g.side === 'groom' ? 'Nhà Trai' : g.side === 'bride' ? 'Nhà Gái' : 'Bạn Chung';
           const eventText = g.eventChoice === 'vuquy' ? 'Lễ Vu Quy' : g.eventChoice === 'naptai' ? 'Lễ Nạp Tài' : 'Cả Hai Lễ';
+          const effectiveLink = (g.shortUrl && g.shortUrl.startsWith('http')) ? g.shortUrl : g.link;
           const row = [
             idx + 1,
             `"${(g.name||'').replace(/"/g,'""')}"`,
@@ -1609,12 +1642,13 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
             `"${eventText}"`,
             `"${(g.attending||'Chưa phản hồi').replace(/"/g,'""')}"`,
             `"${(g.rsvpCount||'').replace(/"/g,'""')}"`,
-            `"${(g.wish||'').replace(/"/g,'""')}"`
+            `"${(g.wish||'').replace(/"/g,'""')}"`,
+            `"${(effectiveLink||'').replace(/"/g,'""')}"`
           ].join(',');
           csv += row + '\n';
         });
         downloadFile(csv, 'danh_sach_rsvp_toan_bo.csv', 'text/csv;charset=utf-8;');
-        showToast('Đã xuất file Excel danh sách RSVP thành công! 📥');
+        showToast('Đã xuất file CSV danh sách RSVP thành công! 📥');
       });
     }
 
@@ -1625,8 +1659,8 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     const tbody = document.getElementById('rsvp-full-table-body');
     if (!tbody) return;
 
-    const isAttYes  = (g) => ['Có tham dự','Có','Sẽ tham dự'].includes(g.attending);
-    const isAttNo   = (g) => ['Không tham dự','Không','Không thể đến','Rất tiếc không đến'].includes(g.attending);
+    const isAttYes  = (g) => ['Có tham dự','Có','Sẽ tham dự'].includes(g.attending) || (g.attending && g.attending.toLowerCase().includes('có'));
+    const isAttNo   = (g) => ['Không tham dự','Không','Không thể đến','Rất tiếc không đến'].includes(g.attending) || (g.attending && g.attending.toLowerCase().includes('không'));
 
     let guests = liveGuests;
 
@@ -1667,7 +1701,8 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
       let attendingHtml = '<span class="badge-attending-waiting">⏳ Chưa phản hồi</span>';
       if (isAttYes(g)) {
-        attendingHtml = `<span class="badge-attending-yes">✅ Sẽ đi</span>`;
+        const countText = g.rsvpCount ? ` (${escapeHtml(g.rsvpCount)})` : '';
+        attendingHtml = `<span class="badge-attending-yes">✅ Sẽ đi${countText}</span>`;
       } else if (isAttNo(g)) {
         attendingHtml = '<span class="badge-attending-no">❌ Không đi</span>';
       }
@@ -1680,9 +1715,27 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         wishHtml = `<div style="font-size:0.81rem; color:#3a322c; line-height:1.5; font-style:italic; background:#fffcf5; border-left:2px solid var(--gold-primary); padding:5px 8px; border-radius:0 4px 4px 0; white-space:normal; word-break:break-word; overflow-wrap:break-word;">"${escapeHtml(g.wish)}"</div>`;
       }
 
+      const effectiveLink = (g.shortUrl && g.shortUrl.startsWith('http')) ? g.shortUrl : g.link;
+      const isShortened = (g.shortUrl && g.shortUrl.startsWith('http'));
+
       tr.innerHTML = `
         <td style="text-align:center; font-size:0.8rem; color:#aaa;">${idx + 1}</td>
-        <td style="font-weight:600;">${escapeHtml(g.name)}</td>
+        <td>
+          <div style="font-weight:600; color: #2e2620; cursor: pointer;" class="guest-name-clickable-rsvp" data-id="${g.id}" title="Bấm để xem lại trên khung tạo link">
+            ${escapeHtml(g.name)}
+          </div>
+          ${isShortened ? `
+            <div style="margin-top: 3px;">
+              <a href="${g.shortUrl}" target="_blank" style="font-size: 0.75rem; color: #b7791f; text-decoration: underline; font-weight: 500;" title="Link rút gọn đã lưu trên Google Sheet">
+                🔗 ${escapeHtml(g.shortUrl.replace(/^https?:\/\//, ''))}
+              </a>
+            </div>
+          ` : `
+            <div style="margin-top: 3px; font-size: 0.72rem; color: #aaa;">
+              ⏳ Chưa rút gọn
+            </div>
+          `}
+        </td>
         <td><span style="background:${sideColor}; color:${sideTxt}; padding:3px 8px; border-radius:12px; font-size:0.78rem; font-weight:600; white-space:nowrap;">${sideText}</span></td>
         <td><span style="background:#fff8ee; border:1px solid #ebd9c5; color:var(--gold-dark); padding:3px 7px; border-radius:12px; font-size:0.76rem; font-weight:600; display:inline-block; white-space:normal; line-height:1.4;">${eventText}</span></td>
         <td>${attendingHtml}</td>
@@ -1690,10 +1743,10 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         <td style="white-space:normal;">${wishHtml}</td>
         <td>
           <div class="action-btn-group" style="justify-content:center;">
-            <button class="btn-small btn-small-gold btn-rsvp-copy-link" data-link="${encodeURI(g.link)}" title="Sao chép link thiệp mời">
-              📋
+            <button class="btn-small btn-small-gold btn-rsvp-copy-link" data-link="${encodeURI(effectiveLink)}" data-short="${isShortened ? 'true' : 'false'}" title="${isShortened ? 'Sao chép link rút gọn: ' + escapeHtml(g.shortUrl) : 'Sao chép link thiệp'}">
+              📋 Copy
             </button>
-            <a href="${g.link}" target="_blank" class="btn-small btn-small-outline" title="Mở thiệp mời" style="padding: 5px 8px;">
+            <a href="${effectiveLink}" target="_blank" class="btn-small btn-small-outline" title="Mở thiệp mời xem thử" style="padding: 5px 8px;">
               👁️
             </a>
             <button class="btn-small btn-small-danger btn-rsvp-del-guest" data-id="${g.id}" title="Xóa khách này">
@@ -1705,11 +1758,27 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       tbody.appendChild(tr);
     });
 
+    // Bấm tên khách để chuyển sang tab tạo link và cuộn tới ô kết quả
+    tbody.querySelectorAll('.guest-name-clickable-rsvp').forEach((el) => {
+      el.addEventListener('click', () => {
+        const id = el.getAttribute('data-id');
+        const targetGuest = liveGuests.find(g => String(g.id) === String(id));
+        if (targetGuest) {
+          const tabGen = document.querySelector('.admin-tab[data-tab="tab-generator"]');
+          if (tabGen) tabGen.click();
+          displayGuestResult(targetGuest);
+          const resultBox = document.getElementById('guest-result-box');
+          if (resultBox) resultBox.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
     // Gắn sự kiện cho nút copy link RSVP
     tbody.querySelectorAll('.btn-rsvp-copy-link').forEach(btn => {
       btn.addEventListener('click', () => {
         const link = decodeURI(btn.getAttribute('data-link'));
-        copyText(link, 'Đã sao chép link thiệp! 🔗');
+        const isShort = btn.getAttribute('data-short') === 'true';
+        copyText(link, isShort ? 'Đã sao chép link rút gọn! 🔗' : 'Đã sao chép link thiệp mời! 🔗');
       });
     });
 
