@@ -1160,10 +1160,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
             <button class="btn-small btn-small-gold btn-copy-guest-link" data-link="${encodeURI(effectiveLink)}" data-short="${isShortened ? 'true' : 'false'}" title="${isShortened ? 'Sao chép link rút gọn: ' + escapeHtml(g.shortUrl) : 'Sao chép link thiệp'}">
               📋 Copy
             </button>
-            <button class="btn-small btn-small-outline btn-shorten-guest-link" data-link="${encodeURI(g.link)}" data-name="${escapeHtml(g.name)}" title="${g.shortUrl ? 'Link rút gọn đã lưu trên Sheet: ' + escapeHtml(g.shortUrl) : 'Rút gọn link rồi sao chép'}">
-              ${g.shortUrl ? '✅ Short' : '🔗 Short'}
-            </button>
-            <a href="${effectiveLink}" target="_blank" class="btn-small btn-small-outline" title="Mở thiệp">
+            <a href="${effectiveLink}" target="_blank" class="btn-small btn-small-outline" title="Mở thiệp xem thử">
               👁️
             </a>
             <button class="btn-small btn-small-danger btn-del-guest" data-id="${g.id}" title="Xóa khách này">
@@ -1181,41 +1178,6 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         const link = decodeURIComponent(btn.getAttribute('data-link'));
         const isShort = btn.getAttribute('data-short') === 'true';
         copyText(link, isShort ? 'Đã sao chép link rút gọn! 🔗' : 'Đã sao chép link thiệp! 📋');
-      });
-    });
-
-    // Nút rút gọn link ngay trong bảng
-    document.querySelectorAll('.btn-shorten-guest-link').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const link = decodeURIComponent(btn.getAttribute('data-link'));
-        const name = btn.getAttribute('data-name');
-        const targetGuest = liveGuests.find(g => isExactNameMatching(g.name, name));
-
-        // ⚡ KIỂM TRA: Nếu khách đã có link rút gọn trong Sheet/liveGuests → DÙNG NGAY!
-        if (targetGuest && targetGuest.shortUrl && targetGuest.shortUrl.startsWith('http')) {
-          await copyText(targetGuest.shortUrl, `Đã sao chép link rút gọn từ Sheet của ${name}! 🔗`);
-          return;
-        }
-
-        const originalText = btn.textContent;
-        btn.textContent = '⏳...';
-        btn.disabled = true;
-        try {
-          // Truyền tên khách để alias được tạo đẹp: sang-thuong-wedding-[tên]
-          const shortUrl = await shortenUrl(link, name);
-          if (targetGuest) {
-            targetGuest.shortUrl = shortUrl;
-          }
-          saveShortLinkToGoogleSheet(name, shortUrl);
-          await copyText(shortUrl, `Đã rút gọn & lưu vào Sheet cho ${name}! 🔗`);
-          renderGuestTable(document.getElementById('search-guest-input')?.value.trim() || '');
-        } catch (err) {
-          showToast('⚠️ Không thể rút gọn. Đã sao chép link gốc!');
-          await copyText(link, 'Đã sao chép link gốc!');
-        } finally {
-          btn.textContent = originalText;
-          btn.disabled = false;
-        }
       });
     });
 
