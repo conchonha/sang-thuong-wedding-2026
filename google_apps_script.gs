@@ -76,6 +76,26 @@ function doPost(e) {
       return jsonResponse({ success: true, message: 'Đã xóa khách trên Google Sheet' });
     }
 
+    // 3. Lưu link rút gọn của 1 khách
+    if (data.action === 'save_short_link') {
+      const targetName = normalizeName(data.name || '');
+      const shortUrl = String(data.shortUrl || data.shortLink || '').trim();
+      if (!targetName || !shortUrl) {
+        return jsonResponse({ success: false, message: 'Thiếu thông tin tên hoặc shortUrl' });
+      }
+      const rows = sheet.getDataRange().getValues();
+      if (rows.length > 0 && (!rows[0][8] || String(rows[0][8]).trim() === '')) {
+        sheet.getRange(1, 9).setValue('Link Rút Gọn');
+      }
+      for (let i = 1; i < rows.length; i++) {
+        if (normalizeName(String(rows[i][1])) === targetName) {
+          sheet.getRange(i + 1, 9).setValue(shortUrl);
+          return jsonResponse({ success: true, message: 'Đã lưu link rút gọn vào Google Sheet' });
+        }
+      }
+      return jsonResponse({ success: false, message: 'Không tìm thấy khách để lưu link rút gọn' });
+    }
+
     const name = String(data.name || '').trim();
     if (!name) {
       return jsonResponse({ success: false, message: 'Thiếu tên khách mời' });
@@ -99,6 +119,7 @@ function doPost(e) {
     const attending = data.attending || 'Chưa phản hồi';
     const count = data.count || '';
     const wish = data.wish || '';
+    const shortUrl = data.shortUrl || data.shortLink || '';
     const nowTime = data.time || new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
 
     // Kiểm tra xem khách đã có trong sheet chưa để cập nhật hoặc thêm mới
@@ -115,7 +136,7 @@ function doPost(e) {
 
     if (foundRow > 0) {
       // Cập nhật dòng khách đã tồn tại
-      // Cột: A(1)=STT, B(2)=Tên, C(3)=Phía, D(4)=Tiệc, E(5)=Trạng Thái, F(6)=Số Người, G(7)=Lời Chúc, H(8)=Thời Gian
+      // Cột: A(1)=STT, B(2)=Tên, C(3)=Phía, D(4)=Tiệc, E(5)=Trạng Thái, F(6)=Số Người, G(7)=Lời Chúc, H(8)=Thời Gian, I(9)=Link Rút Gọn
       if (data.action === 'wish') {
         // Khách gửi lời chúc từ Sổ Lưu Bút Online: chỉ cập nhật lời chúc và thời gian
         if (data.side && sideText && !rows[foundRow - 1][2]) sheet.getRange(foundRow, 3).setValue(sideText);
@@ -129,6 +150,7 @@ function doPost(e) {
         if (count) sheet.getRange(foundRow, 6).setValue(count);
         if (wish) sheet.getRange(foundRow, 7).setValue(wish);
         sheet.getRange(foundRow, 8).setValue(nowTime);
+        if (shortUrl) sheet.getRange(foundRow, 9).setValue(shortUrl);
       }
     } else {
       // Thêm dòng mới nếu khách chưa có trong danh sách
@@ -141,7 +163,8 @@ function doPost(e) {
         data.action === 'wish' ? 'Chưa phản hồi' : attending,
         data.action === 'wish' ? '' : count,
         wish,
-        nowTime
+        nowTime,
+        shortUrl
       ]);
     }
 
@@ -162,7 +185,7 @@ function getOrCreateSheet(name) {
     // Tạo header ban đầu
     const headers = [
       'STT', 'Tên Khách', 'Phía Khách', 'Tiệc Mời',
-      'Trạng Thái', 'Số Người', 'Lời Chúc', 'Thời Gian Xác Nhận'
+      'Trạng Thái', 'Số Người', 'Lời Chúc', 'Thời Gian Xác Nhận', 'Link Rút Gọn'
     ];
     sheet.appendRow(headers);
     const headerRange = sheet.getRange(1, 1, 1, headers.length);

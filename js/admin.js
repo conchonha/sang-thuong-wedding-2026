@@ -5,7 +5,7 @@
 
 // ══ Cấu hình Google Sheets (phải khớp với main.js) ══
 const GOOGLE_SHEET_ID = '1JlN1-utEeoLThwzfsyvnNNIDQovqeocbMTEq_NSeWo4';
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwXC5C_lD2wt7h0Uz_pmiShtafI_lNNdh8iQo-MFGSCziNOh4T1H0dqijxhWpyORf01/exec';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycby8nR8gwv5-nmyktlS0NtdiX4psLWjf-WCHxmw1hGawlIBWbhaLJsFwRaTRJLn5Q1Bl/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   const PIN_CODE = '123456';
@@ -242,8 +242,8 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       if (resultBadgeEvent) resultBadgeEvent.innerText = eventTitleShort;
       if (btnPreview) btnPreview.href = link;
 
-      // Tự động rút gọn link ngay sau khi hiển thị kết quả (truyền thêm tên khách để tạo alias đẹp)
-      applyShortLinkToResultBox(link, name);
+      // Tự động rút gọn link ngay sau khi hiển thị kết quả (truyền thêm tên khách để tạo alias đẹp và kiểm tra link đã lưu)
+      applyShortLinkToResultBox(link, name, guest);
     }
 
     // Hiển thị Dialog cảnh báo nếu khách đã tồn tại trong Excel / danh sách
@@ -571,7 +571,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
   /* ==========================================================================
      CLIENT-SIDE URL SHORTENER (Rút gọn trực tiếp trên Web, 100% Frontend)
-     TinyURL Custom Alias: sang-thuong-wedding-[tên khách]
+     Multi-Proxy & Multi-Provider Architecture (TinyURL + is.gd JSONP)
      ========================================================================== */
 
   /** Tiền tố của alias — có thể đổi cho phù hợp */
@@ -599,56 +599,116 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
   }
 
   /**
-   * Gọi TinyURL API qua AllOrigins Proxy (Client-Side, không cần Apps Script)
-   * @param {string} targetUrl 
-   * @param {string} alias 
-   * @returns {Promise<string>}
+   * Gọi TinyURL API qua nhiều CORS Proxy miễn phí khác nhau
    */
-  function fetchTinyUrlViaProxy(targetUrl, alias = '') {
+  function fetchTinyUrlMultiProxy(targetUrl, alias = '') {
     let tinyApi = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(targetUrl)}`;
     if (alias) tinyApi += `&alias=${encodeURIComponent(alias)}`;
 
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(tinyApi)}`;
+    const proxies = [
+      url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+      url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+    ];
 
-    return fetch(proxyUrl)
-      .then(res => {
-        if (!res.ok) throw new Error('HTTP Proxy Error ' + res.status);
-        return res.json();
-      })
-      .then(data => {
-        const result = (data && data.contents) ? data.contents.trim() : '';
-        if (result && result.startsWith('http') && !result.toLowerCase().includes('error')) {
-          return result;
-        }
-        throw new Error('TinyURL returned error or duplicate alias');
-      });
+    function tryProxy(idx) {
+      if (idx >= proxies.length) {
+        return Promise.reject(new Error('Tất cả proxy TinyURL đều không phản hồi'));
+      }
+
+      const proxyUrl = proxies[idx](tinyApi);
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 3500);
+
+      return fetch(proxyUrl, { signal: controller.signal })
+        .then(res => {
+          clearTimeout(timer);
+          if (!res.ok) throw new Error('Proxy HTTP ' + res.status);
+          return res.text();
+        })
+        .then(text => {
+          let result = text;
+          try {
+            const json = JSON.parse(text);
+            if (json && json.contents) result = json.contents;
+          } catch (e) {}
+
+          result = (result || '').trim();
+          if (result && result.startsWith('http') && !result.toLowerCase().includes('error')) {
+            return result;
+          }
+          throw new Error('TinyURL trả về kết quả không hợp lệ hoặc alias bị trùng');
+        })
+        .catch(err => {
+          clearTimeout(timer);
+          console.warn(`[Shortener] Proxy ${idx + 1} lỗi:`, err.message);
+          return tryProxy(idx + 1);
+        });
+    }
+
+    return tryProxy(0);
   }
 
   /**
-   * Rút gọn URL 100% Client-Side với 3 tầng dự phòng:
-   * 1. TinyURL với custom alias: sang-thuong-wedding-[tên]
-   * 2. TinyURL với fallback alias: sang-thuong-wedding-[tên]-[số ngẫu nhiên]
-   * 3. TinyURL ngẫu nhiên (không alias)
-   * @param {string} longUrl   - URL đầy đủ cần rút gọn
-   * @param {string} guestName - Tên khách để tạo alias
-   * @returns {Promise<string>} - URL đã rút gọn
+   * Dự phòng rút gọn bằng is.gd JSONP script tag (bỏ qua CORS 100%)
+   */
+  function shortenUrlIsGdJsonp(longUrl) {
+    return new Promise((resolve, reject) => {
+      const cbName = 'isgd_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+      const script = document.createElement('script');
+
+      const timer = setTimeout(() => {
+        cleanup();
+        reject(new Error('Hết thời gian chờ is.gd'));
+      }, 5000);
+
+      function cleanup() {
+        if (timer) clearTimeout(timer);
+        delete window[cbName];
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      window[cbName] = function(data) {
+        cleanup();
+        if (data && data.shorturl) {
+          resolve(data.shorturl);
+        } else {
+          reject(new Error((data && data.errormessage) || 'is.gd không trả về link'));
+        }
+      };
+
+      script.onerror = function() {
+        cleanup();
+        reject(new Error('Lỗi kết nối is.gd'));
+      };
+
+      script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}&callback=${cbName}`;
+      document.head.appendChild(script);
+    });
+  }
+
+  /**
+   * Rút gọn URL 100% Client-Side với 4 tầng dự phòng
    */
   function shortenUrl(longUrl, guestName = '') {
     const alias = buildGuestAlias(guestName);
 
-    // Tầng 1: Thử TinyURL với custom alias đẹp
-    return fetchTinyUrlViaProxy(longUrl, alias)
-      .catch(err => {
-        console.warn('[Shortener] Custom alias trùng hoặc lỗi, thử fallback alias:', err.message);
+    // Tầng 1: Thử TinyURL với custom alias đẹp (qua multi-proxy)
+    return fetchTinyUrlMultiProxy(longUrl, alias)
+      .catch(() => {
+        // Tầng 2: Thử TinyURL với fallback alias kèm số ngẫu nhiên
         const fallbackAlias = alias + '-' + Math.floor(Math.random() * 900 + 100);
-        return fetchTinyUrlViaProxy(longUrl, fallbackAlias);
+        return fetchTinyUrlMultiProxy(longUrl, fallbackAlias);
+      })
+      .catch(() => {
+        // Tầng 3: Thử TinyURL ngẫu nhiên
+        return fetchTinyUrlMultiProxy(longUrl, '');
+      })
+      .catch(() => {
+        // Tầng 4: Dự phòng is.gd qua JSONP script injection
+        return shortenUrlIsGdJsonp(longUrl);
       })
       .catch(err => {
-        console.warn('[Shortener] Fallback alias trùng, thử TinyURL ngẫu nhiên:', err.message);
-        return fetchTinyUrlViaProxy(longUrl, '');
-      })
-      .catch(err => {
-        console.warn('[Shortener] Tất cả proxy TinyURL đều thất bại, dùng link gốc:', err.message);
+        console.warn('[Shortener] Tất cả giải pháp rút gọn thất bại, dùng link gốc:', err.message);
         return Promise.reject(err);
       });
   }
@@ -658,8 +718,9 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
    * ở TẤT CẢ mọi chỗ trong result box (link input, preview HTML, plain text, nút chia sẻ).
    * @param {string} fullLink  - Link đầy đủ vừa tạo
    * @param {string} guestName - Tên khách (để tạo alias đẹp)
+   * @param {object|null} targetGuest - Đối tượng khách mời (nếu có)
    */
-  function applyShortLinkToResultBox(fullLink, guestName = '') {
+  function applyShortLinkToResultBox(fullLink, guestName = '', targetGuest = null) {
     const linkInput    = document.getElementById('result-link-input');
     const msgTextarea  = document.getElementById('result-message-text');
     const previewHtml  = document.getElementById('invite-preview-html');
@@ -668,18 +729,57 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
     if (!linkInput) return;
 
-    // Hiện badge "⏳ Đang rút gọn..."
-    if (badge) badge.style.display = 'inline-block';
-
-    const alias = buildGuestAlias(guestName);
-
     // Helper: escape special chars trong regex
     function escRx(str) {
       return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
+    // Tìm khách tương ứng trong liveGuests nếu chưa truyền targetGuest
+    const foundGuest = targetGuest || (guestName ? liveGuests.find(g => isExactNameMatching(g.name, guestName)) : null);
+
+    // ⚡ KIỂM TRA: Nếu khách này ĐÃ CÓ link rút gọn lưu trên Google Sheet trước đó → DÙNG NGAY! Không gọi API lại!
+    if (foundGuest && foundGuest.shortUrl && foundGuest.shortUrl.startsWith('http')) {
+      const savedShortUrl = foundGuest.shortUrl;
+      linkInput.value = savedShortUrl;
+      linkInput.style.color = 'var(--gold-dark)';
+      linkInput.style.fontWeight = '700';
+
+      if (msgTextarea) {
+        msgTextarea.value = msgTextarea.value.split(fullLink).join(savedShortUrl);
+      }
+      if (previewHtml) {
+        previewHtml.innerHTML = previewHtml.innerHTML.replace(new RegExp(escRx(fullLink), 'g'), savedShortUrl);
+      }
+      if (badge) {
+        badge.style.display = 'inline-block';
+        badge.textContent = '✅ Link đã lưu trên Sheet';
+        badge.style.background = '#e8f5e9';
+        badge.style.borderColor = '#a5d6a7';
+        badge.style.color = '#2e7d32';
+        setTimeout(() => { badge.style.display = 'none'; }, 3500);
+      }
+      return;
+    }
+
+    // Hiện badge "⏳ Đang rút gọn..."
+    if (badge) {
+      badge.style.display = 'inline-block';
+      badge.textContent = '⏳ Đang rút gọn...';
+      badge.style.background = '#fff8ee';
+      badge.style.borderColor = '#ebd9c5';
+      badge.style.color = 'var(--gold-dark)';
+    }
+
     shortenUrl(fullLink, guestName)
       .then(shortUrl => {
+        // Cập nhật bộ nhớ liveGuests và lưu lên Google Sheet để dùng lại lần sau
+        if (foundGuest) {
+          foundGuest.shortUrl = shortUrl;
+        }
+        if (guestName) {
+          saveShortLinkToGoogleSheet(guestName, shortUrl);
+        }
+
         // 1. Cập nhật ô link → link ngắn
         linkInput.value = shortUrl;
         linkInput.style.color = 'var(--gold-dark)';
@@ -699,9 +799,9 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         // 4. Giữ nút "Xem Thử Thiệp" vẫn mở link đầy đủ (không redirect qua short)
         //    → không cần thay btnPreview.href
 
-        // 5. Ẩn badge, thay bằng dấu ✅ nhỏ
+        // 5. Ẩn badge, thay bằng dấu ✅
         if (badge) {
-          badge.textContent = '✅ Đã rút gọn';
+          badge.textContent = '✅ Đã rút gọn & đã lưu Sheet';
           badge.style.background = '#e8f5e9';
           badge.style.borderColor = '#a5d6a7';
           badge.style.color = '#2e7d32';
@@ -738,10 +838,25 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         attending: guest.attending || 'Chưa phản hồi',
         count: guest.rsvpCount || '',
         wish: guest.wish || '',
+        shortUrl: guest.shortUrl || '',
         time: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })
       }),
       mode: 'no-cors'
     }).catch(err => console.warn('Lỗi gửi khách lên Google Sheet:', err));
+  }
+
+  function saveShortLinkToGoogleSheet(guestName, shortUrl) {
+    if (!GOOGLE_SHEET_URL || !guestName || !shortUrl) return;
+    fetch(GOOGLE_SHEET_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'save_short_link',
+        name: guestName,
+        shortUrl: shortUrl
+      }),
+      mode: 'no-cors'
+    }).catch(err => console.warn('Lỗi lưu link rút gọn lên Google Sheet:', err));
   }
 
   function deleteGuestOnGoogleSheet(guestName) {
@@ -870,11 +985,12 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
           if (rawEvent.includes('quy') || rawEvent === 'vuquy') eventChoice = 'vuquy';
           else if (rawEvent.includes('tài') || rawEvent === 'naptai') eventChoice = 'naptai';
 
-          // Trạng thái RSVP
+          // Trạng thái RSVP & Link rút gọn
           const attending = String(rowObj['Trạng Thái'] || rowObj['Trạng Thái Đi'] || cells[4] || '').trim();
           const rsvpCount = String(rowObj['Số Người'] || cells[5] || '').trim();
           const wish = String(rowObj['Lời Chúc'] || cells[6] || '').trim();
           const createdAt = String(rowObj['Thời Gian Xác Nhận'] || rowObj['Ngày Tạo'] || cells[7] || '').trim();
+          const shortUrl = String(rowObj['Link Rút Gọn'] || rowObj['Link Short'] || rowObj['Short Link'] || cells[8] || '').trim();
 
           const fullLink = `${baseUrl}?to=${encodeURIComponent(name)}&side=${side}&event=${eventChoice}`;
 
@@ -885,6 +1001,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
             eventChoice,
             note: '',
             link: fullLink,
+            shortUrl: shortUrl || '',
             attending: attending || '',
             rsvpCount: rsvpCount || '',
             wish: wish || '',
@@ -1047,8 +1164,8 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
             <button class="btn-small btn-small-gold btn-copy-guest-link" data-link="${encodeURI(g.link)}" title="Sao chép link đầy đủ">
               📋 Copy
             </button>
-            <button class="btn-small btn-small-outline btn-shorten-guest-link" data-link="${encodeURI(g.link)}" data-name="${escapeHtml(g.name)}" title="Rút gọn link rồi sao chép">
-              🔗 Short
+            <button class="btn-small btn-small-outline btn-shorten-guest-link" data-link="${encodeURI(g.link)}" data-name="${escapeHtml(g.name)}" title="${g.shortUrl ? 'Link rút gọn đã lưu trên Sheet: ' + escapeHtml(g.shortUrl) : 'Rút gọn link rồi sao chép'}">
+              ${g.shortUrl ? '✅ Short' : '🔗 Short'}
             </button>
             <a href="${g.link}" target="_blank" class="btn-small btn-small-outline" title="Mở thiệp">
               👁️
@@ -1075,13 +1192,26 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       btn.addEventListener('click', async () => {
         const link = decodeURIComponent(btn.getAttribute('data-link'));
         const name = btn.getAttribute('data-name');
+        const targetGuest = liveGuests.find(g => isExactNameMatching(g.name, name));
+
+        // ⚡ KIỂM TRA: Nếu khách đã có link rút gọn trong Sheet/liveGuests → DÙNG NGAY!
+        if (targetGuest && targetGuest.shortUrl && targetGuest.shortUrl.startsWith('http')) {
+          await copyText(targetGuest.shortUrl, `Đã sao chép link rút gọn từ Sheet của ${name}! 🔗`);
+          return;
+        }
+
         const originalText = btn.textContent;
         btn.textContent = '⏳...';
         btn.disabled = true;
         try {
           // Truyền tên khách để alias được tạo đẹp: sang-thuong-wedding-[tên]
           const shortUrl = await shortenUrl(link, name);
-          await copyText(shortUrl, `Đã rút gọn và sao chép link cho ${name}! 🔗`);
+          if (targetGuest) {
+            targetGuest.shortUrl = shortUrl;
+          }
+          saveShortLinkToGoogleSheet(name, shortUrl);
+          await copyText(shortUrl, `Đã rút gọn & lưu vào Sheet cho ${name}! 🔗`);
+          renderGuestTable(document.getElementById('search-guest-input')?.value.trim() || '');
         } catch (err) {
           showToast('⚠️ Không thể rút gọn. Đã sao chép link gốc!');
           await copyText(link, 'Đã sao chép link gốc!');
