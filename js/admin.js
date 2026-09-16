@@ -305,7 +305,8 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         if (modalDup) modalDup.classList.remove('active');
         if (currentDupGuest) {
           displayGuestResult(currentDupGuest);
-          copyText(currentDupGuest.link, 'Đã lấy lại link và tin nhắn của khách mời này! 🔗');
+          const linkToCopy = (currentDupGuest.shortUrl && currentDupGuest.shortUrl.startsWith('http')) ? currentDupGuest.shortUrl : currentDupGuest.link;
+          copyText(linkToCopy, `Đã lấy lại link và tin nhắn của khách mời này! 🔗 (${linkToCopy})`);
           resultBox.scrollIntoView({ behavior: 'smooth' });
 
           const row = document.getElementById('guest-row-' + currentDupGuest.id);
@@ -1150,7 +1151,22 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
       tr.innerHTML = `
         <td>${idx + 1}</td>
-        <td style="font-weight:600;">${escapeHtml(g.name)}</td>
+        <td>
+          <div style="font-weight:600; color: #2e2620; cursor: pointer;" class="guest-name-clickable" data-id="${g.id}" title="Bấm để xem lại trên khung tạo link">
+            ${escapeHtml(g.name)}
+          </div>
+          ${isShortened ? `
+            <div style="margin-top: 3px;">
+              <a href="${g.shortUrl}" target="_blank" style="font-size: 0.75rem; color: #b7791f; text-decoration: underline; font-weight: 500;" title="Link rút gọn đã lưu trên Google Sheet">
+                🔗 ${escapeHtml(g.shortUrl.replace(/^https?:\/\//, ''))}
+              </a>
+            </div>
+          ` : `
+            <div style="margin-top: 3px; font-size: 0.72rem; color: #aaa;">
+              ⏳ Chưa rút gọn
+            </div>
+          `}
+        </td>
         <td><span style="background:#f1ece5; padding: 3px 7px; border-radius: 12px; font-size: 0.78rem; white-space:nowrap;">${sideText}</span></td>
         <td><span style="background:#fff8ee; border:1px solid #ebd9c5; color:var(--gold-dark); padding: 3px 7px; border-radius: 12px; font-size: 0.78rem; font-weight:600; display:inline-block;">${eventText}</span></td>
         <td>${attendingHtml}</td>
@@ -1172,12 +1188,26 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       tbody.appendChild(tr);
     });
 
+    // Bấm vào tên khách để nạp lại lên khung tạo link ở trên
+    document.querySelectorAll('.guest-name-clickable').forEach((el) => {
+      el.addEventListener('click', () => {
+        const id = el.getAttribute('data-id');
+        const targetGuest = liveGuests.find(g => String(g.id) === String(id));
+        if (targetGuest) {
+          displayGuestResult(targetGuest);
+          const resultBox = document.getElementById('guest-result-box');
+          if (resultBox) resultBox.scrollIntoView({ behavior: 'smooth' });
+          showToast(`Đã lấy lại link của "${targetGuest.name}" lên khung tạo thiệp! ✨`);
+        }
+      });
+    });
+
     // Attach row events
     document.querySelectorAll('.btn-copy-guest-link').forEach((btn) => {
       btn.addEventListener('click', () => {
         const link = decodeURIComponent(btn.getAttribute('data-link'));
         const isShort = btn.getAttribute('data-short') === 'true';
-        copyText(link, isShort ? 'Đã sao chép link rút gọn! 🔗' : 'Đã sao chép link thiệp! 📋');
+        copyText(link, isShort ? `Đã sao chép link rút gọn: ${link} 🔗` : `Đã sao chép link thiệp: ${link} 📋`);
       });
     });
 
