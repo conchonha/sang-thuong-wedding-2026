@@ -674,17 +674,25 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[đĐ]/g, 'd')
       .replace(/[^a-zA-Z0-9]/g, '')
-      .toLowerCase()
-      .slice(0, 8);
+      .toLowerCase();
 
-    const alias = cleanName ? `stw-${cleanName}` : 'stw';
+    // spoo.me giới hạn alias tối đa 16 ký tự:
+    // "sang-thuong-" là 12 ký tự + tối đa 4 ký tự tên (ví dụ: sang-thuong-lan, sang-thuong-sang)
+    let alias = 'sang-thuong';
+    if (cleanName) {
+      if (cleanName.length <= 4) {
+        alias = `sang-thuong-${cleanName}`; // ví dụ: sang-thuong-lan (15 ký tự)
+      } else {
+        alias = `st-wedding-${cleanName.slice(0, 5)}`; // ví dụ: st-wedding-khanh (16 ký tự)
+      }
+    }
 
-    // Tầng 1: Spoo.me với alias đẹp stw-[tên] (Native CORS)
+    // Tầng 1: Spoo.me với alias đẹp sang-thuong-[tên] (Native CORS)
     return fetchSpooMe(targetUrl, alias)
       .catch(err1 => {
-        console.warn('[Shortener] Spoo.me alias đẹp lỗi/trùng, thử fallback alias:', err1.message);
-        // Tầng 2: Spoo.me với fallback alias (stw-[tên]-88)
-        const fallbackAlias = `${alias.slice(0, 10)}-${Math.floor(Math.random() * 89 + 10)}`;
+        console.warn('[Shortener] Alias đẹp lỗi hoặc đã có người dùng, thử fallback alias:', err1.message);
+        // Tầng 2: Spoo.me với fallback alias (st-[tên]-88)
+        const fallbackAlias = `st-${cleanName.slice(0, 6)}-${Math.floor(Math.random() * 89 + 10)}`.slice(0, 16);
         return fetchSpooMe(targetUrl, fallbackAlias);
       })
       .catch(err2 => {
