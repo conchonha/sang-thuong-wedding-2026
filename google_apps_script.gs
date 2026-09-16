@@ -13,15 +13,22 @@
 const SHEET_NAME = 'RSVP'; // Tên tab sheet lưu trữ khách mời và RSVP
 
 // ═══════════════════════════════════════════════════════════════════
-// HÀM CHẠY THỬ ĐỂ CẤP QUYỀN URLFETCH (Chỉ cần chạy 1 lần duy nhất trong Apps Script)
+// HÀM CHẠY THỬ / DỌN DẸP TRÙNG LẶP TRỰC TIẾP
 // ═══════════════════════════════════════════════════════════════════
 function testAuth() {
   const res = callTinyUrl('https://google.com', 'test-auth');
   Logger.log(res);
 }
 
+// Chạy hàm này trực tiếp trong Apps Script nếu muốn dọn dẹp các dòng trùng trên Sheet ngay lập tức
+function cleanDuplicates() {
+  const sheet = getOrCreateSheet(SHEET_NAME);
+  removeDuplicates(sheet);
+  Logger.log('Đã dọn dẹp xong toàn bộ dòng trùng lặp trên Sheet!');
+}
+
 // ═══════════════════════════════════════════════════════════════════
-// GET — Trả về danh sách khách mời hoặc lưu dữ liệu qua GET
+// GET — Trả về danh sách khách mời hoặc xử lý qua GET
 // ═══════════════════════════════════════════════════════════════════
 function doGet(e) {
   try {
@@ -36,14 +43,21 @@ function doGet(e) {
       return jsonResponse(callTinyUrl(longUrl, alias));
     }
 
-    // 1. Lưu link rút gọn qua GET
-    if (params.action === 'save_short_link') {
-      return handleSaveShortLink(sheet, params);
+    // 1. Tự động dọn dẹp các dòng trùng lặp
+    if (params.action === 'clean_duplicates') {
+      const lock = LockService.getScriptLock();
+      try {
+        lock.waitLock(10000);
+        removeDuplicates(sheet);
+        return jsonResponse({ success: true, message: 'Đã dọn dẹp các dòng trùng lặp thành công' });
+      } finally {
+        lock.releaseLock();
+      }
     }
 
-    // 2. Thêm hoặc cập nhật khách qua GET
-    if (params.name && params.action !== 'get_guests') {
-      return handleSaveGuest(sheet, params);
+    // 2. Lưu link rút gọn qua GET
+    if (params.action === 'save_short_link') {
+      return handleSaveShortLink(sheet, params);
     }
 
     // 3. Xoá 1 khách qua GET
@@ -71,7 +85,6 @@ function doGet(e) {
     return jsonResponse({ success: false, error: err.message });
   }
 }
-
 
 // ═══════════════════════════════════════════════════════════════════
 // POST — Nhận dữ liệu RSVP hoặc khách mới từ website
@@ -139,6 +152,7 @@ function handleSaveShortLink(sheet, data) {
     for (let i = 1; i < rows.length; i++) {
       if (normalizeName(String(rows[i][1])) === targetName) {
         sheet.getRange(i + 1, 9).setValue(shortUrl);
+        removeDuplicates(sheet);
         return jsonResponse({ success: true, message: 'Đã cập nhật link rút gọn vào Google Sheet' });
       }
     }
@@ -165,6 +179,7 @@ function handleDeleteGuest(sheet, data) {
         break;
       }
     }
+    removeDuplicates(sheet);
     return jsonResponse({ success: true, message: 'Đã xóa khách trên Google Sheet' });
   } finally {
     lock.releaseLock();
@@ -244,9 +259,72 @@ function handleSaveGuest(sheet, data) {
       ]);
     }
 
+    // Tự động dọn dẹp trùng lặp và đồng bộ lại STT
+    removeDuplicates(sheet);
+
     return jsonResponse({ success: true, message: 'Đã ghi nhận thành công' });
   } finally {
     lock.releaseLock();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HÀM TỰ ĐỘNG DỌN DẸP TRÙNG LẶP & ĐỒNG BỘ STT
+// ═══════════════════════════════════════════════════════════════════
+function removeDuplicates(sheet) {
+  const rows = sheet.getDataRange().getValues();
+  if (rows.length <= 2) return;
+
+  const seen = {};
+  const rowsToDelete = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const rawName = String(rows[i][1] || '').trim();
+    const key = normalizeName(rawName);
+    if (!key) continue;
+
+    if (seen[key] !== undefined) {
+      const prevRowIdx = seen[key]; // 1-indexed row number
+      const prevShort = String(rows[prevRowIdx - 1][8] || '').trim();
+      const currShort = String(rows[i][8] || '').trim();
+
+      // Nếu dòng trước chưa có link rút gọn mà dòng sau có -> cập nhật vào dòng trước
+      if (!prevShort && currShort) {
+        sheet.getRange(prevRowIdx, 9).setValue(currShort);
+        rows[prevRowIdx - 1][8] = currShort;
+      }
+
+      const prevWish = String(rows[prevRowIdx - 1][6] || '').trim();
+      const currWish = String(rows[i][6] || '').trim();
+      if (!prevWish && currWish) {
+        sheet.getRange(prevRowIdx, 7).setValue(currWish);
+        rows[prevRowIdx - 1][6] = currWish;
+      }
+
+      const prevAttend = String(rows[prevRowIdx - 1][4] || '').trim();
+      const currAttend = String(rows[i][4] || '').trim();
+      if ((!prevAttend || prevAttend === 'Chưa phản hồi') && currAttend && currAttend !== 'Chưa phản hồi') {
+        sheet.getRange(prevRowIdx, 5).setValue(currAttend);
+        rows[prevRowIdx - 1][4] = currAttend;
+      }
+
+      rowsToDelete.push(i + 1);
+    } else {
+      seen[key] = i + 1;
+    }
+  }
+
+  // Xóa các dòng trùng từ dưới lên để không làm sai lệch chỉ số dòng
+  for (let d = rowsToDelete.length - 1; d >= 0; d--) {
+    sheet.deleteRow(rowsToDelete[d]);
+  }
+
+  // Đánh lại số thứ tự STT
+  const finalRows = sheet.getLastRow();
+  if (finalRows > 1) {
+    for (let r = 2; r <= finalRows; r++) {
+      sheet.getRange(r, 1).setValue(r - 1);
+    }
   }
 }
 

@@ -71,6 +71,28 @@ document.addEventListener('DOMContentLoaded', () => {
   checkAuth();
 
   // ─── Helpers & Functions ────────────────────────────────────────────────────
+  // 🔍 Hàm chuẩn hoá tên tiếng Việt và kiểm tra trùng (dùng chung cho toàn bộ Admin)
+  const normalizeVietnamese = (str) => {
+    if (!str) return '';
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, 'd')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  const isExactNameMatching = (name1, name2) => {
+    if (!name1 || !name2) return false;
+    const n1 = name1.toLowerCase().replace(/\s+/g, ' ').trim();
+    const n2 = name2.toLowerCase().replace(/\s+/g, ' ').trim();
+    if (n1 === n2) return true;
+    const v1 = normalizeVietnamese(name1);
+    const v2 = normalizeVietnamese(name2);
+    return v1 === v2 && v1.length > 0;
+  };
 
   function initDashboard() {
     const tabs = document.querySelectorAll('.admin-tab');
@@ -346,29 +368,6 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         }
       });
     }
-
-    // 🔍 Hàm chuẩn hoá tên tiếng Việt và kiểm tra trùng — khai báo ở scope ngoài
-    const normalizeVietnamese = (str) => {
-      if (!str) return '';
-      return str
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[đĐ]/g, 'd')
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-    };
-
-    const isExactNameMatching = (name1, name2) => {
-      if (!name1 || !name2) return false;
-      const n1 = name1.toLowerCase().replace(/\s+/g, ' ').trim();
-      const n2 = name2.toLowerCase().replace(/\s+/g, ' ').trim();
-      if (n1 === n2) return true;
-      const v1 = normalizeVietnamese(name1);
-      const v2 = normalizeVietnamese(name2);
-      return v1 === v2 && v1.length > 0;
-    };
 
     // Xử lý gửi Form tạo link khách
     guestForm.addEventListener('submit', (e) => {
@@ -863,12 +862,9 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
   }
 
 
-  /* ==========================================================================
-     GOOGLE SHEETS INTEGRATION & LIVE SYNC
-     ========================================================================== */
   function sendGuestToGoogleSheet(guest) {
-    if (!GOOGLE_SHEET_URL) return;
-    const params = new URLSearchParams({
+    if (!GOOGLE_SHEET_URL || !guest || !guest.name) return;
+    const payload = {
       name: guest.name || '',
       side: guest.side || 'both',
       eventChoice: guest.eventChoice || 'all',
@@ -877,26 +873,19 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       wish: guest.wish || '',
       shortUrl: guest.shortUrl || '',
       time: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })
-    });
-    // Gửi qua GET (hoạt động 100% qua Google Apps Script 302 redirect)
-    fetch(`${GOOGLE_SHEET_URL}?${params.toString()}`, { mode: 'no-cors' })
-      .catch(err => console.warn('Lỗi gửi khách lên Google Sheet (GET):', err));
-    // Gửi qua POST dự phòng
+    };
+    // Gửi DUY NHẤT 1 request POST (không gửi đồng thời GET + POST gây race condition tạo duplicate)
     fetch(GOOGLE_SHEET_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(Object.fromEntries(params)),
+      body: JSON.stringify(payload),
       mode: 'no-cors'
     }).catch(err => console.warn('Lỗi gửi khách lên Google Sheet (POST):', err));
   }
 
   function saveShortLinkToGoogleSheet(guestName, shortUrl) {
     if (!GOOGLE_SHEET_URL || !guestName || !shortUrl) return;
-    // Gửi qua GET (hoạt động 100% qua Google Apps Script 302 redirect)
-    const getUrl = `${GOOGLE_SHEET_URL}?action=save_short_link&name=${encodeURIComponent(guestName)}&shortUrl=${encodeURIComponent(shortUrl)}`;
-    fetch(getUrl, { mode: 'no-cors' })
-      .catch(err => console.warn('Lỗi lưu link rút gọn (GET):', err));
-    // Gửi qua POST dự phòng
+    // Gửi DUY NHẤT 1 request POST
     fetch(GOOGLE_SHEET_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1059,13 +1048,61 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
           };
         }).filter(Boolean);
 
-        // Lưu dữ liệu DUY NHẤT vào biến liveGuests trong bộ nhớ (không lưu localStorage)
-        liveGuests = guests;
+        // Deduplicate & Merge: loại bỏ hoàn toàn các dòng trùng từ Google Sheet cũ
+        const dedupedMap = new Map();
+        let hadDuplicates = false;
+
+        guests.forEach((g) => {
+          if (!g || !g.name) return;
+          const key = normalizeVietnamese(g.name);
+          if (!key) return;
+
+          if (!dedupedMap.has(key)) {
+            dedupedMap.set(key, { ...g });
+          } else {
+            hadDuplicates = true;
+            const existing = dedupedMap.get(key);
+            // Giữ lại link rút gọn tốt nhất
+            if ((!existing.shortUrl || !existing.shortUrl.startsWith('http')) && g.shortUrl && g.shortUrl.startsWith('http')) {
+              existing.shortUrl = g.shortUrl;
+            }
+            // Giữ lại phản hồi RSVP tốt nhất
+            if ((!existing.attending || existing.attending === 'Chưa phản hồi') && g.attending && g.attending !== 'Chưa phản hồi') {
+              existing.attending = g.attending;
+            }
+            if (!existing.rsvpCount && g.rsvpCount) {
+              existing.rsvpCount = g.rsvpCount;
+            }
+            if (!existing.wish && g.wish) {
+              existing.wish = g.wish;
+            }
+            if (g.side && g.side !== 'both' && existing.side === 'both') {
+              existing.side = g.side;
+            }
+            if (g.eventChoice && g.eventChoice !== 'all' && existing.eventChoice === 'all') {
+              existing.eventChoice = g.eventChoice;
+            }
+          }
+        });
+
+        const finalGuests = Array.from(dedupedMap.values()).map((g, idx) => ({
+          ...g,
+          id: idx + 1
+        }));
+
+        // Lưu dữ liệu DUY NHẤT vào biến liveGuests trong bộ nhớ
+        liveGuests = finalGuests;
         renderGuestTable();
         renderRsvpList();
 
+        // Nếu Google Sheet có dòng trùng cũ, tự động gọi backend clean_duplicates để dọn dẹp Sheet
+        if (hadDuplicates && GOOGLE_SHEET_URL) {
+          fetch(`${GOOGLE_SHEET_URL}?action=clean_duplicates`, { mode: 'no-cors' })
+            .catch(() => {});
+        }
+
         if (showFeedback) {
-          showToast(`Đã đồng bộ ${guests.length} khách từ Google Sheets thành công! 📊`);
+          showToast(`Đã đồng bộ ${finalGuests.length} khách từ Google Sheets thành công! 📊`);
         }
       } catch (err) {
         console.error('Lỗi phân tích Google Sheet:', err);
