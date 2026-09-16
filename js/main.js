@@ -1,6 +1,6 @@
 /**
  * LUXURY WEDDING INVITATION - INTERACTION ENGINE
- * Couple: Thái Bá Sang & Phạm Thị Thương
+ * Couple: Thái Bá Sang & Phạm Thị Kiều Thương
  * Enhanced with Dynamic Guest Personalization & Couple Config Manager
  */
 
@@ -57,9 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
       wishNameInput.title = 'Tên của bạn được tự động ghi nhận từ thiệp mời';
     }
 
-    const cfg = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
+    const rawCfg = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
+    if (rawCfg.brideName === 'Thị Thương' || rawCfg.brideName === 'Phạm Thị Thương') {
+      rawCfg.brideName = 'Kiều Thương';
+      localStorage.setItem('wedding_custom_config', JSON.stringify(rawCfg));
+    }
+    const cfg = rawCfg;
     const grName = cfg.groomName || 'Bá Sang';
-    const brName = cfg.brideName || 'Thị Thương';
+    const brName = (cfg.brideName && cfg.brideName !== 'Thị Thương') ? cfg.brideName : 'Kiều Thương';
     document.title = `Thiệp Mời Cưới Trân Trọng Gửi ${guestName} | ${grName} & ${brName}`;
   } else {
     if (envelopeGuestEl) envelopeGuestEl.innerText = 'Quý Khách & Người Thương';
@@ -744,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         const cfg = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
         const grName = cfg.groomName || 'Bá Sang';
-        const brName = cfg.brideName || 'Thị Thương';
+        const brName = (cfg.brideName && cfg.brideName !== 'Thị Thương') ? cfg.brideName : 'Kiều Thương';
         showToast(`Cảm ơn ${name} đã gửi hồi đáp và lời chúc phúc tới ${grName} & ${brName}! 💐`);
       }
       rsvpForm.reset();
