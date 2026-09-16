@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name": "Chị Nguyễn Văn A",
+    "side": "both",
+    "eventChoice": "all",
+    "attending": "Chưa phản hồi",
+    "rsvpCount": "",
+    "wish": "",
+    "phone": "0912345678",
+    "note": "Đồng nghiệp",
+    "link": "index.html?to=Ch%E1%BB%8B%20Nguy%E1%BB%85n%20V%C4%83n%20A&side=both&event=all"
+  },
+  {
+    "id": 2,
+    "name": "Anh Trần Văn B & Gia Đình",
+    "side": "groom",
+    "eventChoice": "vuquy",
+    "attending": "Chưa phản hồi",
+    "rsvpCount": "",
+    "wish": "",
+    "phone": "0987654321",
+    "note": "Bạn thân (Nhà Trai)",
+    "link": "index.html?to=Anh%20Tr%E1%BA%A7n%20V%C4%83n%20B%20%26%20Gia%20%C4%90%C3%ACnh&side=groom&event=vuquy"
+  },
+  {
+    "id": 3,
+    "name": "Bác Hoàng Văn C & Bác Gái",
+    "side": "bride",
+    "eventChoice": "naptai",
+    "attending": "Chưa phản hồi",
+    "rsvpCount": "",
+    "wish": "",
+    "phone": "0901234567",
+    "note": "Họ hàng (Nhà Gái)",
+    "link": "index.html?to=B%C3%A1c%20Ho%C3%A0ng%20V%C4%83n%20C%20%26%20B%C3%A1c%20G%C3%A1i&side=bride&event=naptai"
+  },
+  {
+    "id": 4,
+    "name": "Em Lê Thị D",
+    "side": "bride",
+    "eventChoice": "naptai",
+    "attending": "Chưa phản hồi",
+    "rsvpCount": "",
+    "wish": "",
+    "phone": "0934567890",
+    "note": "Em họ (Nhà Gái)",
+    "link": "index.html?to=Em%20L%C3%AA%20Th%E1%BB%8B%20D&side=bride&event=naptai"
+  },
+  {
+    "id": 5,
+    "name": "Cô Ba & Gia Đình",
+    "side": "groom",
+    "eventChoice": "vuquy",
+    "attending": "Chưa phản hồi",
+    "rsvpCount": "",
+    "wish": "",
+    "phone": "0945678901",
+    "note": "Người thân (Nhà Trai)",
+    "link": "index.html?to=C%C3%B4%20Ba%20%26%20Gia%20%C4%90%C3%ACnh&side=groom&event=vuquy"
+  }
+]

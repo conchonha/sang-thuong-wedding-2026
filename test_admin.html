@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Admin Form</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, select { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+    button { padding: 10px 20px; background: #b7791f; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+    #log { background: #f5f5f5; padding: 15px; margin-top: 15px; border-radius: 4px; white-space: pre-wrap; font-size: 13px; min-height: 200px; }
+    #result-box { background: #fffef0; border: 2px solid #b7791f; padding: 15px; margin-top: 15px; border-radius: 8px; display: none; }
+    .error { color: red; font-weight: bold; }
+    .success { color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>🧪 Test Admin Form - Tạo Link Khách</h2>
+  <p>Nhấn <strong>Test Submit</strong> rồi xem log bên dưới.</p>
+  
+  <div>
+    <input type="text" id="guest-name" placeholder="Tên khách" value="Anh Minh Test">
+    <select id="guest-side">
+      <option value="groom">Nhà Trai</option>
+      <option value="bride">Nhà Gái</option>
+      <option value="both">Bạn chung</option>
+    </select>
+    <select id="guest-event">
+      <option value="vuquy">Lễ Vu Quy</option>
+      <option value="naptai">Lễ Nạp Tài</option>
+      <option value="all">Cả Hai</option>
+    </select>
+    <input type="text" id="guest-note" placeholder="Ghi chú">
+    <br>
+    <button onclick="testSubmit()">✨ Test Submit Form</button>
+    <button onclick="checkSheet()">📊 Kiểm Tra Google Sheet</button>
+  </div>
+
+  <div id="result-box">
+    <strong>Link tạo được:</strong>
+    <p id="result-link" style="word-break:break-all;"></p>
+  </div>
+
+  <div id="log">Log output:\n</div>
+
+  <script>
+    const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbyyNk2KytHEoX3cfcDs9iMyxrTsFQM4wL59PcdNWFrl59DhxEkkDrjx3QQXJ8-vOBL7/exec';
+    const logEl = document.getElementById('log');
+    
+    function log(msg, type = '') {
+      const line = document.createElement('div');
+      line.className = type;
+      line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+      logEl.appendChild(line);
+    }
+
+    function getBaseUrl() {
+      const origin = window.location.origin;
+      let path = window.location.pathname;
+      path = path.replace('test_admin.html', 'index.html');
+      return origin + path;
+    }
+
+    function displayGuestResult(guest) {
+      log('displayGuestResult gọi cho: ' + guest.name, 'success');
+      document.getElementById('result-box').style.display = 'block';
+      document.getElementById('result-link').textContent = guest.link;
+    }
+
+    let liveGuests = [];
+
+    function testSubmit() {
+      log('--- Bắt đầu test submit ---');
+      try {
+        const name = document.getElementById('guest-name').value.trim();
+        const side = document.getElementById('guest-side').value;
+        const eventChoice = document.getElementById('guest-event').value;
+        const note = document.getElementById('guest-note').value.trim();
+
+        log('name=' + name + ', side=' + side + ', event=' + eventChoice);
+
+        if (!name) { log('⚠️ Tên trống!', 'error'); return; }
+
+        const baseUrl = getBaseUrl();
+        const fullLink = baseUrl + '?to=' + encodeURIComponent(name) + '&side=' + side + '&event=' + eventChoice;
+        
+        log('Link: ' + fullLink);
+
+        const newGuest = {
+          id: Date.now(), name, side, eventChoice, note,
+          link: fullLink, attending: 'Chưa phản hồi',
+          rsvpCount: '', wish: '',
+          createdAt: new Date().toLocaleDateString('vi-VN'),
+        };
+
+        displayGuestResult(newGuest);
+        liveGuests.unshift(newGuest);
+        log('✅ Tạo link thành công!', 'success');
+
+        // Gửi lên sheet
+        log('Đang gửi lên Google Sheet...');
+        fetch(GOOGLE_SHEET_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: newGuest.name,
+            side: newGuest.side,
+            eventChoice: newGuest.eventChoice,
+            attending: 'Chưa phản hồi',
+            count: '', wish: '',
+            time: new Date().toLocaleString('vi-VN')
+          }),
+          mode: 'no-cors'
+        }).then(() => log('✅ Đã gửi lên sheet (no-cors)', 'success'))
+          .catch(e => log('❌ Lỗi gửi sheet: ' + e.message, 'error'));
+
+      } catch (err) {
+        log('❌ LỖI: ' + err.message, 'error');
+        log(err.stack, 'error');
+      }
+    }
+
+    async function checkSheet() {
+      log('Đang đọc Google Sheet...');
+      try {
+        const res = await fetch(GOOGLE_SHEET_URL);
+        const data = await res.json();
+        log('Sheet có ' + data.count + ' khách: ' + JSON.stringify(data.data?.map(d => d['Tên Khách'])), 'success');
+      } catch(e) {
+        log('❌ Không đọc được: ' + e.message, 'error');
+      }
+    }
+
+    log('Trang test đã tải. Nhấn nút để test.');
+  </script>
+</body>
+</html>
