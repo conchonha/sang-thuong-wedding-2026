@@ -572,11 +572,39 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
   /* ==========================================================================
      CLIENT-SIDE URL SHORTENER (Rút gọn trực tiếp trên Web, 100% Frontend)
-     Native CORS Architecture (Spoo.me API + Multi-Provider Fallbacks)
+     TinyURL (sang-thuong-wedding-[tên]) + Multi-Tier Fallbacks
      ========================================================================== */
 
   /**
-   * Rút gọn URL bằng spoo.me API (Hỗ trợ NATIVE CORS 100%, không bị trình duyệt chặn)
+   * Rút gọn TinyURL qua Google Apps Script backend proxy (tránh hoàn toàn CORS)
+   */
+  function fetchTinyUrlViaAppsScript(targetUrl, alias = '') {
+    if (!GOOGLE_SHEET_URL) return Promise.reject(new Error('Chưa có GOOGLE_SHEET_URL'));
+    const url = `${GOOGLE_SHEET_URL}?action=shorten&url=${encodeURIComponent(targetUrl)}&alias=${encodeURIComponent(alias)}`;
+    
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 6000);
+
+    return fetch(url, { signal: controller.signal })
+      .then(res => {
+        clearTimeout(timer);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(json => {
+        if (json && json.success && json.shorturl) {
+          return json.shorturl;
+        }
+        throw new Error((json && json.error) || 'Không thể tạo TinyURL');
+      })
+      .catch(err => {
+        clearTimeout(timer);
+        throw err;
+      });
+  }
+
+  /**
+   * Dự phòng rút gọn bằng spoo.me API (Hỗ trợ NATIVE CORS 100%)
    */
   function fetchSpooMe(targetUrl, alias = '') {
     const params = new URLSearchParams();
@@ -588,7 +616,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     }
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 7000);
+    const timer = setTimeout(() => controller.abort(), 6000);
 
     return fetch('https://spoo.me/', {
       method: 'POST',
@@ -627,41 +655,11 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
   }
 
   /**
-   * Dự phòng rút gọn TinyURL qua proxy AllOrigins (timeout 7s)
-   */
-  function fetchTinyUrlFallback(targetUrl, alias = '') {
-    let tinyApi = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(targetUrl)}`;
-    if (alias) tinyApi += `&alias=${encodeURIComponent(alias)}`;
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(tinyApi)}`;
-
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 7000);
-
-    return fetch(proxyUrl, { signal: controller.signal })
-      .then(res => {
-        clearTimeout(timer);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
-      })
-      .then(json => {
-        const text = (json && json.contents ? json.contents : '').trim();
-        if (text && text.startsWith('http') && !text.toLowerCase().includes('error')) {
-          return text;
-        }
-        throw new Error('TinyURL lỗi hoặc alias bị trùng');
-      })
-      .catch(err => {
-        clearTimeout(timer);
-        throw err;
-      });
-  }
-
-  /**
-   * Rút gọn URL 100% Client-Side với 4 tầng dự phòng
+   * Rút gọn URL với định dạng chuẩn: https://tinyurl.com/sang-thuong-wedding-[tên_khách]
    */
   function shortenUrl(longUrl, guestName = '') {
     // Nếu longUrl chứa localhost hoặc 127.0.0.1 (khi test local), chuyển sang domain public của GitHub Pages
-    // để các dịch vụ rút gọn API (spoo.me, tinyurl) chấp nhận và khách mở được trên điện thoại
+    // để các dịch vụ rút gọn API (tinyurl, spoo.me) chấp nhận và khách mở được trên điện thoại
     let targetUrl = longUrl;
     if (targetUrl.includes('localhost') || targetUrl.includes('127.0.0.1')) {
       const publicBase = 'https://conchonha.github.io/sang-thuong-wedding-2026/index.html';
@@ -677,28 +675,21 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       .replace(/[^a-zA-Z0-9]/g, '')
       .toLowerCase();
 
-    // Luôn luôn bắt đầu bằng "sang-thuong-" (12 ký tự)
-    // spoo.me giới hạn tối đa 16 ký tự -> lấy tối đa 4 ký tự tên: ví dụ sang-thuong-lan, sang-thuong-sang, sang-thuong-uhu...
-    const namePart = (cleanName || 'khach').slice(0, 4);
-    const alias = `sang-thuong-${namePart}`;
+    // Định dạng đầy đủ sang trọng: sang-thuong-wedding-[tên_khách]
+    const alias = cleanName ? `sang-thuong-wedding-${cleanName}` : 'sang-thuong-wedding';
 
-    // Tầng 1: Spoo.me với alias chuẩn sang-thuong-[tên] (Native CORS)
-    return fetchSpooMe(targetUrl, alias)
+    // Tầng 1: TinyURL chính thống qua Google Apps Script Backend (sang-thuong-wedding-[tên])
+    return fetchTinyUrlViaAppsScript(targetUrl, alias)
       .catch(err1 => {
-        console.warn('[Shortener] Alias trùng, thử thêm số vào cuối:', err1.message);
-        // Tầng 2: Spoo.me với fallback alias (ví dụ: sang-thuong-la88)
-        const fallbackAlias = `sang-thuong-${namePart.slice(0, 2)}${Math.floor(Math.random() * 89 + 10)}`;
-        return fetchSpooMe(targetUrl, fallbackAlias);
+        console.warn('[Shortener] TinyURL backend lỗi, thử spoo.me dự phòng:', err1.message);
+        // Tầng 2: Dự phòng Spoo.me (st-wedding-[tên])
+        const spooAlias = `st-wedding-${(cleanName || 'khach').slice(0, 5)}`;
+        return fetchSpooMe(targetUrl, spooAlias);
       })
       .catch(err2 => {
-        console.warn('[Shortener] Spoo.me fallback alias lỗi, thử ngẫu nhiên:', err2.message);
-        // Tầng 3: Spoo.me ngẫu nhiên (không alias)
+        console.warn('[Shortener] Spoo.me lỗi, thử Spoo.me ngẫu nhiên:', err2.message);
+        // Tầng 3: Dự phòng Spoo.me ngẫu nhiên
         return fetchSpooMe(targetUrl, '');
-      })
-      .catch(err3 => {
-        console.warn('[Shortener] Spoo.me lỗi hoàn toàn, thử TinyURL dự phòng:', err3.message);
-        // Tầng 4: TinyURL dự phòng qua proxy
-        return fetchTinyUrlFallback(targetUrl, '');
       })
       .catch(err => {
         console.warn('[Shortener] Tất cả giải pháp rút gọn thất bại, dùng link gốc:', err.message);

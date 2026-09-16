@@ -20,6 +20,14 @@ function doGet(e) {
     const sheet = getOrCreateSheet(SHEET_NAME);
     const params = (e && e.parameter) ? e.parameter : {};
 
+    // 0. Rút gọn link TinyURL qua Apps Script backend
+    if (params.action === 'shorten') {
+      const longUrl = params.url || '';
+      const alias = params.alias || '';
+      if (!longUrl) return jsonResponse({ success: false, error: 'Thiếu tham số url' });
+      return jsonResponse(callTinyUrl(longUrl, alias));
+    }
+
     // 1. Lưu link rút gọn qua GET
     if (params.action === 'save_short_link') {
       return handleSaveShortLink(sheet, params);
@@ -241,4 +249,36 @@ function jsonResponse(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function callTinyUrl(url, alias) {
+  try {
+    let apiUrl = 'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url);
+    if (alias) apiUrl += '&alias=' + encodeURIComponent(alias);
+    const response = UrlFetchApp.fetch(apiUrl, { muteHttpExceptions: true });
+    const text = response.getContentText().trim();
+    if (text && text.startsWith('http') && !text.toLowerCase().includes('error')) {
+      return { success: true, shorturl: text };
+    }
+    // Nếu alias bị trùng, thử fallback alias kèm 2 số ngẫu nhiên
+    if (alias) {
+      const fallbackAlias = alias + '-' + Math.floor(Math.random() * 89 + 10);
+      const fbApi = 'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url) + '&alias=' + encodeURIComponent(fallbackAlias);
+      const fbResp = UrlFetchApp.fetch(fbApi, { muteHttpExceptions: true });
+      const fbText = fbResp.getContentText().trim();
+      if (fbText && fbText.startsWith('http') && !fbText.toLowerCase().includes('error')) {
+        return { success: true, shorturl: fbText };
+      }
+    }
+    // Fallback không alias
+    const rndApi = 'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url);
+    const rndResp = UrlFetchApp.fetch(rndApi, { muteHttpExceptions: true });
+    const rndText = rndResp.getContentText().trim();
+    if (rndText && rndText.startsWith('http')) {
+      return { success: true, shorturl: rndText };
+    }
+    return { success: false, error: text || 'Không thể tạo TinyURL' };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
 }
