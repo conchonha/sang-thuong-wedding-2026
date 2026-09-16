@@ -735,7 +735,7 @@ img {
 
 .hero-card {
   position: relative;
-  max-width: 880px;
+  max-width: 850px;
   width: 100%;
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
@@ -780,7 +780,9 @@ img {
 }
 
 .hero-badge {
-  display: inline-block;
+  display: block;
+  width: fit-content;
+  margin: 0 auto 14px;
   font-family: var(--font-cinzel);
   font-size: clamp(0.75rem, 2.5vw, 0.88rem);
   text-transform: uppercase;
@@ -790,26 +792,27 @@ img {
   border-top: 1px solid var(--gold-primary);
   border-bottom: 1px solid var(--gold-primary);
   padding: 5px 20px;
-  margin-bottom: 18px;
 }
 
 /* Personalized Greeting Badge */
 .hero-guest-salutation {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(253, 246, 230, 0.95) 100%);
   border: 1.5px solid var(--gold-primary);
   border-radius: var(--radius-full);
-  padding: 7px 20px;
+  padding: 8px 22px;
   font-size: 0.95rem;
   color: var(--text-main);
-  margin-bottom: 16px;
+  margin: 10px auto 18px;
+  width: fit-content;
+  max-width: 95%;
   box-shadow: 0 4px 15px rgba(212, 175, 55, 0.18);
   animation: pulseGoldBadge 3s infinite alternate;
-  max-width: 100%;
   flex-wrap: wrap;
+  box-sizing: border-box;
 }
 
 @keyframes pulseGoldBadge {
@@ -1035,7 +1038,7 @@ img {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 32px;
-  max-width: 980px;
+  max-width: 850px;
   margin: 0 auto;
 }
 
@@ -1244,10 +1247,11 @@ img {
   border-radius: var(--radius-lg);
   padding: 26px 28px;
   margin: 0 auto 38px;
-  max-width: 880px;
+  max-width: 850px;
   text-align: center;
   position: relative;
   box-shadow: 0 8px 30px rgba(212, 175, 55, 0.1);
+  box-sizing: border-box;
 }
 
 @media (max-width: 600px) {
@@ -1279,34 +1283,118 @@ img {
 
 .events-grid {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 28px;
-  max-width: 980px;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 850px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .event-card {
-  flex: 1 1 320px;
-  max-width: 440px;
   width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
   background: #ffffff;
   border-radius: var(--radius-lg);
-  padding: 36px 26px;
+  padding: 34px 28px;
   border: 1.5px solid rgba(212, 175, 55, 0.35);
   box-shadow: var(--shadow-lg);
-  text-align: center;
   position: relative;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  box-sizing: border-box;
   transition: var(--transition-smooth);
 }
 
-@media (max-width: 600px) {
+.event-card-body {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+
+.event-card-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.event-card-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.event-map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  min-height: 350px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.1), 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.event-map-iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 350px;
+  border: none;
+}
+
+.map-direct-overlay-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid var(--gold-primary);
+  color: var(--gold-dark);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: var(--transition-smooth);
+  z-index: 2;
+}
+
+.map-direct-overlay-btn:hover {
+  background: var(--gold-primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-gold);
+}
+
+/* Hide Google Maps button inside left panel on desktop (since map is right next to it) */
+@media (min-width: 861px) {
+  .mobile-only-map-btn {
+    display: none !important;
+  }
+}
+
+/* Responsive Stacking for Tablets & Mobile */
+@media (max-width: 860px) {
   .event-card {
-    padding: 28px 18px;
+    padding: 26px 18px;
+  }
+  .event-card-body {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .event-map-wrapper {
+    height: 250px;
+    min-height: 250px;
+  }
+  .event-map-iframe {
+    min-height: 250px;
   }
 }
 
@@ -1340,6 +1428,13 @@ img {
   border: 1.5px solid rgba(212, 175, 55, 0.35);
 }
 
+.event-header-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .event-type {
   font-family: var(--font-cinzel);
   font-size: 0.78rem;
@@ -1356,15 +1451,17 @@ img {
   font-size: clamp(1.6rem, 4vw, 2rem);
   color: var(--text-main);
   font-weight: 700;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .event-datetime-box {
+  width: 100%;
+  box-sizing: border-box;
   background: linear-gradient(135deg, #fffcf6 0%, #faf1e1 100%);
   border: 1px solid rgba(212, 175, 55, 0.35);
   border-radius: var(--radius-md);
   padding: 10px 14px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .event-time-highlight {
@@ -1385,7 +1482,8 @@ img {
 }
 
 .event-location-box {
-  margin-bottom: 18px;
+  width: 100%;
+  margin-bottom: 14px;
 }
 
 .event-location-tag {
@@ -1404,10 +1502,12 @@ img {
 
 /* Event Mini Timeline Breakdown */
 .event-mini-timeline {
+  width: 100%;
+  box-sizing: border-box;
   background: #faf7f2;
   border-radius: var(--radius-md);
   padding: 12px 14px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   text-align: left;
   border-left: 3px solid var(--gold-primary);
 }
@@ -1436,6 +1536,7 @@ img {
 }
 
 .event-actions {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1492,7 +1593,7 @@ img {
 
 .timeline {
   position: relative;
-  max-width: 860px;
+  max-width: 850px;
   margin: 0 auto;
   padding: 15px 0;
 }
@@ -1957,7 +2058,7 @@ img {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 32px;
-  max-width: 1020px;
+  max-width: 850px;
   margin: 0 auto;
 }
 
@@ -3096,4 +3197,56 @@ img {
   white-space: nowrap;
   min-width: 100px;
   letter-spacing: 0.01em;
+}
+
+/* ============================================================
+   URL SHORTENER – Short Link Bar & Shorten Button Styles
+   ============================================================ */
+
+#short-link-bar {
+  background: linear-gradient(135deg, #fffcf0 0%, #fdf6e1 100%);
+  border: 1.5px solid var(--gold-primary);
+  border-radius: 10px;
+  padding: 8px 12px;
+  animation: fadeInUp 0.3s ease;
+}
+
+#result-short-link-input {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  color: var(--gold-dark) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1.5px solid var(--gold-primary) !important;
+  border-radius: 8px !important;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#short-link-status {
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.btn-shorten-guest-link {
+  background: linear-gradient(135deg, #f0fdf4, #e6f7ee) !important;
+  border: 1px solid #a5d6a7 !important;
+  color: #1b5e20 !important;
+  transition: all 0.2s ease;
+  font-weight: 700 !important;
+}
+.btn-shorten-guest-link:hover {
+  background: linear-gradient(135deg, #e6f7ee, #c8e6c9) !important;
+  border-color: #66bb6a !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(46, 125, 50, 0.15);
+}
+.btn-shorten-guest-link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }

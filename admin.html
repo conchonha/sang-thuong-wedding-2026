@@ -181,10 +181,11 @@
             </a>
           </div>
 
-          <!-- Quick Link Bar -->
+          <!-- Unified Link Bar: hiển thị link, tự thay bằng link rút gọn sau khi xong -->
           <div style="margin-top: 15px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #796E65;">
-            <span style="white-space: nowrap; font-weight: 500;">Link thiệp:</span>
-            <input type="text" id="result-link-input" class="guest-link-input" style="padding: 6px 12px; font-size: 0.82rem; background: #fff;" readonly>
+            <span style="white-space: nowrap; font-weight: 600; color: var(--gold-dark);">🔗 Link:</span>
+            <span id="link-shorten-badge" style="display:none; font-size:0.75rem; white-space:nowrap; padding: 2px 8px; border-radius: 20px; background:#fff8e1; border:1px solid #ffe082; color:#b7791f; font-weight:600;">⏳ Đang rút gọn...</span>
+            <input type="text" id="result-link-input" class="guest-link-input" style="padding: 6px 12px; font-size: 0.82rem; background: #fffcf0; border-color: var(--gold-primary); font-weight: 600; color: var(--gold-dark);" readonly>
           </div>
         </div>
       </div>

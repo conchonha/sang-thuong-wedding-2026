@@ -7,7 +7,7 @@
 // ══ Cấu hình Google Sheets ══════════════════════════════════════════════
 // ❗ Dán URL của Google Apps Script vào đây sau khi Deploy
 // Hướng dẫn: xem file google_apps_script.gs
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbyyNk2KytHEoX3cfcDs9iMyxrTsFQM4wL59PcdNWFrl59DhxEkkDrjx3QQXJ8-vOBL7/exec';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycby0zO_N72x-jg8zVZ2cROT_6AGoAhjbcRHkv9UVEKH3DHQyeU9g1Z_NsqHmJW6yHHTu/exec';
 const GOOGLE_SHEET_ID = '1JlN1-utEeoLThwzfsyvnNNIDQovqeocbMTEq_NSeWo4';
 
 /**
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (envelopeGuestEl) envelopeGuestEl.innerText = guestName;
     if (letterGuestEl) letterGuestEl.innerText = guestName;
     if (heroGuestEl) heroGuestEl.innerText = guestName;
-    if (heroGuestWrap) heroGuestWrap.style.display = 'inline-block';
+    if (heroGuestWrap) heroGuestWrap.style.display = 'flex';
     if (rsvpNameInput) {
       rsvpNameInput.value = guestName;
       rsvpNameInput.readOnly = true;
@@ -90,10 +90,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (savedConfig.naptaiAddress) {
     const el = document.getElementById('event-naptai-address');
     if (el) el.innerText = savedConfig.naptaiAddress;
+    const iframe = document.getElementById('event-naptai-iframe');
+    if (iframe) iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(savedConfig.naptaiAddress)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
   }
   if (savedConfig.naptaiMap) {
     const btn = document.getElementById('event-naptai-map-btn');
+    const directBtn = document.getElementById('event-naptai-map-direct');
     if (btn) btn.href = savedConfig.naptaiMap;
+    if (directBtn) directBtn.href = savedConfig.naptaiMap;
   }
 
   // Lễ Vu Quy (Nhà Trai)
@@ -104,10 +108,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (savedConfig.vuquyAddress) {
     const el = document.getElementById('event-vuquy-address');
     if (el) el.innerText = savedConfig.vuquyAddress;
+    const iframe = document.getElementById('event-vuquy-iframe');
+    if (iframe) iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(savedConfig.vuquyAddress)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
   }
   if (savedConfig.vuquyMap) {
     const btn = document.getElementById('event-vuquy-map-btn');
+    const directBtn = document.getElementById('event-vuquy-map-direct');
     if (btn) btn.href = savedConfig.vuquyMap;
+    if (directBtn) directBtn.href = savedConfig.vuquyMap;
   }
 
   // Bank Info
