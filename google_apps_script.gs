@@ -13,6 +13,14 @@
 const SHEET_NAME = 'RSVP'; // Tên tab sheet lưu trữ khách mời và RSVP
 
 // ═══════════════════════════════════════════════════════════════════
+// HÀM CHẠY THỬ ĐỂ CẤP QUYỀN URLFETCH (Chỉ cần chạy 1 lần duy nhất trong Apps Script)
+// ═══════════════════════════════════════════════════════════════════
+function testAuth() {
+  const res = callTinyUrl('https://google.com', 'test-auth');
+  Logger.log(res);
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // GET — Trả về danh sách khách mời hoặc lưu dữ liệu qua GET
 // ═══════════════════════════════════════════════════════════════════
 function doGet(e) {
