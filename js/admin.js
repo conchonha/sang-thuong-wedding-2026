@@ -768,6 +768,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         // Cập nhật bộ nhớ liveGuests và lưu lên Google Sheet để dùng lại lần sau
         if (foundGuest) {
           foundGuest.shortUrl = shortUrl;
+          sendGuestToGoogleSheet(foundGuest);
           renderGuestTable(document.getElementById('search-guest-input')?.value.trim() || '');
         }
         if (guestName) {
@@ -821,26 +822,35 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
      ========================================================================== */
   function sendGuestToGoogleSheet(guest) {
     if (!GOOGLE_SHEET_URL) return;
-    // Gửi raw values để Apps Script tự convert (groom/bride/both, vuquy/naptai/all)
+    const params = new URLSearchParams({
+      name: guest.name || '',
+      side: guest.side || 'both',
+      eventChoice: guest.eventChoice || 'all',
+      attending: guest.attending || 'Chưa phản hồi',
+      count: guest.rsvpCount || '',
+      wish: guest.wish || '',
+      shortUrl: guest.shortUrl || '',
+      time: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })
+    });
+    // Gửi qua GET (hoạt động 100% qua Google Apps Script 302 redirect)
+    fetch(`${GOOGLE_SHEET_URL}?${params.toString()}`, { mode: 'no-cors' })
+      .catch(err => console.warn('Lỗi gửi khách lên Google Sheet (GET):', err));
+    // Gửi qua POST dự phòng
     fetch(GOOGLE_SHEET_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: guest.name,
-        side: guest.side || 'both',
-        eventChoice: guest.eventChoice || 'all',
-        attending: guest.attending || 'Chưa phản hồi',
-        count: guest.rsvpCount || '',
-        wish: guest.wish || '',
-        shortUrl: guest.shortUrl || '',
-        time: new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' })
-      }),
+      body: JSON.stringify(Object.fromEntries(params)),
       mode: 'no-cors'
-    }).catch(err => console.warn('Lỗi gửi khách lên Google Sheet:', err));
+    }).catch(err => console.warn('Lỗi gửi khách lên Google Sheet (POST):', err));
   }
 
   function saveShortLinkToGoogleSheet(guestName, shortUrl) {
     if (!GOOGLE_SHEET_URL || !guestName || !shortUrl) return;
+    // Gửi qua GET (hoạt động 100% qua Google Apps Script 302 redirect)
+    const getUrl = `${GOOGLE_SHEET_URL}?action=save_short_link&name=${encodeURIComponent(guestName)}&shortUrl=${encodeURIComponent(shortUrl)}`;
+    fetch(getUrl, { mode: 'no-cors' })
+      .catch(err => console.warn('Lỗi lưu link rút gọn (GET):', err));
+    // Gửi qua POST dự phòng
     fetch(GOOGLE_SHEET_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -850,7 +860,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         shortUrl: shortUrl
       }),
       mode: 'no-cors'
-    }).catch(err => console.warn('Lỗi lưu link rút gọn lên Google Sheet:', err));
+    }).catch(err => console.warn('Lỗi lưu link rút gọn (POST):', err));
   }
 
   function deleteGuestOnGoogleSheet(guestName) {

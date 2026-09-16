@@ -13,13 +13,30 @@
 const SHEET_NAME = 'RSVP'; // Tên tab sheet lưu trữ khách mời và RSVP
 
 // ═══════════════════════════════════════════════════════════════════
-// GET — Trả về danh sách khách mời trong Google Sheet
+// GET — Trả về danh sách khách mời hoặc lưu dữ liệu qua GET
 // ═══════════════════════════════════════════════════════════════════
 function doGet(e) {
   try {
     const sheet = getOrCreateSheet(SHEET_NAME);
-    const rows = sheet.getDataRange().getValues();
+    const params = (e && e.parameter) ? e.parameter : {};
 
+    // 1. Lưu link rút gọn qua GET
+    if (params.action === 'save_short_link') {
+      return handleSaveShortLink(sheet, params);
+    }
+
+    // 2. Thêm hoặc cập nhật khách qua GET
+    if (params.name && params.action !== 'get_guests') {
+      return handleSaveGuest(sheet, params);
+    }
+
+    // 3. Xoá 1 khách qua GET
+    if (params.action === 'delete_guest') {
+      return handleDeleteGuest(sheet, params);
+    }
+
+    // 4. Mặc định: Trả về danh sách khách mời trong Google Sheet
+    const rows = sheet.getDataRange().getValues();
     if (rows.length <= 1) {
       return jsonResponse({ success: true, count: 0, data: [] });
     }
@@ -49,12 +66,16 @@ function doPost(e) {
     let data = {};
     
     if (e && e.postData && e.postData.contents) {
-      data = JSON.parse(e.postData.contents);
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (err) {
+        data = e.parameter || {};
+      }
     } else if (e && e.parameter) {
       data = e.parameter;
     }
 
-    // 1. Xoá tất cả khách trên Google Sheet (giữ lại dòng header)
+    // 1. Xoá tất cả khách trên Google Sheet
     if (data.action === 'clear_all') {
       const lastRow = sheet.getLastRow();
       if (lastRow > 1) {
@@ -65,113 +86,120 @@ function doPost(e) {
 
     // 2. Xoá 1 khách theo tên
     if (data.action === 'delete_guest') {
-      const targetName = normalizeName(data.name || '');
-      const rows = sheet.getDataRange().getValues();
-      for (let i = 1; i < rows.length; i++) {
-        if (normalizeName(String(rows[i][1])) === targetName) {
-          sheet.deleteRow(i + 1);
-          break;
-        }
-      }
-      return jsonResponse({ success: true, message: 'Đã xóa khách trên Google Sheet' });
+      return handleDeleteGuest(sheet, data);
     }
 
     // 3. Lưu link rút gọn của 1 khách
     if (data.action === 'save_short_link') {
-      const targetName = normalizeName(data.name || '');
-      const shortUrl = String(data.shortUrl || data.shortLink || '').trim();
-      if (!targetName || !shortUrl) {
-        return jsonResponse({ success: false, message: 'Thiếu thông tin tên hoặc shortUrl' });
-      }
-      const rows = sheet.getDataRange().getValues();
-      if (rows.length > 0 && (!rows[0][8] || String(rows[0][8]).trim() === '')) {
-        sheet.getRange(1, 9).setValue('Link Rút Gọn');
-      }
-      for (let i = 1; i < rows.length; i++) {
-        if (normalizeName(String(rows[i][1])) === targetName) {
-          sheet.getRange(i + 1, 9).setValue(shortUrl);
-          return jsonResponse({ success: true, message: 'Đã lưu link rút gọn vào Google Sheet' });
-        }
-      }
-      return jsonResponse({ success: false, message: 'Không tìm thấy khách để lưu link rút gọn' });
+      return handleSaveShortLink(sheet, data);
     }
 
-    const name = String(data.name || '').trim();
-    if (!name) {
-      return jsonResponse({ success: false, message: 'Thiếu tên khách mời' });
-    }
-
-    // Chuyển đổi raw values (groom/bride/both, vuquy/naptai/all) sang text hiển thị
-    // Hỗ trợ cả raw values từ admin.js và text đã convert từ main.js
-    let sideText = data.side || 'Bạn chung';
-    if (data.side === 'groom') sideText = 'Nhà Trai';
-    else if (data.side === 'bride') sideText = 'Nhà Gái';
-    else if (data.side === 'both') sideText = 'Bạn chung';
-    // Nếu đã là text tiếng Việt thì giữ nguyên (từ main.js gửi lên)
-    
-    let eventText = data.eventChoice || 'Cả Hai Buổi Lễ';
-    if (data.eventChoice === 'vuquy') eventText = 'Lễ Vu Quy (Nhà Trai)';
-    else if (data.eventChoice === 'naptai') eventText = 'Lễ Nạp Tài (Nhà Gái)';
-    else if (data.eventChoice === 'all') eventText = 'Cả Hai Buổi Lễ';
-    // Nếu đã là text tiếng Việt thì giữ nguyên (từ main.js gửi lên)
-    
-    // attending: giữ nguyên giá trị, default 'Chưa phản hồi' nếu không có
-    const attending = data.attending || 'Chưa phản hồi';
-    const count = data.count || '';
-    const wish = data.wish || '';
-    const shortUrl = data.shortUrl || data.shortLink || '';
-    const nowTime = data.time || new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-
-    // Kiểm tra xem khách đã có trong sheet chưa để cập nhật hoặc thêm mới
-    const rows = sheet.getDataRange().getValues();
-    let foundRow = -1;
-
-    for (let i = 1; i < rows.length; i++) {
-      const existingName = String(rows[i][1] || '').trim();
-      if (normalizeName(existingName) === normalizeName(name)) {
-        foundRow = i + 1; // 1-indexed row number
-        break;
-      }
-    }
-
-    if (foundRow > 0) {
-      // Cập nhật dòng khách đã tồn tại
-      // Cột: A(1)=STT, B(2)=Tên, C(3)=Phía, D(4)=Tiệc, E(5)=Trạng Thái, F(6)=Số Người, G(7)=Lời Chúc, H(8)=Thời Gian, I(9)=Link Rút Gọn
-      if (data.action === 'wish') {
-        // Khách gửi lời chúc từ Sổ Lưu Bút Online: chỉ cập nhật lời chúc và thời gian
-        if (data.side && sideText && !rows[foundRow - 1][2]) sheet.getRange(foundRow, 3).setValue(sideText);
-        if (wish) sheet.getRange(foundRow, 7).setValue(wish);
-        sheet.getRange(foundRow, 8).setValue(nowTime);
-      } else {
-        // Cập nhật đầy đủ từ form RSVP hoặc Admin
-        if (sideText) sheet.getRange(foundRow, 3).setValue(sideText);
-        if (eventText) sheet.getRange(foundRow, 4).setValue(eventText);
-        if (data.attending) sheet.getRange(foundRow, 5).setValue(attending);
-        if (count) sheet.getRange(foundRow, 6).setValue(count);
-        if (wish) sheet.getRange(foundRow, 7).setValue(wish);
-        sheet.getRange(foundRow, 8).setValue(nowTime);
-        if (shortUrl) sheet.getRange(foundRow, 9).setValue(shortUrl);
-      }
-    } else {
-      // Thêm dòng mới nếu khách chưa có trong danh sách
-      const nextStt = rows.length <= 1 ? 1 : rows.length;
-      sheet.appendRow([
-        nextStt,
-        name,
-        sideText,
-        data.action === 'wish' ? 'Cả Hai Buổi Lễ' : eventText,
-        data.action === 'wish' ? 'Chưa phản hồi' : attending,
-        data.action === 'wish' ? '' : count,
-        wish,
-        nowTime,
-        shortUrl
-      ]);
-    }
-
-    return jsonResponse({ success: true, message: 'Đã ghi nhận thành công' });
+    // 4. Thêm hoặc cập nhật khách
+    return handleSaveGuest(sheet, data);
   } catch (err) {
     return jsonResponse({ success: false, error: err.message });
   }
+}
+
+// ─── XỬ LÝ LƯU LINK RÚT GỌN ───────────────────────────────────────
+function handleSaveShortLink(sheet, data) {
+  const targetName = normalizeName(data.name || '');
+  const shortUrl = String(data.shortUrl || data.shortLink || '').trim();
+  if (!targetName || !shortUrl) {
+    return jsonResponse({ success: false, message: 'Thiếu thông tin tên hoặc shortUrl' });
+  }
+  const rows = sheet.getDataRange().getValues();
+  if (rows.length > 0 && (!rows[0][8] || String(rows[0][8]).trim() === '')) {
+    sheet.getRange(1, 9).setValue('Link Rút Gọn');
+  }
+  for (let i = 1; i < rows.length; i++) {
+    if (normalizeName(String(rows[i][1])) === targetName) {
+      sheet.getRange(i + 1, 9).setValue(shortUrl);
+      return jsonResponse({ success: true, message: 'Đã lưu link rút gọn vào Google Sheet' });
+    }
+  }
+  return jsonResponse({ success: false, message: 'Không tìm thấy khách để lưu link rút gọn' });
+}
+
+// ─── XỬ LÝ XOÁ KHÁCH ──────────────────────────────────────────────
+function handleDeleteGuest(sheet, data) {
+  const targetName = normalizeName(data.name || '');
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (normalizeName(String(rows[i][1])) === targetName) {
+      sheet.deleteRow(i + 1);
+      break;
+    }
+  }
+  return jsonResponse({ success: true, message: 'Đã xóa khách trên Google Sheet' });
+}
+
+// ─── XỬ LÝ THÊM / CẬP NHẬT KHÁCH ──────────────────────────────────
+function handleSaveGuest(sheet, data) {
+  const name = String(data.name || '').trim();
+  if (!name) {
+    return jsonResponse({ success: false, message: 'Thiếu tên khách mời' });
+  }
+
+  let sideText = data.side || 'Bạn chung';
+  if (data.side === 'groom') sideText = 'Nhà Trai';
+  else if (data.side === 'bride') sideText = 'Nhà Gái';
+  else if (data.side === 'both') sideText = 'Bạn chung';
+
+  let eventText = data.eventChoice || 'Cả Hai Buổi Lễ';
+  if (data.eventChoice === 'vuquy') eventText = 'Lễ Vu Quy (Nhà Trai)';
+  else if (data.eventChoice === 'naptai') eventText = 'Lễ Nạp Tài (Nhà Gái)';
+  else if (data.eventChoice === 'all') eventText = 'Cả Hai Buổi Lễ';
+
+  const attending = data.attending || 'Chưa phản hồi';
+  const count = data.count || '';
+  const wish = data.wish || '';
+  const shortUrl = String(data.shortUrl || data.shortLink || '').trim();
+  const nowTime = data.time || new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+
+  const rows = sheet.getDataRange().getValues();
+  let foundRow = -1;
+
+  for (let i = 1; i < rows.length; i++) {
+    const existingName = String(rows[i][1] || '').trim();
+    if (normalizeName(existingName) === normalizeName(name)) {
+      foundRow = i + 1;
+      break;
+    }
+  }
+
+  if (foundRow > 0) {
+    // Cập nhật dòng khách đã tồn tại
+    if (data.action === 'wish') {
+      if (data.side && sideText && !rows[foundRow - 1][2]) sheet.getRange(foundRow, 3).setValue(sideText);
+      if (wish) sheet.getRange(foundRow, 7).setValue(wish);
+      sheet.getRange(foundRow, 8).setValue(nowTime);
+    } else {
+      if (sideText) sheet.getRange(foundRow, 3).setValue(sideText);
+      if (eventText) sheet.getRange(foundRow, 4).setValue(eventText);
+      if (data.attending) sheet.getRange(foundRow, 5).setValue(attending);
+      if (count) sheet.getRange(foundRow, 6).setValue(count);
+      if (wish) sheet.getRange(foundRow, 7).setValue(wish);
+      sheet.getRange(foundRow, 8).setValue(nowTime);
+      if (shortUrl) sheet.getRange(foundRow, 9).setValue(shortUrl);
+    }
+  } else {
+    // Thêm dòng mới
+    const nextStt = rows.length <= 1 ? 1 : rows.length;
+    sheet.appendRow([
+      nextStt,
+      name,
+      sideText,
+      data.action === 'wish' ? 'Cả Hai Buổi Lễ' : eventText,
+      data.action === 'wish' ? 'Chưa phản hồi' : attending,
+      data.action === 'wish' ? '' : count,
+      wish,
+      nowTime,
+      shortUrl
+    ]);
+  }
+
+  return jsonResponse({ success: true, message: 'Đã ghi nhận thành công' });
 }
 
 // ═══════════════════════════════════════════════════════════════════
