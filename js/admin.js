@@ -414,7 +414,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
         console.log('[Admin] Tạo khách mới:', newGuest);
 
-        // Cập nhật giao diện khung kết quả
+        // Cập nhật giao diện khung kết quả & tự động rút gọn link
         displayGuestResult(newGuest);
 
         // Lưu khách mới vào danh sách hiển thị
@@ -423,9 +423,6 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         renderGuestTable();
         renderRsvpList();
         showToast(`Đã tạo thành công thiệp riêng cho ${name}! ✨`);
-
-        // Gửi khách mới lên Google Sheet (fire-and-forget)
-        sendGuestToGoogleSheet(newGuest);
 
         // Cuộn đến khung kết quả
         resultBox.scrollIntoView({ behavior: 'smooth' });
@@ -800,14 +797,13 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
     shortenUrl(fullLink, guestName)
       .then(shortUrl => {
-        // Cập nhật bộ nhớ liveGuests và lưu lên Google Sheet để dùng lại vĩnh viễn
+        // Cập nhật bộ nhớ liveGuests và lưu lên Google Sheet đúng 1 lần với đầy đủ link rút gọn
         if (foundGuest) {
           foundGuest.shortUrl = shortUrl;
           sendGuestToGoogleSheet(foundGuest);
           renderGuestTable(document.getElementById('search-guest-input')?.value.trim() || '');
           renderRsvpList();
-        }
-        if (guestName) {
+        } else if (guestName) {
           saveShortLinkToGoogleSheet(guestName, shortUrl);
         }
 
@@ -837,7 +833,13 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       })
       .catch(err => {
         console.warn('[Admin] shortenUrl fallback to longUrl:', err.message);
-        // Fallback: giữ link đầy đủ và cập nhật tin nhắn không còn trạng thái loading
+        // Fallback: gửi link gốc lên Google Sheet đúng 1 lần
+        if (foundGuest) {
+          sendGuestToGoogleSheet(foundGuest);
+          renderGuestTable(document.getElementById('search-guest-input')?.value.trim() || '');
+          renderRsvpList();
+        }
+
         const fallbackMsg = buildInviteMessage(guestObj, fullLink, false);
         if (msgTextarea) msgTextarea.value = fallbackMsg.plainMsg;
         if (previewHtml) previewHtml.innerHTML = fallbackMsg.htmlPreview;

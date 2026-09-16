@@ -119,103 +119,135 @@ function doPost(e) {
 
 // ─── XỬ LÝ LƯU LINK RÚT GỌN ───────────────────────────────────────
 function handleSaveShortLink(sheet, data) {
-  const targetName = normalizeName(data.name || '');
-  const shortUrl = String(data.shortUrl || data.shortLink || '').trim();
-  if (!targetName || !shortUrl) {
-    return jsonResponse({ success: false, message: 'Thiếu thông tin tên hoặc shortUrl' });
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+  } catch (e) {
+    return jsonResponse({ success: false, message: 'Hệ thống đang bận' });
   }
-  const rows = sheet.getDataRange().getValues();
-  if (rows.length > 0 && (!rows[0][8] || String(rows[0][8]).trim() === '')) {
-    sheet.getRange(1, 9).setValue('Link Rút Gọn');
-  }
-  for (let i = 1; i < rows.length; i++) {
-    if (normalizeName(String(rows[i][1])) === targetName) {
-      sheet.getRange(i + 1, 9).setValue(shortUrl);
-      return jsonResponse({ success: true, message: 'Đã lưu link rút gọn vào Google Sheet' });
+
+  try {
+    const targetName = normalizeName(data.name || '');
+    const shortUrl = String(data.shortUrl || data.shortLink || '').trim();
+    if (!targetName || !shortUrl) {
+      return jsonResponse({ success: false, message: 'Thiếu thông tin tên hoặc shortUrl' });
     }
+    const rows = sheet.getDataRange().getValues();
+    if (rows.length > 0 && (!rows[0][8] || String(rows[0][8]).trim() === '')) {
+      sheet.getRange(1, 9).setValue('Link Rút Gọn');
+    }
+    for (let i = 1; i < rows.length; i++) {
+      if (normalizeName(String(rows[i][1])) === targetName) {
+        sheet.getRange(i + 1, 9).setValue(shortUrl);
+        return jsonResponse({ success: true, message: 'Đã cập nhật link rút gọn vào Google Sheet' });
+      }
+    }
+    // Không tìm thấy thì KHÔNG được insert mới
+    return jsonResponse({ success: false, message: 'Không tìm thấy khách để cập nhật link rút gọn' });
+  } finally {
+    lock.releaseLock();
   }
-  return jsonResponse({ success: false, message: 'Không tìm thấy khách để lưu link rút gọn' });
 }
 
 // ─── XỬ LÝ XOÁ KHÁCH ──────────────────────────────────────────────
 function handleDeleteGuest(sheet, data) {
-  const targetName = normalizeName(data.name || '');
-  const rows = sheet.getDataRange().getValues();
-  for (let i = 1; i < rows.length; i++) {
-    if (normalizeName(String(rows[i][1])) === targetName) {
-      sheet.deleteRow(i + 1);
-      break;
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+  } catch (e) {}
+
+  try {
+    const targetName = normalizeName(data.name || '');
+    const rows = sheet.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if (normalizeName(String(rows[i][1])) === targetName) {
+        sheet.deleteRow(i + 1);
+        break;
+      }
     }
+    return jsonResponse({ success: true, message: 'Đã xóa khách trên Google Sheet' });
+  } finally {
+    lock.releaseLock();
   }
-  return jsonResponse({ success: true, message: 'Đã xóa khách trên Google Sheet' });
 }
 
 // ─── XỬ LÝ THÊM / CẬP NHẬT KHÁCH ──────────────────────────────────
 function handleSaveGuest(sheet, data) {
-  const name = String(data.name || '').trim();
-  if (!name) {
-    return jsonResponse({ success: false, message: 'Thiếu tên khách mời' });
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+  } catch (e) {
+    return jsonResponse({ success: false, message: 'Hệ thống đang bận' });
   }
 
-  let sideText = data.side || 'Bạn chung';
-  if (data.side === 'groom') sideText = 'Nhà Trai';
-  else if (data.side === 'bride') sideText = 'Nhà Gái';
-  else if (data.side === 'both') sideText = 'Bạn chung';
-
-  let eventText = data.eventChoice || 'Cả Hai Buổi Lễ';
-  if (data.eventChoice === 'vuquy') eventText = 'Lễ Vu Quy (Nhà Trai)';
-  else if (data.eventChoice === 'naptai') eventText = 'Lễ Nạp Tài (Nhà Gái)';
-  else if (data.eventChoice === 'all') eventText = 'Cả Hai Buổi Lễ';
-
-  const attending = data.attending || 'Chưa phản hồi';
-  const count = data.count || '';
-  const wish = data.wish || '';
-  const shortUrl = String(data.shortUrl || data.shortLink || '').trim();
-  const nowTime = data.time || new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
-
-  const rows = sheet.getDataRange().getValues();
-  let foundRow = -1;
-
-  for (let i = 1; i < rows.length; i++) {
-    const existingName = String(rows[i][1] || '').trim();
-    if (normalizeName(existingName) === normalizeName(name)) {
-      foundRow = i + 1;
-      break;
+  try {
+    const name = String(data.name || '').trim();
+    if (!name) {
+      return jsonResponse({ success: false, message: 'Thiếu tên khách mời' });
     }
-  }
 
-  if (foundRow > 0) {
-    // Cập nhật dòng khách đã tồn tại
-    if (data.action === 'wish') {
-      if (data.side && sideText && !rows[foundRow - 1][2]) sheet.getRange(foundRow, 3).setValue(sideText);
-      if (wish) sheet.getRange(foundRow, 7).setValue(wish);
-      sheet.getRange(foundRow, 8).setValue(nowTime);
+    let sideText = data.side || 'Bạn chung';
+    if (data.side === 'groom') sideText = 'Nhà Trai';
+    else if (data.side === 'bride') sideText = 'Nhà Gái';
+    else if (data.side === 'both') sideText = 'Bạn chung';
+
+    let eventText = data.eventChoice || 'Cả Hai Buổi Lễ';
+    if (data.eventChoice === 'vuquy') eventText = 'Lễ Vu Quy (Nhà Trai)';
+    else if (data.eventChoice === 'naptai') eventText = 'Lễ Nạp Tài (Nhà Gái)';
+    else if (data.eventChoice === 'all') eventText = 'Cả Hai Buổi Lễ';
+
+    const attending = data.attending || 'Chưa phản hồi';
+    const count = data.count || '';
+    const wish = data.wish || '';
+    const shortUrl = String(data.shortUrl || data.shortLink || '').trim();
+    const nowTime = data.time || new Date().toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
+
+    const rows = sheet.getDataRange().getValues();
+    let foundRow = -1;
+
+    for (let i = 1; i < rows.length; i++) {
+      const existingName = String(rows[i][1] || '').trim();
+      if (normalizeName(existingName) === normalizeName(name)) {
+        foundRow = i + 1;
+        break;
+      }
+    }
+
+    if (foundRow > 0) {
+      // Cập nhật dòng khách đã tồn tại (TUYỆT ĐỐI KHÔNG TẠO DÒNG MỚI)
+      if (data.action === 'wish') {
+        if (data.side && sideText && !rows[foundRow - 1][2]) sheet.getRange(foundRow, 3).setValue(sideText);
+        if (wish) sheet.getRange(foundRow, 7).setValue(wish);
+        sheet.getRange(foundRow, 8).setValue(nowTime);
+      } else {
+        if (sideText) sheet.getRange(foundRow, 3).setValue(sideText);
+        if (eventText) sheet.getRange(foundRow, 4).setValue(eventText);
+        if (data.attending) sheet.getRange(foundRow, 5).setValue(attending);
+        if (count) sheet.getRange(foundRow, 6).setValue(count);
+        if (wish) sheet.getRange(foundRow, 7).setValue(wish);
+        sheet.getRange(foundRow, 8).setValue(nowTime);
+        if (shortUrl) sheet.getRange(foundRow, 9).setValue(shortUrl);
+      }
     } else {
-      if (sideText) sheet.getRange(foundRow, 3).setValue(sideText);
-      if (eventText) sheet.getRange(foundRow, 4).setValue(eventText);
-      if (data.attending) sheet.getRange(foundRow, 5).setValue(attending);
-      if (count) sheet.getRange(foundRow, 6).setValue(count);
-      if (wish) sheet.getRange(foundRow, 7).setValue(wish);
-      sheet.getRange(foundRow, 8).setValue(nowTime);
-      if (shortUrl) sheet.getRange(foundRow, 9).setValue(shortUrl);
+      // Chỉ thêm dòng mới khi tên chưa từng tồn tại trên Sheet
+      const nextStt = rows.length <= 1 ? 1 : rows.length;
+      sheet.appendRow([
+        nextStt,
+        name,
+        sideText,
+        data.action === 'wish' ? 'Cả Hai Buổi Lễ' : eventText,
+        data.action === 'wish' ? 'Chưa phản hồi' : attending,
+        data.action === 'wish' ? '' : count,
+        wish,
+        nowTime,
+        shortUrl
+      ]);
     }
-  } else {
-    // Thêm dòng mới
-    const nextStt = rows.length <= 1 ? 1 : rows.length;
-    sheet.appendRow([
-      nextStt,
-      name,
-      sideText,
-      data.action === 'wish' ? 'Cả Hai Buổi Lễ' : eventText,
-      data.action === 'wish' ? 'Chưa phản hồi' : attending,
-      data.action === 'wish' ? '' : count,
-      wish,
-      nowTime,
-      shortUrl
-    ]);
-  }
 
-  return jsonResponse({ success: true, message: 'Đã ghi nhận thành công' });
+    return jsonResponse({ success: true, message: 'Đã ghi nhận thành công' });
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
