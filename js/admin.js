@@ -185,9 +185,9 @@ document.addEventListener('DOMContentLoaded', () => {
       updateEventOptions();
     }
 
-    // Hiển thị kết quả thiệp mời và mẫu tin nhắn
-    function displayGuestResult(guest) {
-      const { name, side, eventChoice, link } = guest;
+    // ═══ TRÌNH TẠO MẪU TIN NHẮN VÀ XEM TRƯỚC THIỆP MỜI ═══
+    function buildInviteMessage(guest, linkToUse, isShortening = false) {
+      const { name, side, eventChoice } = guest;
       const coupleNames = 'Minh Quân & Hoàng Yến';
       let eventText = 'Cả Hai Buổi Lễ (Lễ Nạp Tài & Lễ Vu Quy)';
       let eventTitleShort = 'Cả Hai Buổi Lễ';
@@ -214,7 +214,28 @@ document.addEventListener('DOMContentLoaded', () => {
 Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn lao nhất đối với ${familyText}.
 
 📍 Kính mời ${name} xem thiệp mời riêng và thông tin bản đồ chỉ đường tại:
-👉 ${link}`;
+👉 ${linkToUse}`;
+
+      let linkBoxHtml;
+      if (isShortening) {
+        linkBoxHtml = `
+          <div style="background: #fffdf5; border: 1.5px dashed #f59e0b; border-radius: 8px; padding: 12px 14px; word-break: break-all;">
+            <div style="display:flex; align-items:center; gap:8px; color: #b45309; font-weight: 600; font-size: 0.9rem; margin-bottom: 5px;">
+              <span style="display:inline-block; animation:spin 1s linear infinite;">⏳</span>
+              <span>Đang tạo &amp; tối ưu link rút gọn...</span>
+            </div>
+            <div style="font-size: 0.78rem; color: #888; word-break: break-all;">
+              ${escapeHtml(linkToUse)}
+            </div>
+          </div>
+        `;
+      } else {
+        linkBoxHtml = `
+          <div style="background: #fff9f0; border: 1.5px dashed var(--gold-primary); border-radius: 8px; padding: 11px 14px; word-break: break-all; font-weight: 600; box-shadow: 0 2px 8px rgba(183,121,31,0.08);">
+            👉 <a href="${linkToUse}" target="_blank" style="color: var(--gold-dark); text-decoration: underline; font-weight: 700; font-size: 0.98rem;">${escapeHtml(linkToUse)}</a>
+          </div>
+        `;
+      }
 
       const htmlPreview = `
         <div style="font-size: 0.96rem; line-height: 1.7; color: #2e2620;">
@@ -227,23 +248,30 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
           <p style="margin-bottom: 8px; color: #4a3e35;">
             📍 Kính mời <strong>${escapeHtml(name)}</strong> xem thiệp mời riêng và thông tin bản đồ chỉ đường tại:
           </p>
-          <div style="background: #fff9f0; border: 1px dashed var(--gold-primary); border-radius: 8px; padding: 10px 14px; word-break: break-all; font-weight: 600;">
-            👉 <a href="${link}" target="_blank" style="color: var(--gold-dark); text-decoration: underline;">${escapeHtml(link)}</a>
-          </div>
+          ${linkBoxHtml}
         </div>
       `;
 
+      return { plainMsg, htmlPreview, sideTitleShort, eventTitleShort };
+    }
+
+    // Hiển thị kết quả thiệp mời và mẫu tin nhắn
+    function displayGuestResult(guest) {
+      const isAlreadyShort = (guest.shortUrl && guest.shortUrl.startsWith('http'));
+      const activeLink = isAlreadyShort ? guest.shortUrl : guest.link;
+      const { plainMsg, htmlPreview, sideTitleShort, eventTitleShort } = buildInviteMessage(guest, activeLink, !isAlreadyShort);
+
       resultBox.style.display = 'block';
-      if (resultGuestName) resultGuestName.innerText = name;
-      if (resultLinkInput) resultLinkInput.value = link;
+      if (resultGuestName) resultGuestName.innerText = guest.name;
+      if (resultLinkInput) resultLinkInput.value = activeLink;
       if (resultMessageText) resultMessageText.value = plainMsg;
       if (invitePreviewHtml) invitePreviewHtml.innerHTML = htmlPreview;
       if (resultBadgeSide) resultBadgeSide.innerText = sideTitleShort;
       if (resultBadgeEvent) resultBadgeEvent.innerText = eventTitleShort;
-      if (btnPreview) btnPreview.href = link;
+      if (btnPreview) btnPreview.href = activeLink;
 
-      // Tự động rút gọn link ngay sau khi hiển thị kết quả (truyền thêm tên khách để tạo alias đẹp và kiểm tra link đã lưu)
-      applyShortLinkToResultBox(link, name, guest);
+      // Kích hoạt tiến trình rút gọn link & cập nhật UI
+      applyShortLinkToResultBox(guest.link, guest.name, guest);
     }
 
     // Hiển thị Dialog cảnh báo nếu khách đã tồn tại trong Excel / danh sách
@@ -698,41 +726,49 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
   }
 
   /**
-   * Sau khi rút gọn link thành công: thay thế link dài bằng link ngắn
-   * ở TẤT CẢ mọi chỗ trong result box (link input, preview HTML, plain text, nút chia sẻ).
+   * Sau khi rút gọn link thành công: cập nhật lại link ngắn vào toàn bộ result box
+   * (ô link input, preview card, plain text textarea, các nút chia sẻ, và trạng thái loading).
    * @param {string} fullLink  - Link đầy đủ vừa tạo
    * @param {string} guestName - Tên khách (để tạo alias đẹp)
    * @param {object|null} targetGuest - Đối tượng khách mời (nếu có)
    */
   function applyShortLinkToResultBox(fullLink, guestName = '', targetGuest = null) {
-    const linkInput    = document.getElementById('result-link-input');
-    const msgTextarea  = document.getElementById('result-message-text');
-    const previewHtml  = document.getElementById('invite-preview-html');
-    const badge        = document.getElementById('link-shorten-badge');
-    const btnPreview   = document.getElementById('btn-open-preview');
+    const linkInput     = document.getElementById('result-link-input');
+    const msgTextarea   = document.getElementById('result-message-text');
+    const previewHtml   = document.getElementById('invite-preview-html');
+    const badge         = document.getElementById('link-shorten-badge');
+    const previewStatus = document.getElementById('preview-short-status');
+    const createBtn     = document.getElementById('guest-create-btn');
+    const createBtnIcon = document.getElementById('guest-create-btn-icon');
+    const createBtnText = document.getElementById('guest-create-btn-text');
 
     if (!linkInput) return;
 
-    // Helper: escape special chars trong regex
-    function escRx(str) {
-      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
+    // Helper phục hồi trạng thái nút submit
+    const restoreSubmitBtn = () => {
+      if (createBtn) createBtn.disabled = false;
+      if (createBtnIcon) createBtnIcon.textContent = '✨';
+      if (createBtnText) createBtnText.textContent = 'Tạo Link Mời Khách Này';
+    };
 
     // Tìm khách tương ứng trong liveGuests nếu chưa truyền targetGuest
     const foundGuest = targetGuest || (guestName ? liveGuests.find(g => isExactNameMatching(g.name, guestName)) : null);
+    const guestObj = foundGuest || { name: guestName, side: 'both', eventChoice: 'all', link: fullLink };
 
     // ⚡ KIỂM TRA: Nếu khách này ĐÃ CÓ link rút gọn lưu trên Google Sheet trước đó → DÙNG NGAY! Không gọi API lại!
     if (foundGuest && foundGuest.shortUrl && foundGuest.shortUrl.startsWith('http')) {
       const savedShortUrl = foundGuest.shortUrl;
+      const updatedMsg = buildInviteMessage(foundGuest, savedShortUrl, false);
+
       linkInput.value = savedShortUrl;
       linkInput.style.color = 'var(--gold-dark)';
       linkInput.style.fontWeight = '700';
 
-      if (msgTextarea) {
-        msgTextarea.value = msgTextarea.value.split(fullLink).join(savedShortUrl);
-      }
-      if (previewHtml) {
-        previewHtml.innerHTML = previewHtml.innerHTML.replace(new RegExp(escRx(fullLink), 'g'), savedShortUrl);
+      if (msgTextarea) msgTextarea.value = updatedMsg.plainMsg;
+      if (previewHtml) previewHtml.innerHTML = updatedMsg.htmlPreview;
+
+      if (previewStatus) {
+        previewStatus.innerHTML = '<span style="color:#2e7d32; font-weight:600;">✅ Link rút gọn đã lưu</span>';
       }
       if (badge) {
         badge.style.display = 'inline-block';
@@ -740,12 +776,20 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         badge.style.background = '#e8f5e9';
         badge.style.borderColor = '#a5d6a7';
         badge.style.color = '#2e7d32';
-        setTimeout(() => { badge.style.display = 'none'; }, 3500);
+        setTimeout(() => { if (badge) badge.style.display = 'none'; }, 3500);
       }
+      restoreSubmitBtn();
       return;
     }
 
-    // Hiện badge "⏳ Đang rút gọn..."
+    // ⏳ BẬT TRẠNG THÁI LOADING: Nút tạo link + Header Xem Trước + Badge
+    if (createBtn) createBtn.disabled = true;
+    if (createBtnIcon) createBtnIcon.textContent = '⏳';
+    if (createBtnText) createBtnText.textContent = 'Đang tạo & rút gọn link...';
+
+    if (previewStatus) {
+      previewStatus.innerHTML = '<span style="color:#d97706; font-weight:600;"><span style="display:inline-block; animation:spin 1s linear infinite;">⏳</span> Đang tạo link rút gọn...</span>';
+    }
     if (badge) {
       badge.style.display = 'inline-block';
       badge.textContent = '⏳ Đang rút gọn...';
@@ -756,54 +800,64 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
     shortenUrl(fullLink, guestName)
       .then(shortUrl => {
-        // Cập nhật bộ nhớ liveGuests và lưu lên Google Sheet để dùng lại lần sau
+        // Cập nhật bộ nhớ liveGuests và lưu lên Google Sheet để dùng lại vĩnh viễn
         if (foundGuest) {
           foundGuest.shortUrl = shortUrl;
           sendGuestToGoogleSheet(foundGuest);
           renderGuestTable(document.getElementById('search-guest-input')?.value.trim() || '');
+          renderRsvpList();
         }
         if (guestName) {
           saveShortLinkToGoogleSheet(guestName, shortUrl);
         }
 
-        // 1. Cập nhật ô link → link ngắn
+        // 1. Tái tạo mẫu tin nhắn và cập nhật "Xem Trước Tin Nhắn Thiệp Mời" với link rút gọn
+        const finalMsg = buildInviteMessage(guestObj, shortUrl, false);
+        if (msgTextarea) msgTextarea.value = finalMsg.plainMsg;
+        if (invitePreviewHtml) invitePreviewHtml.innerHTML = finalMsg.htmlPreview;
+
+        // 2. Cập nhật ô input link
         linkInput.value = shortUrl;
         linkInput.style.color = 'var(--gold-dark)';
         linkInput.style.fontWeight = '700';
 
-        // 2. Cập nhật textarea plain text (Zalo / Messenger / Copy Tin Nhắn dùng cái này)
-        if (msgTextarea) {
-          msgTextarea.value = msgTextarea.value.split(fullLink).join(shortUrl);
+        // 3. Cập nhật trạng thái thành công
+        if (previewStatus) {
+          previewStatus.innerHTML = '<span style="color:#2e7d32; font-weight:600;">✅ Link rút gọn sẵn sàng</span>';
         }
-
-        // 3. Cập nhật preview HTML (thay href và text của thẻ <a> chứa link dài)
-        if (previewHtml) {
-          previewHtml.innerHTML = previewHtml.innerHTML
-            .replace(new RegExp(escRx(fullLink), 'g'), shortUrl);
-        }
-
-        // 4. Giữ nút "Xem Thử Thiệp" vẫn mở link đầy đủ (không redirect qua short)
-        //    → không cần thay btnPreview.href
-
-        // 5. Ẩn badge, thay bằng dấu ✅
         if (badge) {
           badge.textContent = '✅ Đã rút gọn & đã lưu Sheet';
           badge.style.background = '#e8f5e9';
           badge.style.borderColor = '#a5d6a7';
           badge.style.color = '#2e7d32';
-          setTimeout(() => { badge.style.display = 'none'; }, 3000);
+          setTimeout(() => { if (badge) badge.style.display = 'none'; }, 4000);
         }
+
+        // 4. Tắt loading nút submit
+        restoreSubmitBtn();
+        showToast(`🎉 Đã rút gọn link và cập nhật vào tin nhắn thiệp mời!`);
       })
       .catch(err => {
-        // Fallback: giữ nguyên link gốc, ẩn badge
+        console.warn('[Admin] shortenUrl fallback to longUrl:', err.message);
+        // Fallback: giữ link đầy đủ và cập nhật tin nhắn không còn trạng thái loading
+        const fallbackMsg = buildInviteMessage(guestObj, fullLink, false);
+        if (msgTextarea) msgTextarea.value = fallbackMsg.plainMsg;
+        if (invitePreviewHtml) invitePreviewHtml.innerHTML = fallbackMsg.htmlPreview;
+        linkInput.value = fullLink;
+
+        if (previewStatus) {
+          previewStatus.innerHTML = '<span style="color:#c62828; font-weight:600;">⚠️ Dùng link đầy đủ</span>';
+        }
         if (badge) {
           badge.textContent = '⚠️ Dùng link gốc';
           badge.style.background = '#ffebee';
           badge.style.borderColor = '#ffcdd2';
           badge.style.color = '#c62828';
-          setTimeout(() => { badge.style.display = 'none'; }, 4000);
+          setTimeout(() => { if (badge) badge.style.display = 'none'; }, 4000);
         }
-        console.warn('[Admin] shortenUrl error:', err.message);
+
+        // Tắt loading nút submit
+        restoreSubmitBtn();
       });
   }
 

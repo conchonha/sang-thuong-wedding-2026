@@ -111,8 +111,9 @@
             </div>
           </div>
 
-          <button type="submit" class="btn-luxury btn-gold" style="padding: 12px 30px; margin-top: 5px;">
-            ✨ Tạo Link Mời Khách Này
+          <button type="submit" id="guest-create-btn" class="btn-luxury btn-gold" style="padding: 12px 30px; margin-top: 5px; display: inline-flex; align-items: center; gap: 8px; justify-content: center;">
+            <span id="guest-create-btn-icon">✨</span>
+            <span id="guest-create-btn-text">Tạo Link Mời Khách Này</span>
           </button>
         </form>
 
@@ -136,7 +137,10 @@
 
           <!-- Formatted Invitation Preview Card -->
           <div class="invite-preview-card">
-            <div class="invite-preview-ribbon">✨ Xem Trước Tin Nhắn Thiệp Mời</div>
+            <div class="invite-preview-ribbon" style="display: flex; align-items: center; justify-content: space-between;">
+              <span>✨ Xem Trước Tin Nhắn Thiệp Mời</span>
+              <span id="preview-short-status" style="font-size:0.75rem; font-weight:500; letter-spacing:0; text-transform:none;"></span>
+            </div>
             <div class="invite-preview-body" id="invite-preview-html">
               <!-- Dynamically populated formatted text -->
             </div>
