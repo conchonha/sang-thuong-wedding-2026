@@ -131,6 +131,76 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ═══ TRÌNH TẠO MẪU TIN NHẮN VÀ XEM TRƯỚC THIỆP MỜI ═══
+  function buildInviteMessage(guest, linkToUse, isShortening = false) {
+    const { name, side, eventChoice } = guest;
+    const coupleNames = 'Minh Quân & Hoàng Yến';
+    let eventText = 'Cả Hai Buổi Lễ (Lễ Nạp Tài & Lễ Vu Quy)';
+    let eventTitleShort = 'Cả Hai Buổi Lễ';
+    if (eventChoice === 'vuquy') {
+      eventText = 'Lễ Vu Quy tại Tư gia Nhà Trai';
+      eventTitleShort = 'Lễ Vu Quy (Nhà Trai)';
+    } else if (eventChoice === 'naptai') {
+      eventText = 'Lễ Nạp Tài tại Tư gia Nhà Gái';
+      eventTitleShort = 'Lễ Nạp Tài (Nhà Gái)';
+    }
+
+    let familyText = 'đôi bạn trẻ và hai bên gia đình';
+    let sideTitleShort = 'Bạn chung';
+    if (side === 'groom') {
+      familyText = 'Chú Rể & Gia Đình Nhà Trai';
+      sideTitleShort = 'Nhà Trai';
+    } else if (side === 'bride') {
+      familyText = 'Cô Dâu & Gia Đình Nhà Gái';
+      sideTitleShort = 'Nhà Gái';
+    }
+
+    const plainMsg = `Trân trọng kính mời ${name} tới tham dự ${eventText} của ${coupleNames}!
+
+Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn lao nhất đối với ${familyText}.
+
+📍 Kính mời ${name} xem thiệp mời riêng và thông tin bản đồ chỉ đường tại:
+👉 ${linkToUse}`;
+
+    let linkBoxHtml;
+    if (isShortening) {
+      linkBoxHtml = `
+        <div style="background: #fffdf5; border: 1.5px dashed #f59e0b; border-radius: 8px; padding: 12px 14px; word-break: break-all;">
+          <div style="display:flex; align-items:center; gap:8px; color: #b45309; font-weight: 600; font-size: 0.9rem; margin-bottom: 5px;">
+            <span style="display:inline-block; animation:spin 1s linear infinite;">⏳</span>
+            <span>Đang tạo &amp; tối ưu link rút gọn...</span>
+          </div>
+          <div style="font-size: 0.78rem; color: #888; word-break: break-all;">
+            ${escapeHtml(linkToUse)}
+          </div>
+        </div>
+      `;
+    } else {
+      linkBoxHtml = `
+        <div style="background: #fff9f0; border: 1.5px dashed var(--gold-primary); border-radius: 8px; padding: 11px 14px; word-break: break-all; font-weight: 600; box-shadow: 0 2px 8px rgba(183,121,31,0.08);">
+          👉 <a href="${linkToUse}" target="_blank" style="color: var(--gold-dark); text-decoration: underline; font-weight: 700; font-size: 0.98rem;">${escapeHtml(linkToUse)}</a>
+        </div>
+      `;
+    }
+
+    const htmlPreview = `
+      <div style="font-size: 0.96rem; line-height: 1.7; color: #2e2620;">
+        <p style="margin-bottom: 12px;">
+          Trân trọng kính mời <strong style="color: var(--gold-dark); font-size: 1.05rem;">${escapeHtml(name)}</strong> tới tham dự <strong style="color: #b7791f;">${escapeHtml(eventText)}</strong> của <strong style="color: var(--gold-dark); font-family: var(--font-serif); font-size: 1.1rem;">${coupleNames}</strong>!
+        </p>
+        <p style="margin-bottom: 12px; color: #4a3e35;">
+          Sự hiện diện của <strong style="color: var(--gold-dark);">${escapeHtml(name)}</strong> là niềm vinh hạnh và hạnh phúc lớn lao nhất đối với <strong>${escapeHtml(familyText)}</strong>.
+        </p>
+        <p style="margin-bottom: 8px; color: #4a3e35;">
+          📍 Kính mời <strong>${escapeHtml(name)}</strong> xem thiệp mời riêng và thông tin bản đồ chỉ đường tại:
+        </p>
+        ${linkBoxHtml}
+      </div>
+    `;
+
+    return { plainMsg, htmlPreview, sideTitleShort, eventTitleShort };
+  }
+
   function initGuestGenerator() {
     const guestForm = document.getElementById('guest-create-form');
     const resultBox = document.getElementById('guest-result-box');
@@ -183,76 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sideSelect) {
       sideSelect.addEventListener('change', updateEventOptions);
       updateEventOptions();
-    }
-
-    // ═══ TRÌNH TẠO MẪU TIN NHẮN VÀ XEM TRƯỚC THIỆP MỜI ═══
-    function buildInviteMessage(guest, linkToUse, isShortening = false) {
-      const { name, side, eventChoice } = guest;
-      const coupleNames = 'Minh Quân & Hoàng Yến';
-      let eventText = 'Cả Hai Buổi Lễ (Lễ Nạp Tài & Lễ Vu Quy)';
-      let eventTitleShort = 'Cả Hai Buổi Lễ';
-      if (eventChoice === 'vuquy') {
-        eventText = 'Lễ Vu Quy tại Tư gia Nhà Trai';
-        eventTitleShort = 'Lễ Vu Quy (Nhà Trai)';
-      } else if (eventChoice === 'naptai') {
-        eventText = 'Lễ Nạp Tài tại Tư gia Nhà Gái';
-        eventTitleShort = 'Lễ Nạp Tài (Nhà Gái)';
-      }
-
-      let familyText = 'đôi bạn trẻ và hai bên gia đình';
-      let sideTitleShort = 'Bạn chung';
-      if (side === 'groom') {
-        familyText = 'Chú Rể & Gia Đình Nhà Trai';
-        sideTitleShort = 'Nhà Trai';
-      } else if (side === 'bride') {
-        familyText = 'Cô Dâu & Gia Đình Nhà Gái';
-        sideTitleShort = 'Nhà Gái';
-      }
-
-      const plainMsg = `Trân trọng kính mời ${name} tới tham dự ${eventText} của ${coupleNames}!
-
-Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn lao nhất đối với ${familyText}.
-
-📍 Kính mời ${name} xem thiệp mời riêng và thông tin bản đồ chỉ đường tại:
-👉 ${linkToUse}`;
-
-      let linkBoxHtml;
-      if (isShortening) {
-        linkBoxHtml = `
-          <div style="background: #fffdf5; border: 1.5px dashed #f59e0b; border-radius: 8px; padding: 12px 14px; word-break: break-all;">
-            <div style="display:flex; align-items:center; gap:8px; color: #b45309; font-weight: 600; font-size: 0.9rem; margin-bottom: 5px;">
-              <span style="display:inline-block; animation:spin 1s linear infinite;">⏳</span>
-              <span>Đang tạo &amp; tối ưu link rút gọn...</span>
-            </div>
-            <div style="font-size: 0.78rem; color: #888; word-break: break-all;">
-              ${escapeHtml(linkToUse)}
-            </div>
-          </div>
-        `;
-      } else {
-        linkBoxHtml = `
-          <div style="background: #fff9f0; border: 1.5px dashed var(--gold-primary); border-radius: 8px; padding: 11px 14px; word-break: break-all; font-weight: 600; box-shadow: 0 2px 8px rgba(183,121,31,0.08);">
-            👉 <a href="${linkToUse}" target="_blank" style="color: var(--gold-dark); text-decoration: underline; font-weight: 700; font-size: 0.98rem;">${escapeHtml(linkToUse)}</a>
-          </div>
-        `;
-      }
-
-      const htmlPreview = `
-        <div style="font-size: 0.96rem; line-height: 1.7; color: #2e2620;">
-          <p style="margin-bottom: 12px;">
-            Trân trọng kính mời <strong style="color: var(--gold-dark); font-size: 1.05rem;">${escapeHtml(name)}</strong> tới tham dự <strong style="color: #b7791f;">${escapeHtml(eventText)}</strong> của <strong style="color: var(--gold-dark); font-family: var(--font-serif); font-size: 1.1rem;">${coupleNames}</strong>!
-          </p>
-          <p style="margin-bottom: 12px; color: #4a3e35;">
-            Sự hiện diện của <strong style="color: var(--gold-dark);">${escapeHtml(name)}</strong> là niềm vinh hạnh và hạnh phúc lớn lao nhất đối với <strong>${escapeHtml(familyText)}</strong>.
-          </p>
-          <p style="margin-bottom: 8px; color: #4a3e35;">
-            📍 Kính mời <strong>${escapeHtml(name)}</strong> xem thiệp mời riêng và thông tin bản đồ chỉ đường tại:
-          </p>
-          ${linkBoxHtml}
-        </div>
-      `;
-
-      return { plainMsg, htmlPreview, sideTitleShort, eventTitleShort };
     }
 
     // Hiển thị kết quả thiệp mời và mẫu tin nhắn
