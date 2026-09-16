@@ -7,7 +7,7 @@
 // ══ Cấu hình Google Sheets ══════════════════════════════════════════════
 // ❗ Dán URL của Google Apps Script vào đây sau khi Deploy
 // Hướng dẫn: xem file google_apps_script.gs
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycby0zO_N72x-jg8zVZ2cROT_6AGoAhjbcRHkv9UVEKH3DHQyeU9g1Z_NsqHmJW6yHHTu/exec';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwXC5C_lD2wt7h0Uz_pmiShtafI_lNNdh8iQo-MFGSCziNOh4T1H0dqijxhWpyORf01/exec';
 const GOOGLE_SHEET_ID = '1JlN1-utEeoLThwzfsyvnNNIDQovqeocbMTEq_NSeWo4';
 
 /**

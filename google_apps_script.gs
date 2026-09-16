@@ -13,41 +13,10 @@
 const SHEET_NAME = 'RSVP'; // Tên tab sheet lưu trữ khách mời và RSVP
 
 // ═══════════════════════════════════════════════════════════════════
-// GET — Trả về danh sách khách HOẶC rút gọn link (proxy is.gd)
+// GET — Trả về danh sách khách mời trong Google Sheet
 // ═══════════════════════════════════════════════════════════════════
 function doGet(e) {
   try {
-
-    // ── ACTION: Rút gọn link qua is.gd (proxy server-side, bypass CORS) ──
-    if (e && e.parameter && e.parameter.action === 'shorten') {
-      const longUrl = e.parameter.url || '';
-      const customAlias = e.parameter.alias || '';
-
-      if (!longUrl) {
-        return jsonResponse({ success: false, error: 'Missing url parameter' });
-      }
-
-      // Thử với custom alias trước
-      if (customAlias) {
-        const result = callIsGd(longUrl, customAlias);
-        if (result.success) return jsonResponse(result);
-
-        // Alias bị chiếm → thêm 3 số ngẫu nhiên vào cuối (dùng _)
-        const fallbackAlias = customAlias + '_' + Math.floor(Math.random() * 900 + 100);
-        const result2 = callIsGd(longUrl, fallbackAlias);
-        if (result2.success) return jsonResponse(result2);
-      }
-
-      // Fallback 3: tạo link ngẫu nhiên (không alias)
-      const result3 = callIsGd(longUrl, '');
-      if (result3.success) return jsonResponse(result3);
-
-      // Fallback 4: TinyURL nếu is.gd gặp lỗi
-      const resultTiny = callTinyUrl(longUrl);
-      return jsonResponse(resultTiny);
-    }
-
-    // ── Mặc định: Trả về danh sách khách trong Google Sheet ──
     const sheet = getOrCreateSheet(SHEET_NAME);
     const rows = sheet.getDataRange().getValues();
 
@@ -67,46 +36,6 @@ function doGet(e) {
     return jsonResponse({ success: true, count: data.length, data: data });
   } catch (err) {
     return jsonResponse({ success: false, error: err.message });
-  }
-}
-
-// ── Helper: Gọi is.gd API từ server (không bị CORS) ──
-function callIsGd(longUrl, alias) {
-  try {
-    let apiUrl = 'https://is.gd/create.php?format=json&url=' + encodeURIComponent(longUrl);
-    if (alias) apiUrl += '&shorturl=' + encodeURIComponent(alias);
-
-    const response = UrlFetchApp.fetch(apiUrl, {
-      muteHttpExceptions: true,
-      followRedirects: true
-    });
-    const text = response.getContentText();
-    const data = JSON.parse(text);
-
-    if (data && data.shorturl) {
-      return { success: true, shorturl: data.shorturl };
-    }
-    return { success: false, error: data.errormessage || 'is.gd trả về lỗi không xác định' };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-}
-
-// ── Helper dự phòng: Gọi TinyURL API ──
-function callTinyUrl(longUrl) {
-  try {
-    const apiUrl = 'https://tinyurl.com/api-create.php?url=' + encodeURIComponent(longUrl);
-    const response = UrlFetchApp.fetch(apiUrl, {
-      muteHttpExceptions: true,
-      followRedirects: true
-    });
-    const text = response.getContentText().trim();
-    if (text && text.startsWith('http')) {
-      return { success: true, shorturl: text };
-    }
-    return { success: false, error: 'TinyURL trả về kết quả không hợp lệ' };
-  } catch (err) {
-    return { success: false, error: err.message };
   }
 }
 

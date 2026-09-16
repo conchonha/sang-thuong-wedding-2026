@@ -5,7 +5,7 @@
 
 // ══ Cấu hình Google Sheets (phải khớp với main.js) ══
 const GOOGLE_SHEET_ID = '1JlN1-utEeoLThwzfsyvnNNIDQovqeocbMTEq_NSeWo4';
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycby0zO_N72x-jg8zVZ2cROT_6AGoAhjbcRHkv9UVEKH3DHQyeU9g1Z_NsqHmJW6yHHTu/exec';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwXC5C_lD2wt7h0Uz_pmiShtafI_lNNdh8iQo-MFGSCziNOh4T1H0dqijxhWpyORf01/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   const PIN_CODE = '123456';
@@ -106,17 +106,15 @@ document.addEventListener('DOMContentLoaded', () => {
      3. GUEST LINK GENERATOR & LIST
      ========================================================================== */
   function getBaseUrl() {
-    // Current URL minus admin.html, replaced with index.html
     const origin = window.location.origin;
     let path = window.location.pathname;
-    if (path.endsWith('admin.html')) {
-      path = path.replace('admin.html', 'index.html');
-    } else if (path.endsWith('/')) {
-      path = path + 'index.html';
-    } else {
-      path = path + '/index.html';
-    }
-    return `${origin}${path}`;
+
+    // Loại bỏ admin.html, /admin/, /admin/index.html
+    path = path.replace(/\/admin(\.html|\/index\.html|\/)?$/, '');
+    path = path.replace(/\/index\.html$/, '');
+    path = path.replace(/\/$/, '');
+
+    return `${origin}${path}/index.html`;
   }
 
   function updateSideFilterCounts() {
@@ -551,9 +549,8 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       if (!link || (!link.startsWith('http') && !link.includes('index.html'))) {
         link = `${baseUrl}?to=${encodeURIComponent(name)}&side=${side}&event=${eventChoice}`;
       } else if (link.startsWith('index.html')) {
-        const origin = window.location.origin;
-        let p = window.location.pathname.replace('admin.html', '').replace(/\/+$/, '');
-        link = `${origin}${p}/${link}`;
+        const queryString = link.includes('?') ? link.slice(link.indexOf('?')) : '';
+        link = `${baseUrl}${queryString}`;
       }
 
       parsedGuests.push({
@@ -573,18 +570,18 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
   }
 
   /* ==========================================================================
-     URL SHORTENER — Proxy qua Google Apps Script (bypass CORS)
-     Custom alias: sang-thuong-wedding-[tên khách]
+     CLIENT-SIDE URL SHORTENER (Rút gọn trực tiếp trên Web, 100% Frontend)
+     TinyURL Custom Alias: sang-thuong-wedding-[tên khách]
      ========================================================================== */
 
   /** Tiền tố của alias — có thể đổi cho phù hợp */
-  const SHORT_PREFIX = 'sang_thuong_wedding';
+  const SHORT_PREFIX = 'sang-thuong-wedding';
 
   /**
-   * Tạo alias is.gd từ tên khách mời.
-   * Ví dụ: "Nguyễn Thị Lan" → "sang_thuong_wedding_lan"
+   * Tạo alias TinyURL từ tên khách mời.
+   * Ví dụ: "Nguyễn Thị Lan" → "sang-thuong-wedding-lan"
    * @param {string} guestName
-   * @returns {string} alias sạch theo định dạng is.gd (5-30 ký tự)
+   * @returns {string} alias sạch (5-30 ký tự)
    */
   function buildGuestAlias(guestName) {
     if (!guestName) return SHORT_PREFIX;
@@ -597,84 +594,62 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       .replace(/[^a-zA-Z0-9]/g, '')    // chỉ giữ chữ + số
       .toLowerCase()
       .slice(0, 10);
-    const alias = clean ? `${SHORT_PREFIX}_${clean}` : SHORT_PREFIX;
-    // is.gd yêu cầu 5-30 ký tự
+    const alias = clean ? `${SHORT_PREFIX}-${clean}` : SHORT_PREFIX;
     return alias.slice(0, 30);
   }
 
   /**
-   * Dự phòng rút gọn link trực tiếp qua is.gd JSONP (chạy ngay trên trình duyệt, không bị CORS).
-   * @param {string} longUrl
+   * Gọi TinyURL API qua AllOrigins Proxy (Client-Side, không cần Apps Script)
+   * @param {string} targetUrl 
+   * @param {string} alias 
    * @returns {Promise<string>}
    */
-  function shortenUrlJsonp(longUrl) {
-    return new Promise((resolve, reject) => {
-      const cbName = 'isgd_cb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-      const script = document.createElement('script');
+  function fetchTinyUrlViaProxy(targetUrl, alias = '') {
+    let tinyApi = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(targetUrl)}`;
+    if (alias) tinyApi += `&alias=${encodeURIComponent(alias)}`;
 
-      const timer = setTimeout(() => {
-        cleanup();
-        reject(new Error('Hết thời gian chờ is.gd'));
-      }, 7000);
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(tinyApi)}`;
 
-      function cleanup() {
-        if (timer) clearTimeout(timer);
-        delete window[cbName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-      }
-
-      window[cbName] = function(data) {
-        cleanup();
-        if (data && data.shorturl) {
-          resolve(data.shorturl);
-        } else {
-          reject(new Error((data && data.errormessage) || 'is.gd không trả về link'));
+    return fetch(proxyUrl)
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP Proxy Error ' + res.status);
+        return res.json();
+      })
+      .then(data => {
+        const result = (data && data.contents) ? data.contents.trim() : '';
+        if (result && result.startsWith('http') && !result.toLowerCase().includes('error')) {
+          return result;
         }
-      };
-
-      script.onerror = function() {
-        cleanup();
-        reject(new Error('Lỗi kết nối is.gd'));
-      };
-
-      script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}&callback=${cbName}`;
-      document.head.appendChild(script);
-    });
+        throw new Error('TinyURL returned error or duplicate alias');
+      });
   }
 
   /**
-   * Rút gọn URL qua Google Apps Script proxy (không bị CORS).
-   * Nếu Apps Script gặp lỗi (hoặc chưa cấp quyền), tự động dùng dự phòng is.gd JSONP trực tiếp.
+   * Rút gọn URL 100% Client-Side với 3 tầng dự phòng:
+   * 1. TinyURL với custom alias: sang-thuong-wedding-[tên]
+   * 2. TinyURL với fallback alias: sang-thuong-wedding-[tên]-[số ngẫu nhiên]
+   * 3. TinyURL ngẫu nhiên (không alias)
    * @param {string} longUrl   - URL đầy đủ cần rút gọn
-   * @param {string} guestName - Tên khách để tạo custom alias (tuỳ chọn)
+   * @param {string} guestName - Tên khách để tạo alias
    * @returns {Promise<string>} - URL đã rút gọn
    */
   function shortenUrl(longUrl, guestName = '') {
     const alias = buildGuestAlias(guestName);
 
-    if (!GOOGLE_SHEET_URL) {
-      return shortenUrlJsonp(longUrl);
-    }
-
-    const params = new URLSearchParams({
-      action: 'shorten',
-      url: longUrl,
-      alias: alias
-    });
-
-    return fetch(`${GOOGLE_SHEET_URL}?${params.toString()}`)
-      .then(res => {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
-      })
-      .then(data => {
-        if (data && data.success && data.shorturl) return data.shorturl;
-        console.warn('Apps Script proxy error, using is.gd JSONP fallback:', data?.error);
-        return shortenUrlJsonp(longUrl);
+    // Tầng 1: Thử TinyURL với custom alias đẹp
+    return fetchTinyUrlViaProxy(longUrl, alias)
+      .catch(err => {
+        console.warn('[Shortener] Custom alias trùng hoặc lỗi, thử fallback alias:', err.message);
+        const fallbackAlias = alias + '-' + Math.floor(Math.random() * 900 + 100);
+        return fetchTinyUrlViaProxy(longUrl, fallbackAlias);
       })
       .catch(err => {
-        console.warn('Apps Script fetch failed, using is.gd JSONP fallback:', err);
-        return shortenUrlJsonp(longUrl);
+        console.warn('[Shortener] Fallback alias trùng, thử TinyURL ngẫu nhiên:', err.message);
+        return fetchTinyUrlViaProxy(longUrl, '');
+      })
+      .catch(err => {
+        console.warn('[Shortener] Tất cả proxy TinyURL đều thất bại, dùng link gốc:', err.message);
+        return Promise.reject(err);
       });
   }
 
