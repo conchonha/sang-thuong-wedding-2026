@@ -5,7 +5,7 @@
 
 // ══ Cấu hình Google Sheets (phải khớp với main.js) ══
 const GOOGLE_SHEET_ID = '1JlN1-utEeoLThwzfsyvnNNIDQovqeocbMTEq_NSeWo4';
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxBXr9yGWLTjSlzoAHaA9AJ1jZB0o6bCi_-QTG3Oe3bAwkgQwz4iwctWI6IVMFvIU9f/exec';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwB_1JkjiwOoxgIuCCj7eUo1XY09g5pYiUITsojBAG-1R8O8pk-PctlK00FxAUd3Lal/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   const PIN_CODE = '123456';
