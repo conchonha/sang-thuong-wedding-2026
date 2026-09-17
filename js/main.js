@@ -570,6 +570,222 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCountdown();
 
   /* ==========================================================================
+     4.5 STORY MEDIA PRESENTATION MODAL (VIDEO TỎ TÌNH TRƯỚC + ẢNH SAU)
+     ========================================================================== */
+  const storyModal = document.getElementById('story-modal');
+  const storyModalBackdrop = document.getElementById('story-modal-backdrop');
+  const storyModalClose = document.getElementById('story-modal-close');
+  const storyTrack = document.getElementById('story-track');
+  const storyViewport = document.getElementById('story-viewport');
+  const storyNavPrev = document.getElementById('story-nav-prev');
+  const storyNavNext = document.getElementById('story-nav-next');
+  const storyCaption = document.getElementById('story-caption');
+  const storyThumbBtns = document.querySelectorAll('.story-thumb-btn');
+  const storyVideoPlayer = document.getElementById('story-video-player');
+  const timelineInteractiveItems = document.querySelectorAll('.timeline-interactive');
+
+  const storyItems = [
+    { type: 'video', caption: 'Video Khoảnh Khắc Tỏ Tình Lãng Mạn (15/09/2025)' },
+    { type: 'image', caption: 'Khoảnh khắc hạnh phúc ngày em nhận lời yêu' },
+    { type: 'image', caption: 'Nụ cười rạng rỡ và ánh mắt đong đầy yêu thương' },
+    { type: 'image', caption: 'Bó hoa tươi thắm cùng lời hứa bên nhau trọn đời' },
+    { type: 'image', caption: 'Hành trình tình yêu chính thức đơm hoa kết trái' }
+  ];
+
+  let currentStoryIdx = 0;
+  const totalStoryItems = storyItems.length;
+
+  function goToStorySlide(index, animate = true) {
+    if (index < 0) index = totalStoryItems - 1;
+    if (index >= totalStoryItems) index = 0;
+    currentStoryIdx = index;
+
+    if (storyTrack) {
+      storyTrack.style.transition = animate ? 'transform 0.45s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
+      storyTrack.style.transform = `translateX(-${currentStoryIdx * 100}%)`;
+    }
+
+    if (storyCaption && storyItems[currentStoryIdx]) {
+      storyCaption.innerText = storyItems[currentStoryIdx].caption;
+    }
+
+    // Update Thumbnails
+    if (storyThumbBtns && storyThumbBtns.length > 0) {
+      storyThumbBtns.forEach((btn, i) => {
+        btn.classList.toggle('active', i === currentStoryIdx);
+      });
+    }
+
+    // Video handling: If leaving slide 0, pause video; if entering slide 0, play video
+    if (storyVideoPlayer) {
+      if (currentStoryIdx !== 0) {
+        storyVideoPlayer.pause();
+      } else {
+        storyVideoPlayer.play().catch(() => {});
+      }
+    }
+  }
+
+  function nextStorySlide() {
+    goToStorySlide(currentStoryIdx + 1);
+  }
+
+  function prevStorySlide() {
+    goToStorySlide(currentStoryIdx - 1);
+  }
+
+  function openStoryModal(initialIndex = 0) {
+    if (!storyModal) return;
+    goToStorySlide(initialIndex, false);
+    storyModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // Auto play video if slide 0
+    if (initialIndex === 0 && storyVideoPlayer) {
+      storyVideoPlayer.currentTime = 0;
+      storyVideoPlayer.play().catch(() => {});
+    }
+  }
+
+  function closeStoryModal() {
+    if (!storyModal) return;
+    storyModal.classList.remove('active');
+    document.body.style.overflow = '';
+    if (storyVideoPlayer) {
+      storyVideoPlayer.pause();
+    }
+  }
+
+  if (storyModalClose) storyModalClose.addEventListener('click', closeStoryModal);
+  if (storyModalBackdrop) storyModalBackdrop.addEventListener('click', closeStoryModal);
+  if (storyNavPrev) storyNavPrev.addEventListener('click', prevStorySlide);
+  if (storyNavNext) storyNavNext.addEventListener('click', nextStorySlide);
+
+  storyThumbBtns.forEach((btn, idx) => {
+    btn.addEventListener('click', () => goToStorySlide(idx));
+  });
+
+  // Attach click listener to timeline items 1 and 2
+  timelineInteractiveItems.forEach((item) => {
+    item.addEventListener('click', () => {
+      openStoryModal(0); // Starts with Video first as requested!
+    });
+  });
+
+  // Touch Swipe & Mouse Drag on Story Modal
+  let sStartX = 0;
+  let sStartY = 0;
+  let sCurrentX = 0;
+  let sCurrentY = 0;
+  let sIsDragging = false;
+  let sIsHorizontal = null;
+  let sDragDist = 0;
+
+  if (storyViewport && storyTrack) {
+    // Touch
+    storyViewport.addEventListener('touchstart', (e) => {
+      if (e.target.closest('video')) return; // Allow video native controls
+      if (e.touches.length > 1) return;
+      const touch = e.touches[0];
+      sStartX = touch.clientX;
+      sStartY = touch.clientY;
+      sCurrentX = sStartX;
+      sCurrentY = sStartY;
+      sIsDragging = true;
+      sIsHorizontal = null;
+      sDragDist = 0;
+      storyTrack.style.transition = 'none';
+    }, { passive: true });
+
+    storyViewport.addEventListener('touchmove', (e) => {
+      if (!sIsDragging) return;
+      const touch = e.touches[0];
+      sCurrentX = touch.clientX;
+      sCurrentY = touch.clientY;
+      const diffX = sCurrentX - sStartX;
+      const diffY = sCurrentY - sStartY;
+      sDragDist = diffX;
+
+      if (sIsHorizontal === null) {
+        if (Math.abs(diffX) > 6 || Math.abs(diffY) > 6) {
+          sIsHorizontal = Math.abs(diffX) > Math.abs(diffY);
+        }
+      }
+
+      if (sIsHorizontal) {
+        if (e.cancelable) e.preventDefault();
+        const basePercent = -currentStoryIdx * 100;
+        const viewportWidth = storyViewport.offsetWidth || 1;
+        const pixelPercent = (diffX / viewportWidth) * 100;
+        storyTrack.style.transform = `translateX(${basePercent + pixelPercent}%)`;
+      }
+    }, { passive: false });
+
+    storyViewport.addEventListener('touchend', () => {
+      if (!sIsDragging) return;
+      sIsDragging = false;
+      const threshold = 40;
+
+      if (sIsHorizontal && Math.abs(sDragDist) > threshold) {
+        if (sDragDist < 0) {
+          nextStorySlide();
+        } else {
+          prevStorySlide();
+        }
+      } else {
+        goToStorySlide(currentStoryIdx, true);
+      }
+      sIsHorizontal = null;
+    });
+
+    // Mouse Drag on Story Modal
+    storyViewport.addEventListener('mousedown', (e) => {
+      if (e.target.closest('video')) return; // Allow video controls
+      if (e.button !== 0) return;
+      e.preventDefault();
+      sStartX = e.clientX;
+      sStartY = e.clientY;
+      sCurrentX = sStartX;
+      sCurrentY = sStartY;
+      sIsDragging = true;
+      sDragDist = 0;
+      storyTrack.style.transition = 'none';
+      storyViewport.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!sIsDragging) return;
+      sCurrentX = e.clientX;
+      sCurrentY = e.clientY;
+      const diffX = sCurrentX - sStartX;
+      sDragDist = diffX;
+
+      const basePercent = -currentStoryIdx * 100;
+      const viewportWidth = storyViewport.offsetWidth || 1;
+      const pixelPercent = (diffX / viewportWidth) * 100;
+      storyTrack.style.transform = `translateX(${basePercent + pixelPercent}%)`;
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (!sIsDragging) return;
+      sIsDragging = false;
+      storyViewport.style.cursor = '';
+      const threshold = 45;
+
+      if (Math.abs(sDragDist) > threshold) {
+        if (sDragDist < 0) {
+          nextStorySlide();
+        } else {
+          prevStorySlide();
+        }
+      } else {
+        goToStorySlide(currentStoryIdx, true);
+      }
+      sDragDist = 0;
+    });
+  }
+
+  /* ==========================================================================
      5. PHOTO GALLERY: IN-PAGE SLIDER (TOUCH SWIPE & MOUSE DRAG) & LIGHTBOX
      ========================================================================== */
   // Image metadata
@@ -1063,7 +1279,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard navigation
   document.addEventListener('keydown', (e) => {
-    if (lightbox && lightbox.classList.contains('active')) {
+    if (storyModal && storyModal.classList.contains('active')) {
+      if (e.key === 'Escape') closeStoryModal();
+      if (e.key === 'ArrowRight') nextStorySlide();
+      if (e.key === 'ArrowLeft') prevStorySlide();
+    } else if (lightbox && lightbox.classList.contains('active')) {
       if (e.key === 'Escape') closeLightbox();
       if (e.key === 'ArrowRight') showNextImage();
       if (e.key === 'ArrowLeft') showPrevImage();

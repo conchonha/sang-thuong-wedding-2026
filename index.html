@@ -446,7 +446,7 @@
 
       <div class="timeline">
         <!-- 1. Lần đầu quen nhau -->
-        <div class="timeline-item">
+        <div class="timeline-item timeline-interactive" data-story="totinh">
           <div class="timeline-dot"></div>
           <div class="timeline-content">
             <span class="timeline-date" id="story-date-1">Tháng 08 Năm 2025</span>
@@ -454,12 +454,15 @@
             <p class="timeline-desc" id="story-desc-1">Không có ánh nhìn vô tình giữa quán quen, chỉ có một notification xuất hiện đúng thời điểm. Dòng tin nhắn ngập ngừng ngày ấy đã viết nên khởi đầu cho câu chuyện tình yêu đẹp nhất của hai đứa.</p>
             <div class="timeline-photo">
               <img src="assets/images/story_1.jpg" alt="Lần đầu quen nhau" loading="lazy">
+              <div class="timeline-photo-overlay">
+                <span class="timeline-play-pill">🎬 Xem Video &amp; Ảnh Tỏ Tình (5 khoảnh khắc) ↗</span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- 2. Lời Hẹn Ước Đầu Tiên -->
-        <div class="timeline-item">
+        <div class="timeline-item timeline-interactive" data-story="totinh">
           <div class="timeline-dot"></div>
           <div class="timeline-content">
             <span class="timeline-date" id="story-date-2">NGÀY 15 THÁNG 09 NĂM 2025</span>
@@ -467,6 +470,9 @@
             <p class="timeline-desc" id="story-desc-2">Dưới ánh đèn dịu dàng và tiếng tim đập rộn ràng, lời ngỏ: &ldquo;Làm người yêu anh nhé!&rdquo; cất lên. Một cái gật đầu e ấp đã mở ra cả một trời hạnh phúc ngập tràn nụ cười.</p>
             <div class="timeline-photo">
               <img src="assets/images/story_2.jpg" alt="Lời Hẹn Ước Đầu Tiên" loading="lazy">
+              <div class="timeline-photo-overlay">
+                <span class="timeline-play-pill">🎬 Xem Video &amp; Ảnh Tỏ Tình (5 khoảnh khắc) ↗</span>
+              </div>
             </div>
           </div>
         </div>
@@ -1047,7 +1053,104 @@
     </button>
   </div>
 
+  <!-- ==========================================================================
+       13. STORY MEDIA PRESENTATION MODAL (VIDEO & PHOTOS SLIDESHOW)
+       ========================================================================== -->
+  <div class="story-modal" id="story-modal">
+    <div class="story-modal-backdrop" id="story-modal-backdrop"></div>
+    <div class="story-modal-dialog">
+      <button class="story-modal-close" id="story-modal-close" aria-label="Đóng">&times;</button>
+      
+      <div class="story-modal-header">
+        <span class="story-modal-tag" id="story-modal-tag">KỶ NIỆM TỎ TÌNH • 15.09.2025</span>
+        <h3 class="story-modal-title" id="story-modal-title">Lời Hẹn Ước Đầu Tiên</h3>
+      </div>
+
+      <div class="story-stage" id="story-stage">
+        <button class="story-nav-btn story-nav-prev" id="story-nav-prev" aria-label="Lùi lại">&#10094;</button>
+
+        <div class="story-viewport" id="story-viewport">
+          <div class="story-track" id="story-track">
+            <!-- Slide 0: Video Tỏ Tình -->
+            <div class="story-slide" data-type="video" data-index="0" data-caption="Video Khoảnh Khắc Tỏ Tình Lãng Mạn (15/09/2025)">
+              <div class="story-media-card">
+                <video id="story-video-player" controls playsinline preload="metadata" poster="assets/images/totinh_1.jpg">
+                  <source src="assets/videos/totinh_video.mp4" type="video/mp4">
+                  Trình duyệt không hỗ trợ phát video.
+                </video>
+                <div class="story-media-badge">🎥 Video Kỷ Niệm 15.09.2025</div>
+              </div>
+            </div>
+
+            <!-- Slide 1: Ảnh 1 -->
+            <div class="story-slide" data-type="image" data-index="1" data-caption="Khoảnh khắc hạnh phúc ngày em nhận lời yêu">
+              <div class="story-media-card">
+                <img src="assets/images/totinh_1.jpg" alt="Ảnh tỏ tình 1" draggable="false">
+                <div class="story-media-badge">Ảnh 01 / 04</div>
+              </div>
+            </div>
+
+            <!-- Slide 2: Ảnh 2 -->
+            <div class="story-slide" data-type="image" data-index="2" data-caption="Nụ cười rạng rỡ và ánh mắt đong đầy yêu thương">
+              <div class="story-media-card">
+                <img src="assets/images/totinh_2.jpg" alt="Ảnh tỏ tình 2" draggable="false">
+                <div class="story-media-badge">Ảnh 02 / 04</div>
+              </div>
+            </div>
+
+            <!-- Slide 3: Ảnh 3 -->
+            <div class="story-slide" data-type="image" data-index="3" data-caption="Bó hoa tươi thắm cùng lời hứa bên nhau trọn đời">
+              <div class="story-media-card">
+                <img src="assets/images/totinh_3.jpg" alt="Ảnh tỏ tình 3" draggable="false">
+                <div class="story-media-badge">Ảnh 03 / 04</div>
+              </div>
+            </div>
+
+            <!-- Slide 4: Ảnh 4 -->
+            <div class="story-slide" data-type="image" data-index="4" data-caption="Hành trình tình yêu chính thức đơm hoa kết trái">
+              <div class="story-media-card">
+                <img src="assets/images/totinh_4.jpg" alt="Ảnh tỏ tình 4" draggable="false">
+                <div class="story-media-badge">Ảnh 04 / 04</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="story-nav-btn story-nav-next" id="story-nav-next" aria-label="Tiếp theo">&#10095;</button>
+      </div>
+
+      <!-- Live Caption -->
+      <div class="story-caption" id="story-caption">
+        Video Khoảnh Khắc Tỏ Tình Lãng Mạn (15/09/2025)
+      </div>
+
+      <!-- Bottom Thumbnails -->
+      <div class="story-thumbs" id="story-thumbs">
+        <button class="story-thumb-btn active" data-index="0" aria-label="Xem Video">
+          <span class="story-thumb-video-icon">▶</span>
+          <img src="assets/images/totinh_1.jpg" alt="Video">
+        </button>
+        <button class="story-thumb-btn" data-index="1" aria-label="Xem Ảnh 1">
+          <img src="assets/images/totinh_1.jpg" alt="Ảnh 1">
+        </button>
+        <button class="story-thumb-btn" data-index="2" aria-label="Xem Ảnh 2">
+          <img src="assets/images/totinh_2.jpg" alt="Ảnh 2">
+        </button>
+        <button class="story-thumb-btn" data-index="3" aria-label="Xem Ảnh 3">
+          <img src="assets/images/totinh_3.jpg" alt="Ảnh 3">
+        </button>
+        <button class="story-thumb-btn" data-index="4" aria-label="Xem Ảnh 4">
+          <img src="assets/images/totinh_4.jpg" alt="Ảnh 4">
+        </button>
+      </div>
+
+      <div class="story-modal-hint">
+        <span>👈 Dùng chuột kéo hoặc vuốt ngón tay sang trái/phải để chuyển video &amp; ảnh 👉</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Main JavaScript -->
-  <script src="js/main.js?v=2.1"></script>
+  <script src="js/main.js?v=2.2"></script>
 </body>
 </html>
