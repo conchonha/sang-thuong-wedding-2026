@@ -1534,7 +1534,9 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     const savedConfig = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
 
     if (savedConfig.groomName) document.getElementById('cfg-groom-name').value = savedConfig.groomName;
-    if (savedConfig.brideName) document.getElementById('cfg-bride-name').value = savedConfig.brideName;
+    if (savedConfig.brideName) {
+      document.getElementById('cfg-bride-name').value = (savedConfig.brideName === 'Thị Thương') ? 'Kiều Thương' : savedConfig.brideName;
+    }
     if (savedConfig.weddingDate) document.getElementById('cfg-wedding-date').value = savedConfig.weddingDate;
     if (savedConfig.weddingDateText) document.getElementById('cfg-wedding-date-text').value = savedConfig.weddingDateText;
 
@@ -1545,8 +1547,16 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
     // Lễ Vu Quy (Nhà Trai)
     if (savedConfig.vuquyTime) document.getElementById('cfg-vuquy-time').value = savedConfig.vuquyTime;
-    if (savedConfig.vuquyAddress) document.getElementById('cfg-vuquy-address').value = savedConfig.vuquyAddress;
-    if (savedConfig.vuquyMap) document.getElementById('cfg-vuquy-map').value = savedConfig.vuquyMap;
+    if (savedConfig.vuquyAddress && !savedConfig.vuquyAddress.includes('Đội Cấn') && !savedConfig.vuquyAddress.includes('Trống Đồng') && !savedConfig.vuquyAddress.includes('Quán Sứ') && !savedConfig.vuquyAddress.includes('Hà Nội')) {
+      document.getElementById('cfg-vuquy-address').value = savedConfig.vuquyAddress;
+    } else {
+      document.getElementById('cfg-vuquy-address').value = 'Sân vận động thôn Đại Mỹ, Xã Thượng Đức, Thành Phố Đà Nẵng';
+    }
+    if (savedConfig.vuquyMap && !savedConfig.vuquyMap.includes('Doi+Can') && !savedConfig.vuquyMap.includes('Trong+Dong')) {
+      document.getElementById('cfg-vuquy-map').value = savedConfig.vuquyMap;
+    } else {
+      document.getElementById('cfg-vuquy-map').value = 'https://maps.app.goo.gl/caDXU6YDqyaPM3Wt9';
+    }
 
     // Banks
     if (savedConfig.bankGroomAcc) document.getElementById('cfg-bank-groom-acc').value = savedConfig.bankGroomAcc;

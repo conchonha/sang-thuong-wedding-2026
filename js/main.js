@@ -58,9 +58,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const rawCfg = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
+    let cfgNeedsSave = false;
     if (rawCfg.brideName === 'Thị Thương' || rawCfg.brideName === 'Phạm Thị Thương') {
       rawCfg.brideName = 'Kiều Thương';
-      localStorage.setItem('wedding_custom_config', JSON.stringify(rawCfg));
+      cfgNeedsSave = true;
+    }
+    // Sanitize any legacy Hanoi / Đội Cấn dummy data from earlier tests in localStorage
+    if (!rawCfg.vuquyAddress || 
+        rawCfg.vuquyAddress.includes('Đội Cấn') || 
+        rawCfg.vuquyAddress.includes('Doi Can') || 
+        rawCfg.vuquyAddress.includes('Trống Đồng') || 
+        rawCfg.vuquyAddress.includes('Trong Dong') || 
+        rawCfg.vuquyAddress.includes('Quán Sứ') || 
+        rawCfg.vuquyAddress.includes('Hà Nội') || 
+        rawCfg.vuquyAddress.includes('Ha Noi') ||
+        rawCfg.vuquyAddress.includes('Ba Đình')) {
+      rawCfg.vuquyAddress = 'Sân vận động thôn Đại Mỹ, Xã Thượng Đức, Thành Phố Đà Nẵng';
+      rawCfg.vuquyMap = 'https://maps.app.goo.gl/caDXU6YDqyaPM3Wt9';
+      rawCfg.vuquyTime = '10:00 • 20.12.2026';
+      cfgNeedsSave = true;
+    }
+    if (cfgNeedsSave) {
+      try {
+        localStorage.setItem('wedding_custom_config', JSON.stringify(rawCfg));
+      } catch (e) {}
     }
     const cfg = rawCfg;
     const grName = cfg.groomName || 'Bá Sang';
@@ -78,7 +99,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sideRadio) sideRadio.checked = true;
   }
 
-  // Load Custom Configuration (Address, Times & Google Maps) from Couple Config
+  // Purge any stale map/address keys from localStorage so they never conflict
+  try {
+    const rawCfg = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
+    let cfgCleaned = false;
+    if (rawCfg.vuquyAddress || rawCfg.vuquyMap || rawCfg.naptaiAddress || rawCfg.naptaiMap) {
+      delete rawCfg.vuquyAddress;
+      delete rawCfg.vuquyMap;
+      delete rawCfg.naptaiAddress;
+      delete rawCfg.naptaiMap;
+      cfgCleaned = true;
+    }
+    if (rawCfg.brideName === 'Thị Thương' || rawCfg.brideName === 'Phạm Thị Thương') {
+      rawCfg.brideName = 'Kiều Thương';
+      cfgCleaned = true;
+    }
+    if (cfgCleaned) {
+      localStorage.setItem('wedding_custom_config', JSON.stringify(rawCfg));
+    }
+  } catch (e) {}
+
+  // Load Custom Configuration for Date/Banks/Story from Couple Config
   const savedConfig = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
 
   let targetWeddingTime = '2026-12-20T10:00:00+07:00';
@@ -90,93 +131,40 @@ document.addEventListener('DOMContentLoaded', () => {
     if (heroDateEl) heroDateEl.innerText = savedConfig.weddingDateText;
   }
 
-  // ═══ GOOGLE MAP EMBED URL RESOLVER ═══
-  function getGoogleMapEmbedUrl(mapUrl, address) {
-    const trimmedUrl = (mapUrl || '').trim();
-    if (trimmedUrl.includes('output=embed') || trimmedUrl.includes('google.com/maps/embed')) {
-      return trimmedUrl;
-    }
-    // Specific short link support
-    if (trimmedUrl.includes('caDXU6YDqyaPM3Wt9') || trimmedUrl.includes('2rbTxYcyEpWjvdc6A')) {
-      return 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1085.6283062991024!2d107.89884126958216!3d15.866987289056569!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1svi!2s!4v1789618372252!5m2!1svi!2s';
-    }
-    // Google Plus Code support (e.g., VV8X+QQX Thượng Đức, Đà Nẵng, Việt Nam)
-    if (trimmedUrl.includes('VV8X+QQX') || trimmedUrl.includes('VV8X%2BQQX') || (address && address.includes('VV8X+QQX'))) {
-      return 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1085.6283062991024!2d107.89884126958216!3d15.866987289056569!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1svi!2s!4v1789618372252!5m2!1svi!2s';
-    }
-    // If URL contains lat,lng coordinates
-    const atMatch = trimmedUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-    if (atMatch) {
-      return `https://maps.google.com/maps?q=${atMatch[1]},${atMatch[2]}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
-    }
-    const qCoordMatch = trimmedUrl.match(/[?&]q=(-?\d+\.\d+)[,+](-?\d+\.\d+)/);
-    if (qCoordMatch) {
-      return `https://maps.google.com/maps?q=${qCoordMatch[1]},${qCoordMatch[2]}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
-    }
-    const searchCoordMatch = trimmedUrl.match(/\/search\/(-?\d+\.\d+)[,+]+(-?\d+\.\d+)/);
-    if (searchCoordMatch) {
-      return `https://maps.google.com/maps?q=${searchCoordMatch[1]},${searchCoordMatch[2]}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
-    }
-    const placeCoordMatch = trimmedUrl.match(/\/place\/(-?\d+\.\d+)[,+]+(-?\d+\.\d+)/);
-    if (placeCoordMatch) {
-      return `https://maps.google.com/maps?q=${placeCoordMatch[1]},${placeCoordMatch[2]}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
-    }
-    if (trimmedUrl.includes('q=')) {
-      try {
-        const urlObj = new URL(trimmedUrl);
-        const qVal = urlObj.searchParams.get('q');
-        if (qVal) {
-          return `https://maps.google.com/maps?q=${encodeURIComponent(qVal)}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
-        }
-      } catch (e) {}
-    }
-    if (address) {
-      return `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-    }
-    return '';
-  }
+  // ═══ AUTHORITATIVE DEFAULT EVENT CONFIGURATIONS (BỎ LOCALSTORAGE CHO MAP) ═══
+  // 1. Nhà Gái: Lễ Nạp Tài
+  const DEFAULT_NAPTAI_TIME = '09:00 • 10.12.2026';
+  const DEFAULT_NAPTAI_ADDRESS = 'Số 68 Phố Huế, Phường Hàng Bài, Quận Hoàn Kiếm, TP. Hà Nội';
+  const DEFAULT_NAPTAI_MAP = 'https://maps.google.com/?q=68+Pho+Hue+Hanoi';
+  const DEFAULT_NAPTAI_EMBED = 'https://maps.google.com/maps?q=68+Pho+Hue+Hoan+Kiem+Hanoi&t=&z=15&ie=UTF8&iwloc=&output=embed';
 
-  // Lễ Nạp Tài (Nhà Gái)
-  if (savedConfig.naptaiTime) {
-    const el = document.getElementById('event-naptai-time');
-    if (el) el.innerText = savedConfig.naptaiTime;
-  }
-  if (savedConfig.naptaiAddress) {
-    const el = document.getElementById('event-naptai-address');
-    if (el) el.innerText = savedConfig.naptaiAddress;
-  }
-  if (savedConfig.naptaiMap || savedConfig.naptaiAddress) {
-    const iframe = document.getElementById('event-naptai-iframe');
-    const embedUrl = getGoogleMapEmbedUrl(savedConfig.naptaiMap, savedConfig.naptaiAddress);
-    if (iframe && embedUrl) iframe.src = embedUrl;
-  }
-  if (savedConfig.naptaiMap) {
-    const btn = document.getElementById('event-naptai-map-btn');
-    const directBtn = document.getElementById('event-naptai-map-direct');
-    if (btn) btn.href = savedConfig.naptaiMap;
-    if (directBtn) directBtn.href = savedConfig.naptaiMap;
-  }
+  const elNapTaiTime = document.getElementById('event-naptai-time');
+  if (elNapTaiTime) elNapTaiTime.innerText = DEFAULT_NAPTAI_TIME;
+  const elNapTaiAddr = document.getElementById('event-naptai-address');
+  if (elNapTaiAddr) elNapTaiAddr.innerText = DEFAULT_NAPTAI_ADDRESS;
+  const elNapTaiIframe = document.getElementById('event-naptai-iframe');
+  if (elNapTaiIframe) elNapTaiIframe.src = DEFAULT_NAPTAI_EMBED;
+  const elNapTaiBtn = document.getElementById('event-naptai-map-btn');
+  if (elNapTaiBtn) elNapTaiBtn.href = DEFAULT_NAPTAI_MAP;
+  const elNapTaiDirect = document.getElementById('event-naptai-map-direct');
+  if (elNapTaiDirect) elNapTaiDirect.href = DEFAULT_NAPTAI_MAP;
 
-  // Lễ Vu Quy (Nhà Trai)
-  if (savedConfig.vuquyTime) {
-    const el = document.getElementById('event-vuquy-time');
-    if (el) el.innerText = savedConfig.vuquyTime;
-  }
-  if (savedConfig.vuquyAddress) {
-    const el = document.getElementById('event-vuquy-address');
-    if (el) el.innerText = savedConfig.vuquyAddress;
-  }
-  if (savedConfig.vuquyMap || savedConfig.vuquyAddress) {
-    const iframe = document.getElementById('event-vuquy-iframe');
-    const embedUrl = getGoogleMapEmbedUrl(savedConfig.vuquyMap, savedConfig.vuquyAddress);
-    if (iframe && embedUrl) iframe.src = embedUrl;
-  }
-  if (savedConfig.vuquyMap) {
-    const btn = document.getElementById('event-vuquy-map-btn');
-    const directBtn = document.getElementById('event-vuquy-map-direct');
-    if (btn) btn.href = savedConfig.vuquyMap;
-    if (directBtn) directBtn.href = savedConfig.vuquyMap;
-  }
+  // 2. Nhà Trai: Lễ Vu Quy
+  const DEFAULT_VUQUY_TIME = '10:00 • 20.12.2026';
+  const DEFAULT_VUQUY_ADDRESS = 'Sân vận động thôn Đại Mỹ, Xã Thượng Đức, Thành Phố Đà Nẵng';
+  const DEFAULT_VUQUY_MAP = 'https://maps.app.goo.gl/caDXU6YDqyaPM3Wt9';
+  const DEFAULT_VUQUY_EMBED = 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1085.6283062991024!2d107.89884126958216!3d15.866987289056569!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1svi!2s!4v1789618372252!5m2!1svi!2s';
+
+  const elVuQuyTime = document.getElementById('event-vuquy-time');
+  if (elVuQuyTime) elVuQuyTime.innerText = DEFAULT_VUQUY_TIME;
+  const elVuQuyAddr = document.getElementById('event-vuquy-address');
+  if (elVuQuyAddr) elVuQuyAddr.innerText = DEFAULT_VUQUY_ADDRESS;
+  const elVuQuyIframe = document.getElementById('event-vuquy-iframe');
+  if (elVuQuyIframe) elVuQuyIframe.src = DEFAULT_VUQUY_EMBED;
+  const elVuQuyBtn = document.getElementById('event-vuquy-map-btn');
+  if (elVuQuyBtn) elVuQuyBtn.href = DEFAULT_VUQUY_MAP;
+  const elVuQuyDirect = document.getElementById('event-vuquy-map-direct');
+  if (elVuQuyDirect) elVuQuyDirect.href = DEFAULT_VUQUY_MAP;
 
   // Bank Info
   if (savedConfig.bankGroomAcc) {
