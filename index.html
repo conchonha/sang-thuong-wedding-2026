@@ -408,7 +408,7 @@
               </div>
 
               <div class="event-actions">
-                <a id="event-vuquy-map-btn" href="https://maps.app.goo.gl/2rbTxYcyEpWjvdc6A" target="_blank" rel="noopener" class="btn-luxury btn-gold mobile-only-map-btn">
+                <a id="event-vuquy-map-btn" href="https://maps.app.goo.gl/caDXU6YDqyaPM3Wt9" target="_blank" rel="noopener" class="btn-luxury btn-gold mobile-only-map-btn">
                   🗺️ Chỉ đường Google Maps
                 </a>
                 <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Le+Vu+Quy+Ba+Sang+va+Kieu+Thuong&dates=20261220T030000Z/20261220T053000Z&details=Le+Vu+Quy+nha+trai&location=San+van+dong+thon+Dai+My,+Xa+Thuong+Duc,+Da+Nang" target="_blank" rel="noopener" class="btn-luxury btn-outline-gold">
@@ -420,8 +420,8 @@
             <!-- Right Column: Interactive Embedded Google Map -->
             <div class="event-card-right">
               <div class="event-map-wrapper">
-                <iframe id="event-vuquy-iframe" class="event-map-iframe" src="https://maps.google.com/maps?q=15.867038,107.899549&t=&z=16&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                <a id="event-vuquy-map-direct" href="https://maps.app.goo.gl/2rbTxYcyEpWjvdc6A" target="_blank" rel="noopener" class="map-direct-overlay-btn">
+                <iframe id="event-vuquy-iframe" class="event-map-iframe" src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1085.6283062991024!2d107.89884126958216!3d15.866987289056569!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1svi!2s!4v1789618372252!5m2!1svi!2s" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <a id="event-vuquy-map-direct" href="https://maps.app.goo.gl/caDXU6YDqyaPM3Wt9" target="_blank" rel="noopener" class="map-direct-overlay-btn">
                   🗺️ Mở Google Maps ↗
                 </a>
               </div>
@@ -677,11 +677,6 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="rsvp-wish">Lời chúc phúc gửi tới Cô Dâu &amp; Chú Rể (không bắt buộc)</label>
-            <textarea id="rsvp-wish" class="form-control" rows="3" placeholder="Gửi những lời chúc tốt đẹp, ý nghĩa nhất đến Bá Sang &amp; Kiều Thương nhé..."></textarea>
-          </div>
-
           <div class="rsvp-submit-wrap">
             <button type="submit" id="rsvp-submit-btn" class="btn-luxury btn-gold rsvp-btn">
               Gửi Xác Nhận Tham Dự ❤️
@@ -765,14 +760,14 @@
     <div class="modal-content">
       <button class="modal-close" id="gift-close-btn">&times;</button>
       <div style="text-align: center;">
-        <span class="section-subtitle" style="font-size: 1.8rem;">Gửi Lời Chúc &amp; Mừng Cưới</span>
-        <h3 class="section-title" style="font-size: 1.5rem; margin-bottom: 8px;">HỘP MỪNG CƯỚI</h3>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 15px;">
+        <span class="section-subtitle" id="gift-modal-subtitle" style="font-size: 1.8rem;">Gửi Lời Chúc &amp; Mừng Cưới</span>
+        <h3 class="section-title" id="gift-modal-title" style="font-size: 1.5rem; margin-bottom: 8px;">HỘP MỪNG CƯỚI</h3>
+        <p id="gift-modal-desc" style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 15px;">
           Sự chúc phúc và tình cảm của quý vị là món quà quý giá nhất dành cho đôi uyên ương.
         </p>
       </div>
 
-      <div class="modal-tabs">
+      <div class="modal-tabs" id="gift-modal-tabs">
         <button class="modal-tab-btn active" id="tab-groom">👑 Mừng Chú Rể (Nhà Trai)</button>
         <button class="modal-tab-btn" id="tab-bride">👰 Mừng Cô Dâu (Nhà Gái)</button>
       </div>
@@ -808,7 +803,7 @@
           <div class="bank-name-badge">TECHCOMBANK</div>
           <div class="bank-acc-label">SỐ TÀI KHOẢN</div>
           <div class="bank-acc-number" id="bride-bank-acc">1903 6688 9999</div>
-          <div class="bank-holder-name">PHAM THI THUONG</div>
+          <div class="bank-holder-name">PHAM THI KIEU THUONG</div>
         </div>
 
         <div class="qr-image-wrap">

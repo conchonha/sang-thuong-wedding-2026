@@ -90,6 +90,52 @@ document.addEventListener('DOMContentLoaded', () => {
     if (heroDateEl) heroDateEl.innerText = savedConfig.weddingDateText;
   }
 
+  // ═══ GOOGLE MAP EMBED URL RESOLVER ═══
+  function getGoogleMapEmbedUrl(mapUrl, address) {
+    const trimmedUrl = (mapUrl || '').trim();
+    if (trimmedUrl.includes('output=embed') || trimmedUrl.includes('google.com/maps/embed')) {
+      return trimmedUrl;
+    }
+    // Specific short link support
+    if (trimmedUrl.includes('caDXU6YDqyaPM3Wt9') || trimmedUrl.includes('2rbTxYcyEpWjvdc6A')) {
+      return 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1085.6283062991024!2d107.89884126958216!3d15.866987289056569!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1svi!2s!4v1789618372252!5m2!1svi!2s';
+    }
+    // Google Plus Code support (e.g., VV8X+QQX Thượng Đức, Đà Nẵng, Việt Nam)
+    if (trimmedUrl.includes('VV8X+QQX') || trimmedUrl.includes('VV8X%2BQQX') || (address && address.includes('VV8X+QQX'))) {
+      return 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1085.6283062991024!2d107.89884126958216!3d15.866987289056569!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1svi!2s!4v1789618372252!5m2!1svi!2s';
+    }
+    // If URL contains lat,lng coordinates
+    const atMatch = trimmedUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (atMatch) {
+      return `https://maps.google.com/maps?q=${atMatch[1]},${atMatch[2]}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+    }
+    const qCoordMatch = trimmedUrl.match(/[?&]q=(-?\d+\.\d+)[,+](-?\d+\.\d+)/);
+    if (qCoordMatch) {
+      return `https://maps.google.com/maps?q=${qCoordMatch[1]},${qCoordMatch[2]}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+    }
+    const searchCoordMatch = trimmedUrl.match(/\/search\/(-?\d+\.\d+)[,+]+(-?\d+\.\d+)/);
+    if (searchCoordMatch) {
+      return `https://maps.google.com/maps?q=${searchCoordMatch[1]},${searchCoordMatch[2]}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+    }
+    const placeCoordMatch = trimmedUrl.match(/\/place\/(-?\d+\.\d+)[,+]+(-?\d+\.\d+)/);
+    if (placeCoordMatch) {
+      return `https://maps.google.com/maps?q=${placeCoordMatch[1]},${placeCoordMatch[2]}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+    }
+    if (trimmedUrl.includes('q=')) {
+      try {
+        const urlObj = new URL(trimmedUrl);
+        const qVal = urlObj.searchParams.get('q');
+        if (qVal) {
+          return `https://maps.google.com/maps?q=${encodeURIComponent(qVal)}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+        }
+      } catch (e) {}
+    }
+    if (address) {
+      return `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+    }
+    return '';
+  }
+
   // Lễ Nạp Tài (Nhà Gái)
   if (savedConfig.naptaiTime) {
     const el = document.getElementById('event-naptai-time');
@@ -98,8 +144,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (savedConfig.naptaiAddress) {
     const el = document.getElementById('event-naptai-address');
     if (el) el.innerText = savedConfig.naptaiAddress;
+  }
+  if (savedConfig.naptaiMap || savedConfig.naptaiAddress) {
     const iframe = document.getElementById('event-naptai-iframe');
-    if (iframe) iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(savedConfig.naptaiAddress)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+    const embedUrl = getGoogleMapEmbedUrl(savedConfig.naptaiMap, savedConfig.naptaiAddress);
+    if (iframe && embedUrl) iframe.src = embedUrl;
   }
   if (savedConfig.naptaiMap) {
     const btn = document.getElementById('event-naptai-map-btn');
@@ -116,8 +165,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (savedConfig.vuquyAddress) {
     const el = document.getElementById('event-vuquy-address');
     if (el) el.innerText = savedConfig.vuquyAddress;
+  }
+  if (savedConfig.vuquyMap || savedConfig.vuquyAddress) {
     const iframe = document.getElementById('event-vuquy-iframe');
-    if (iframe) iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(savedConfig.vuquyAddress)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+    const embedUrl = getGoogleMapEmbedUrl(savedConfig.vuquyMap, savedConfig.vuquyAddress);
+    if (iframe && embedUrl) iframe.src = embedUrl;
   }
   if (savedConfig.vuquyMap) {
     const btn = document.getElementById('event-vuquy-map-btn');
@@ -518,10 +570,11 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCountdown();
 
   /* ==========================================================================
-     5. PHOTO GALLERY LIGHTBOX
+     5. PHOTO GALLERY LIGHTBOX WITH TOUCH SWIPE & MOUSE DRAG
      ========================================================================== */
   const galleryItems = document.querySelectorAll('.gallery-item');
   const lightbox = document.getElementById('lightbox');
+  const lightboxContent = document.querySelector('.lightbox-content');
   const lightboxImg = document.getElementById('lightbox-img');
   const lightboxCaption = document.getElementById('lightbox-caption');
   const lightboxClose = document.getElementById('lightbox-close');
@@ -534,7 +587,9 @@ document.addEventListener('DOMContentLoaded', () => {
   galleryItems.forEach((item, index) => {
     const img = item.querySelector('img');
     const caption = item.getAttribute('data-caption') || 'Khoảnh khắc ngọt ngào';
-    imageSources.push({ src: img.src, caption });
+    if (img) {
+      imageSources.push({ src: img.src, caption });
+    }
 
     item.addEventListener('click', () => {
       currentImageIndex = index;
@@ -542,9 +597,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Dots / Indicator strip inside Lightbox
+  let lightboxDotsContainer = document.getElementById('lightbox-dots');
+  if (!lightboxDotsContainer && lightboxContent) {
+    lightboxDotsContainer = document.createElement('div');
+    lightboxDotsContainer.id = 'lightbox-dots';
+    lightboxDotsContainer.className = 'lightbox-dots';
+    lightboxContent.appendChild(lightboxDotsContainer);
+  }
+
+  function renderLightboxDots() {
+    if (!lightboxDotsContainer) return;
+    lightboxDotsContainer.innerHTML = '';
+    imageSources.forEach((_, idx) => {
+      const dot = document.createElement('button');
+      dot.className = `lightbox-dot ${idx === currentImageIndex ? 'active' : ''}`;
+      dot.setAttribute('aria-label', `Xem ảnh ${idx + 1}`);
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (idx !== currentImageIndex) {
+          const dir = idx > currentImageIndex ? 'next' : 'prev';
+          currentImageIndex = idx;
+          updateLightboxContent(dir);
+        }
+      });
+      lightboxDotsContainer.appendChild(dot);
+    });
+  }
+
   function openLightbox() {
     if (!lightbox) return;
     updateLightboxContent();
+    renderLightboxDots();
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
@@ -553,35 +637,191 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!lightbox) return;
     lightbox.classList.remove('active');
     document.body.style.overflow = '';
+    if (lightboxImg) {
+      lightboxImg.style.transform = '';
+      lightboxImg.style.opacity = '1';
+    }
   }
 
-  function updateLightboxContent() {
+  function updateLightboxContent(direction = '') {
     const data = imageSources[currentImageIndex];
-    if (!data) return;
-    lightboxImg.src = data.src;
-    lightboxCaption.innerText = `${data.caption} (${currentImageIndex + 1}/${imageSources.length})`;
+    if (!data || !lightboxImg) return;
+
+    if (direction) {
+      lightboxImg.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
+      lightboxImg.style.opacity = '0';
+      lightboxImg.style.transform = direction === 'next' ? 'translateX(-30px) scale(0.96)' : 'translateX(30px) scale(0.96)';
+
+      setTimeout(() => {
+        lightboxImg.src = data.src;
+        if (lightboxCaption) {
+          lightboxCaption.innerText = `${data.caption} (${currentImageIndex + 1}/${imageSources.length})`;
+        }
+        renderLightboxDots();
+        lightboxImg.style.transform = direction === 'next' ? 'translateX(30px) scale(0.96)' : 'translateX(-30px) scale(0.96)';
+
+        requestAnimationFrame(() => {
+          lightboxImg.style.opacity = '1';
+          lightboxImg.style.transform = 'translateX(0) scale(1)';
+        });
+      }, 180);
+    } else {
+      lightboxImg.src = data.src;
+      lightboxImg.style.opacity = '1';
+      lightboxImg.style.transform = 'translateX(0) scale(1)';
+      if (lightboxCaption) {
+        lightboxCaption.innerText = `${data.caption} (${currentImageIndex + 1}/${imageSources.length})`;
+      }
+      renderLightboxDots();
+    }
   }
 
   function showNextImage() {
     currentImageIndex = (currentImageIndex + 1) % imageSources.length;
-    updateLightboxContent();
+    updateLightboxContent('next');
   }
 
   function showPrevImage() {
     currentImageIndex = (currentImageIndex - 1 + imageSources.length) % imageSources.length;
-    updateLightboxContent();
+    updateLightboxContent('prev');
   }
 
   if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
-  if (lightboxNext) lightboxNext.addEventListener('click', showNextImage);
-  if (lightboxPrev) lightboxPrev.addEventListener('click', showPrevImage);
+  if (lightboxNext) lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); showNextImage(); });
+  if (lightboxPrev) lightboxPrev.addEventListener('click', (e) => { e.stopPropagation(); showPrevImage(); });
+
+  // ═══ TOUCH SWIPE & MOUSE DRAG ENGINE (MOBILE & DESKTOP) ═══
+  let startX = 0;
+  let startY = 0;
+  let currentX = 0;
+  let currentY = 0;
+  let isDragging = false;
+  let isHorizontalSwipe = null;
 
   if (lightbox) {
+    // Touch Events (Mobile Phone & Tablet)
+    lightbox.addEventListener('touchstart', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.target.closest('.lightbox-nav') || e.target.closest('.lightbox-close') || e.target.closest('.lightbox-dots')) return;
+      const touch = e.touches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+      currentX = startX;
+      currentY = startY;
+      isDragging = true;
+      isHorizontalSwipe = null;
+      if (lightboxImg) lightboxImg.style.transition = 'none';
+    }, { passive: true });
+
+    lightbox.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const touch = e.touches[0];
+      currentX = touch.clientX;
+      currentY = touch.clientY;
+      const diffX = currentX - startX;
+      const diffY = currentY - startY;
+
+      if (isHorizontalSwipe === null) {
+        if (Math.abs(diffX) > 8 || Math.abs(diffY) > 8) {
+          isHorizontalSwipe = Math.abs(diffX) > Math.abs(diffY);
+        }
+      }
+
+      if (isHorizontalSwipe) {
+        if (e.cancelable) e.preventDefault();
+        if (lightboxImg) {
+          lightboxImg.style.transform = `translateX(${diffX}px) scale(${1 - Math.min(Math.abs(diffX) / 1000, 0.08)})`;
+          lightboxImg.style.opacity = `${1 - Math.min(Math.abs(diffX) / 600, 0.35)}`;
+        }
+      }
+    }, { passive: false });
+
+    lightbox.addEventListener('touchend', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      const diffX = currentX - startX;
+      const threshold = 45; // pixels swipe threshold
+
+      if (isHorizontalSwipe && Math.abs(diffX) > threshold) {
+        if (diffX < 0) {
+          showNextImage();
+        } else {
+          showPrevImage();
+        }
+      } else {
+        if (lightboxImg) {
+          lightboxImg.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+          lightboxImg.style.transform = 'translateX(0) scale(1)';
+          lightboxImg.style.opacity = '1';
+        }
+      }
+      isHorizontalSwipe = null;
+    });
+
+    // Mouse Drag Events (Desktop Web)
+    lightbox.addEventListener('mousedown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.target.closest('.lightbox-nav') || e.target.closest('.lightbox-close') || e.target.closest('.lightbox-dots')) return;
+      if (e.button !== 0) return;
+      startX = e.clientX;
+      startY = e.clientY;
+      currentX = startX;
+      currentY = startY;
+      isDragging = true;
+      if (lightboxImg) {
+        lightboxImg.style.transition = 'none';
+        lightboxImg.style.cursor = 'grabbing';
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging || !lightbox.classList.contains('active')) return;
+      currentX = e.clientX;
+      currentY = e.clientY;
+      const diffX = currentX - startX;
+
+      if (Math.abs(diffX) > 4 && lightboxImg) {
+        lightboxImg.style.transform = `translateX(${diffX}px) scale(${1 - Math.min(Math.abs(diffX) / 1200, 0.08)})`;
+        lightboxImg.style.opacity = `${1 - Math.min(Math.abs(diffX) / 800, 0.35)}`;
+      }
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const diffX = currentX - startX;
+      const threshold = 55; // pixels
+
+      if (lightboxImg) {
+        lightboxImg.style.cursor = 'grab';
+      }
+
+      if (Math.abs(diffX) > threshold) {
+        if (diffX < 0) {
+          showNextImage();
+        } else {
+          showPrevImage();
+        }
+      } else {
+        if (lightboxImg) {
+          lightboxImg.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+          lightboxImg.style.transform = 'translateX(0) scale(1)';
+          lightboxImg.style.opacity = '1';
+        }
+      }
+    });
+
+    // Click outside to close (only if didn't drag)
     lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox) closeLightbox();
+      const diffX = Math.abs(currentX - startX);
+      if (diffX > 10) return;
+      if (e.target === lightbox || e.target === lightboxContent) {
+        closeLightbox();
+      }
     });
   }
 
+  // Keyboard navigation
   document.addEventListener('keydown', (e) => {
     if (!lightbox || !lightbox.classList.contains('active')) return;
     if (e.key === 'Escape') closeLightbox();
@@ -594,23 +834,68 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
   const giftModal = document.getElementById('gift-modal');
   const giftCloseBtn = document.getElementById('gift-close-btn');
+  const giftModalTabs = document.getElementById('gift-modal-tabs');
+  const giftModalTitle = document.getElementById('gift-modal-title');
+  const giftModalSubtitle = document.getElementById('gift-modal-subtitle');
   const tabGroom = document.getElementById('tab-groom');
   const tabBride = document.getElementById('tab-bride');
   const contentGroom = document.getElementById('content-groom');
   const contentBride = document.getElementById('content-bride');
+
+  function setupGiftModalView() {
+    const groomDisplayName = (savedConfig.groomName || 'Bá Sang');
+    const brideDisplayName = (savedConfig.brideName && savedConfig.brideName !== 'Thị Thương') ? savedConfig.brideName : 'Kiều Thương';
+
+    // 1. Tiệc Nhà Trai (Lễ Vu Quy): Chỉ hiển thị STK Nhà Trai (Chú Rể)
+    if (guestEvent === 'vuquy' || (!guestEvent && guestSide === 'groom')) {
+      if (giftModalTabs) giftModalTabs.style.display = 'none';
+      if (giftModalSubtitle) giftModalSubtitle.innerText = `Mừng Cưới Chú Rể ${groomDisplayName}`;
+      if (giftModalTitle) giftModalTitle.innerText = 'HỘP MỪNG CƯỚI (NHÀ TRAI)';
+      if (tabGroom) tabGroom.classList.add('active');
+      if (tabBride) tabBride.classList.remove('active');
+      if (contentGroom) contentGroom.style.display = 'block';
+      if (contentBride) contentBride.style.display = 'none';
+    }
+    // 2. Tiệc Nạp Tài (Nhà Gái): Chỉ hiển thị STK Nhà Gái (Cô Dâu)
+    else if (guestEvent === 'naptai' || (!guestEvent && guestSide === 'bride')) {
+      if (giftModalTabs) giftModalTabs.style.display = 'none';
+      if (giftModalSubtitle) giftModalSubtitle.innerText = `Mừng Cưới Cô Dâu ${brideDisplayName}`;
+      if (giftModalTitle) giftModalTitle.innerText = 'HỘP MỪNG CƯỚI (NHÀ GÁI)';
+      if (tabBride) tabBride.classList.add('active');
+      if (tabGroom) tabGroom.classList.remove('active');
+      if (contentBride) contentBride.style.display = 'block';
+      if (contentGroom) contentGroom.style.display = 'none';
+    }
+    // 3. Cả Hai Buổi Lễ hoặc xem chung: Hiển thị cả 2 tab để khách tùy chọn
+    else {
+      if (giftModalTabs) giftModalTabs.style.display = 'flex';
+      if (giftModalSubtitle) giftModalSubtitle.innerText = 'Gửi Lời Chúc & Mừng Cưới';
+      if (giftModalTitle) giftModalTitle.innerText = 'HỘP MỪNG CƯỚI';
+      if (guestSide === 'bride') {
+        if (tabBride) tabBride.classList.add('active');
+        if (tabGroom) tabGroom.classList.remove('active');
+        if (contentBride) contentBride.style.display = 'block';
+        if (contentGroom) contentGroom.style.display = 'none';
+      } else {
+        if (tabGroom) tabGroom.classList.add('active');
+        if (tabBride) tabBride.classList.remove('active');
+        if (contentGroom) contentGroom.style.display = 'block';
+        if (contentBride) contentBride.style.display = 'none';
+      }
+    }
+  }
+
+  // Khởi tạo hiển thị modal mừng cưới phù hợp với khách
+  setupGiftModalView();
 
   // Trigger buttons
   const openGiftBtns = document.querySelectorAll('.open-gift-modal-btn');
   openGiftBtns.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
+      setupGiftModalView();
       if (giftModal) giftModal.classList.add('active');
       document.body.style.overflow = 'hidden';
-      if (guestSide === 'bride' && tabBride) {
-        tabBride.click();
-      } else if (guestSide === 'groom' && tabGroom) {
-        tabGroom.click();
-      }
     });
   });
 
