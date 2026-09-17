@@ -539,17 +539,17 @@
 
         <!-- View Mode Switcher -->
         <div class="album-view-switcher">
-          <button class="album-switch-btn active" id="album-mode-slide" type="button" aria-label="Chế độ trình chiếu">
-            <span>🎞️ Trình Chiếu (Vuốt / Kéo)</span>
-          </button>
-          <button class="album-switch-btn" id="album-mode-grid" type="button" aria-label="Chế độ lưới ảnh">
+          <button class="album-switch-btn active" id="album-mode-grid" type="button" aria-label="Chế độ lưới ảnh">
             <span>🖼️ Xem Tất Cả (Lưới ảnh)</span>
+          </button>
+          <button class="album-switch-btn" id="album-mode-slide" type="button" aria-label="Chế độ trình chiếu">
+            <span>🎞️ Trình Chiếu (Vuốt / Kéo)</span>
           </button>
         </div>
       </div>
 
-      <!-- 1. SLIDER / CAROUSEL VIEW (TOUCH SWIPE & MOUSE DRAGGABLE) -->
-      <div class="album-carousel-wrapper" id="album-carousel-wrapper">
+      <!-- 1. SLIDER / CAROUSEL VIEW (TOUCH SWIPE & MOUSE DRAGGABLE - HIDDEN BY DEFAULT) -->
+      <div class="album-carousel-wrapper" id="album-carousel-wrapper" style="display: none;">
         <div class="album-carousel-main">
           <button class="album-nav-btn album-nav-prev" id="album-btn-prev" aria-label="Ảnh trước" type="button">
             <span>&#10094;</span>
@@ -690,8 +690,8 @@
         </div>
       </div>
 
-      <!-- 2. GRID VIEW (FALLBACK / ALL-PHOTOS) -->
-      <div class="album-grid-wrapper" id="album-grid-wrapper" style="display: none;">
+      <!-- 2. GRID VIEW (DEFAULT) -->
+      <div class="album-grid-wrapper" id="album-grid-wrapper">
         <div class="gallery-grid">
           <div class="gallery-item item-large" data-caption="Ánh mắt trao nhau lời thề nguyện">
             <img src="assets/images/gallery_1.jpg" alt="Ảnh cưới 1" loading="lazy">

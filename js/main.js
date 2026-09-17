@@ -678,20 +678,35 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // View Mode Switcher
+  function switchToSlideView(index, smoothScroll = false) {
+    if (albumModeSlide) albumModeSlide.classList.add('active');
+    if (albumModeGrid) albumModeGrid.classList.remove('active');
+    if (albumCarouselWrapper) albumCarouselWrapper.style.display = 'block';
+    if (albumGridWrapper) albumGridWrapper.style.display = 'none';
+
+    const targetIdx = typeof index === 'number' ? index : currentPhotoIndex;
+    goToSlide(targetIdx, false);
+
+    if (smoothScroll && albumCarouselWrapper) {
+      const topOffset = albumCarouselWrapper.getBoundingClientRect().top + window.pageYOffset - 120;
+      window.scrollTo({ top: topOffset, behavior: 'smooth' });
+    }
+  }
+
+  function switchToGridView() {
+    if (albumModeGrid) albumModeGrid.classList.add('active');
+    if (albumModeSlide) albumModeSlide.classList.remove('active');
+    if (albumCarouselWrapper) albumCarouselWrapper.style.display = 'none';
+    if (albumGridWrapper) albumGridWrapper.style.display = 'block';
+  }
+
   if (albumModeSlide && albumModeGrid) {
     albumModeSlide.addEventListener('click', () => {
-      albumModeSlide.classList.add('active');
-      albumModeGrid.classList.remove('active');
-      if (albumCarouselWrapper) albumCarouselWrapper.style.display = 'block';
-      if (albumGridWrapper) albumGridWrapper.style.display = 'none';
-      goToSlide(currentPhotoIndex, false);
+      switchToSlideView(currentPhotoIndex, false);
     });
 
     albumModeGrid.addEventListener('click', () => {
-      albumModeGrid.classList.add('active');
-      albumModeSlide.classList.remove('active');
-      if (albumCarouselWrapper) albumCarouselWrapper.style.display = 'none';
-      if (albumGridWrapper) albumGridWrapper.style.display = 'block';
+      switchToGridView();
     });
   }
 
@@ -811,10 +826,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Grid view clicks
+  // Grid view clicks: switch to interactive Slide / Trình chiếu mode at clicked photo index
   gridItems.forEach((item, index) => {
     item.addEventListener('click', () => {
-      openLightbox(index);
+      switchToSlideView(index, true);
     });
   });
 
