@@ -570,34 +570,121 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCountdown();
 
   /* ==========================================================================
-     4.5 STORY MEDIA PRESENTATION MODAL (VIDEO TỎ TÌNH TRƯỚC + ẢNH SAU)
+     4.5 STORY MEDIA PRESENTATION MODAL (VIDEO TỎ TÌNH & DẶM NGÕ: VIDEO TRƯỚC + ẢNH SAU)
      ========================================================================== */
   const storyModal = document.getElementById('story-modal');
   const storyModalBackdrop = document.getElementById('story-modal-backdrop');
   const storyModalClose = document.getElementById('story-modal-close');
+  const storyModalTag = document.getElementById('story-modal-tag');
+  const storyModalTitle = document.getElementById('story-modal-title');
   const storyTrack = document.getElementById('story-track');
   const storyViewport = document.getElementById('story-viewport');
   const storyNavPrev = document.getElementById('story-nav-prev');
   const storyNavNext = document.getElementById('story-nav-next');
   const storyCaption = document.getElementById('story-caption');
-  const storyThumbBtns = document.querySelectorAll('.story-thumb-btn');
-  const storyVideoPlayer = document.getElementById('story-video-player');
+  const storyThumbsContainer = document.getElementById('story-thumbs');
   const timelineInteractiveItems = document.querySelectorAll('.timeline-interactive');
 
-  const storyItems = [
-    { type: 'video', caption: 'Video Khoảnh Khắc Tỏ Tình Lãng Mạn (15/09/2025)' },
-    { type: 'image', caption: 'Khoảnh khắc hạnh phúc ngày em nhận lời yêu' },
-    { type: 'image', caption: 'Nụ cười rạng rỡ và ánh mắt đong đầy yêu thương' },
-    { type: 'image', caption: 'Bó hoa tươi thắm cùng lời hứa bên nhau trọn đời' },
-    { type: 'image', caption: 'Hành trình tình yêu chính thức đơm hoa kết trái' }
-  ];
+  const storyDatasets = {
+    totinh: {
+      tag: 'KỶ NIỆM TỎ TÌNH • 15.09.2025',
+      title: 'Lời Hẹn Ước Đầu Tiên',
+      items: [
+        { type: 'video', src: 'assets/videos/totinh_video.mp4', poster: 'assets/images/totinh_1.jpg', badge: '🎥 Video Kỷ Niệm 15.09.2025', caption: 'Video Khoảnh Khắc Tỏ Tình Lãng Mạn (15/09/2025)' },
+        { type: 'image', src: 'assets/images/totinh_1.jpg', badge: 'Ảnh 01 / 04', caption: 'Khoảnh khắc hạnh phúc ngày em nhận lời yêu' },
+        { type: 'image', src: 'assets/images/totinh_2.jpg', badge: 'Ảnh 02 / 04', caption: 'Nụ cười rạng rỡ và ánh mắt đong đầy yêu thương' },
+        { type: 'image', src: 'assets/images/totinh_3.jpg', badge: 'Ảnh 03 / 04', caption: 'Bó hoa tươi thắm cùng lời hứa bên nhau trọn đời' },
+        { type: 'image', src: 'assets/images/totinh_4.jpg', badge: 'Ảnh 04 / 04', caption: 'Hành trình tình yêu chính thức đơm hoa kết trái' }
+      ]
+    },
+    damngo: {
+      tag: 'LỄ DẶM NGÕ • 12.08.2026',
+      title: 'Lễ Dặm Ngõ Ấm Cúng',
+      items: [
+        { type: 'video', src: 'assets/videos/damngo_video.mp4', poster: 'assets/images/damngo_1.jpg', badge: '🎥 Video Lễ Dặm Ngõ 12.08.2026', caption: 'Video Khoảnh Khắc Lễ Dặm Ngõ Ấm Cúng (12/08/2026)' },
+        { type: 'image', src: 'assets/images/damngo_1.jpg', badge: 'Ảnh 01 / 06', caption: 'Bó hoa tươi thắm cùng mâm tráp lễ vẹn tròn' },
+        { type: 'image', src: 'assets/images/damngo_2.jpg', badge: 'Ảnh 02 / 06', caption: 'Hai gia đình sum họp bên chén trà ấm cúng' },
+        { type: 'image', src: 'assets/images/damngo_3.jpg', badge: 'Ảnh 03 / 06', caption: 'Khoảnh khắc chính thức nhận dâu nhận rể trước hai họ' },
+        { type: 'image', src: 'assets/images/damngo_4.jpg', badge: 'Ảnh 04 / 06', caption: 'Nụ cười rạng rỡ của đôi uyên ương trong ngày vui' },
+        { type: 'image', src: 'assets/images/damngo_5.jpg', badge: 'Ảnh 05 / 06', caption: 'Những lời chúc phúc thân thương từ hai bên gia đình' },
+        { type: 'image', src: 'assets/images/damngo_6.jpg', badge: 'Ảnh 06 / 06', caption: 'Kỷ niệm trọn vẹn mở đầu cho ngày chung đôi hạnh phúc' }
+      ]
+    }
+  };
 
+  let activeStoryKey = 'totinh';
   let currentStoryIdx = 0;
-  const totalStoryItems = storyItems.length;
+
+  function renderStoryModalContent(key) {
+    activeStoryKey = storyDatasets[key] ? key : 'totinh';
+    const dataset = storyDatasets[activeStoryKey];
+
+    if (storyModalTag) storyModalTag.innerText = dataset.tag;
+    if (storyModalTitle) storyModalTitle.innerText = dataset.title;
+
+    // Render Track Slides
+    if (storyTrack) {
+      storyTrack.innerHTML = '';
+      dataset.items.forEach((item, idx) => {
+        const slide = document.createElement('div');
+        slide.className = 'story-slide';
+        slide.setAttribute('data-type', item.type);
+        slide.setAttribute('data-index', idx);
+
+        if (item.type === 'video') {
+          slide.innerHTML = `
+            <div class="story-media-card">
+              <video id="story-video-player" controls playsinline preload="metadata" poster="${item.poster}">
+                <source src="${item.src}" type="video/mp4">
+                Trình duyệt không hỗ trợ phát video.
+              </video>
+              <div class="story-media-badge">${item.badge}</div>
+            </div>
+          `;
+        } else {
+          slide.innerHTML = `
+            <div class="story-media-card">
+              <img src="${item.src}" alt="${item.caption}" draggable="false" loading="lazy">
+              <div class="story-media-badge">${item.badge}</div>
+            </div>
+          `;
+        }
+        storyTrack.appendChild(slide);
+      });
+    }
+
+    // Render Thumbnails
+    if (storyThumbsContainer) {
+      storyThumbsContainer.innerHTML = '';
+      dataset.items.forEach((item, idx) => {
+        const thumbBtn = document.createElement('button');
+        thumbBtn.className = `story-thumb-btn ${idx === 0 ? 'active' : ''}`;
+        thumbBtn.setAttribute('data-index', idx);
+        thumbBtn.setAttribute('aria-label', `Xem mục ${idx + 1}`);
+
+        if (item.type === 'video') {
+          thumbBtn.innerHTML = `
+            <span class="story-thumb-video-icon">▶</span>
+            <img src="${item.poster}" alt="Video">
+          `;
+        } else {
+          thumbBtn.innerHTML = `
+            <img src="${item.src}" alt="${item.caption}">
+          `;
+        }
+
+        thumbBtn.addEventListener('click', () => goToStorySlide(idx));
+        storyThumbsContainer.appendChild(thumbBtn);
+      });
+    }
+  }
 
   function goToStorySlide(index, animate = true) {
-    if (index < 0) index = totalStoryItems - 1;
-    if (index >= totalStoryItems) index = 0;
+    const dataset = storyDatasets[activeStoryKey] || storyDatasets.totinh;
+    const totalItems = dataset.items.length;
+
+    if (index < 0) index = totalItems - 1;
+    if (index >= totalItems) index = 0;
     currentStoryIdx = index;
 
     if (storyTrack) {
@@ -605,23 +692,25 @@ document.addEventListener('DOMContentLoaded', () => {
       storyTrack.style.transform = `translateX(-${currentStoryIdx * 100}%)`;
     }
 
-    if (storyCaption && storyItems[currentStoryIdx]) {
-      storyCaption.innerText = storyItems[currentStoryIdx].caption;
+    if (storyCaption && dataset.items[currentStoryIdx]) {
+      storyCaption.innerText = dataset.items[currentStoryIdx].caption;
     }
 
     // Update Thumbnails
-    if (storyThumbBtns && storyThumbBtns.length > 0) {
-      storyThumbBtns.forEach((btn, i) => {
+    if (storyThumbsContainer) {
+      const thumbs = storyThumbsContainer.querySelectorAll('.story-thumb-btn');
+      thumbs.forEach((btn, i) => {
         btn.classList.toggle('active', i === currentStoryIdx);
       });
     }
 
-    // Video handling: If leaving slide 0, pause video; if entering slide 0, play video
-    if (storyVideoPlayer) {
+    // Video handling
+    const videoEl = document.getElementById('story-video-player');
+    if (videoEl) {
       if (currentStoryIdx !== 0) {
-        storyVideoPlayer.pause();
+        videoEl.pause();
       } else {
-        storyVideoPlayer.play().catch(() => {});
+        videoEl.play().catch(() => {});
       }
     }
   }
@@ -634,16 +723,20 @@ document.addEventListener('DOMContentLoaded', () => {
     goToStorySlide(currentStoryIdx - 1);
   }
 
-  function openStoryModal(initialIndex = 0) {
+  function openStoryModal(storyKey = 'totinh', initialIndex = 0) {
     if (!storyModal) return;
+    renderStoryModalContent(storyKey);
     goToStorySlide(initialIndex, false);
     storyModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
     // Auto play video if slide 0
-    if (initialIndex === 0 && storyVideoPlayer) {
-      storyVideoPlayer.currentTime = 0;
-      storyVideoPlayer.play().catch(() => {});
+    if (initialIndex === 0) {
+      const videoEl = document.getElementById('story-video-player');
+      if (videoEl) {
+        videoEl.currentTime = 0;
+        videoEl.play().catch(() => {});
+      }
     }
   }
 
@@ -651,8 +744,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!storyModal) return;
     storyModal.classList.remove('active');
     document.body.style.overflow = '';
-    if (storyVideoPlayer) {
-      storyVideoPlayer.pause();
+    const videoEl = document.getElementById('story-video-player');
+    if (videoEl) {
+      videoEl.pause();
     }
   }
 
@@ -661,14 +755,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (storyNavPrev) storyNavPrev.addEventListener('click', prevStorySlide);
   if (storyNavNext) storyNavNext.addEventListener('click', nextStorySlide);
 
-  storyThumbBtns.forEach((btn, idx) => {
-    btn.addEventListener('click', () => goToStorySlide(idx));
-  });
-
-  // Attach click listener to timeline items 1 and 2
+  // Attach click listener to timeline items (totinh, damngo, etc.)
   timelineInteractiveItems.forEach((item) => {
     item.addEventListener('click', () => {
-      openStoryModal(0); // Starts with Video first as requested!
+      const storyKey = item.getAttribute('data-story') || 'totinh';
+      openStoryModal(storyKey, 0); // Always starts with Video first as requested!
     });
   });
 
