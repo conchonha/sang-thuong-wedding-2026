@@ -527,7 +527,7 @@
   </section>
 
   <!-- ==========================================================================
-       7. PHOTO GALLERY (EDITORIAL MAGAZINE LOOK)
+       7. PHOTO GALLERY (LUXURY INTERACTIVE SLIDER & GRID)
        ========================================================================== -->
   <section class="gallery-section section-padding" id="gallery">
     <div class="container">
@@ -535,48 +535,203 @@
         <span class="section-subtitle">Khoảnh Khắc Ngọt Ngào</span>
         <h2 class="section-title">ALBUM ẢNH CƯỚI</h2>
         <span class="section-title-icon">📸</span>
-        <p class="section-desc">Chạm vào bất kỳ bức ảnh nào để chiêm ngưỡng trọn vẹn những khung hình tình yêu của chúng mình.</p>
+        <p class="section-desc">Kéo vuốt hoặc bấm nút chuyển ảnh để cùng ngắm nhìn những khoảnh khắc hạnh phúc nhất của chúng mình.</p>
+
+        <!-- View Mode Switcher -->
+        <div class="album-view-switcher">
+          <button class="album-switch-btn active" id="album-mode-slide" type="button" aria-label="Chế độ trình chiếu">
+            <span>🎞️ Trình Chiếu (Vuốt / Kéo)</span>
+          </button>
+          <button class="album-switch-btn" id="album-mode-grid" type="button" aria-label="Chế độ lưới ảnh">
+            <span>🖼️ Xem Tất Cả (Lưới ảnh)</span>
+          </button>
+        </div>
       </div>
 
-      <div class="gallery-grid">
-        <div class="gallery-item item-large" data-caption="Ánh mắt trao nhau lời thề nguyện">
-          <img src="assets/images/gallery_1.jpg" alt="Ảnh cưới 1" loading="lazy">
-          <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+      <!-- 1. SLIDER / CAROUSEL VIEW (TOUCH SWIPE & MOUSE DRAGGABLE) -->
+      <div class="album-carousel-wrapper" id="album-carousel-wrapper">
+        <div class="album-carousel-main">
+          <button class="album-nav-btn album-nav-prev" id="album-btn-prev" aria-label="Ảnh trước" type="button">
+            <span>&#10094;</span>
+          </button>
+
+          <div class="album-viewport" id="album-viewport">
+            <div class="album-track" id="album-track">
+              <div class="album-slide" data-index="0" data-caption="Ánh mắt trao nhau lời thề nguyện">
+                <div class="album-slide-card">
+                  <img src="assets/images/gallery_1.jpg" alt="Ảnh cưới 1" draggable="false" loading="eager">
+                  <div class="album-slide-badge">01 / 08</div>
+                  <div class="album-slide-overlay">
+                    <p class="album-slide-caption">Ánh mắt trao nhau lời thề nguyện</p>
+                    <span class="album-slide-zoom-hint">🔍 Nhấn để xem toàn màn hình</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="album-slide" data-index="1" data-caption="Hạnh phúc giản đơn bên cạnh người mình yêu">
+                <div class="album-slide-card">
+                  <img src="assets/images/gallery_2.jpg" alt="Ảnh cưới 2" draggable="false" loading="lazy">
+                  <div class="album-slide-badge">02 / 08</div>
+                  <div class="album-slide-overlay">
+                    <p class="album-slide-caption">Hạnh phúc giản đơn bên cạnh người mình yêu</p>
+                    <span class="album-slide-zoom-hint">🔍 Nhấn để xem toàn màn hình</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="album-slide" data-index="2" data-caption="Chiếc váy cưới trắng tinh khôi">
+                <div class="album-slide-card">
+                  <img src="assets/images/gallery_3.jpg" alt="Ảnh cưới 3" draggable="false" loading="lazy">
+                  <div class="album-slide-badge">03 / 08</div>
+                  <div class="album-slide-overlay">
+                    <p class="album-slide-caption">Chiếc váy cưới trắng tinh khôi</p>
+                    <span class="album-slide-zoom-hint">🔍 Nhấn để xem toàn màn hình</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="album-slide" data-index="3" data-caption="Hoàng hôn lãng mạn trên bãi biển">
+                <div class="album-slide-card">
+                  <img src="assets/images/gallery_4.jpg" alt="Ảnh cưới 4" draggable="false" loading="lazy">
+                  <div class="album-slide-badge">04 / 08</div>
+                  <div class="album-slide-overlay">
+                    <p class="album-slide-caption">Hoàng hôn lãng mạn trên bãi biển</p>
+                    <span class="album-slide-zoom-hint">🔍 Nhấn để xem toàn màn hình</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="album-slide" data-index="4" data-caption="Nụ cười rạng rỡ của nàng dâu">
+                <div class="album-slide-card">
+                  <img src="assets/images/gallery_5.jpg" alt="Ảnh cưới 5" draggable="false" loading="lazy">
+                  <div class="album-slide-badge">05 / 08</div>
+                  <div class="album-slide-overlay">
+                    <p class="album-slide-caption">Nụ cười rạng rỡ của nàng dâu</p>
+                    <span class="album-slide-zoom-hint">🔍 Nhấn để xem toàn màn hình</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="album-slide" data-index="5" data-caption="Bó hoa cưới ngát hương tình">
+                <div class="album-slide-card">
+                  <img src="assets/images/gallery_6.jpg" alt="Ảnh cưới 6" draggable="false" loading="lazy">
+                  <div class="album-slide-badge">06 / 08</div>
+                  <div class="album-slide-overlay">
+                    <p class="album-slide-caption">Bó hoa cưới ngát hương tình</p>
+                    <span class="album-slide-zoom-hint">🔍 Nhấn để xem toàn màn hình</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="album-slide" data-index="6" data-caption="Trao nhau nhẫn cưới thiêng liêng">
+                <div class="album-slide-card">
+                  <img src="assets/images/gallery_7.jpg" alt="Ảnh cưới 7" draggable="false" loading="lazy">
+                  <div class="album-slide-badge">07 / 08</div>
+                  <div class="album-slide-overlay">
+                    <p class="album-slide-caption">Trao nhau nhẫn cưới thiêng liêng</p>
+                    <span class="album-slide-zoom-hint">🔍 Nhấn để xem toàn màn hình</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="album-slide" data-index="7" data-caption="Cùng nhau bước vào lễ đường">
+                <div class="album-slide-card">
+                  <img src="assets/images/gallery_8.jpg" alt="Ảnh cưới 8" draggable="false" loading="lazy">
+                  <div class="album-slide-badge">08 / 08</div>
+                  <div class="album-slide-overlay">
+                    <p class="album-slide-caption">Cùng nhau bước vào lễ đường</p>
+                    <span class="album-slide-zoom-hint">🔍 Nhấn để xem toàn màn hình</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button class="album-nav-btn album-nav-next" id="album-btn-next" aria-label="Ảnh kế tiếp" type="button">
+            <span>&#10095;</span>
+          </button>
         </div>
 
-        <div class="gallery-item" data-caption="Hạnh phúc giản đơn bên cạnh người mình yêu">
-          <img src="assets/images/gallery_2.jpg" alt="Ảnh cưới 2" loading="lazy">
-          <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+        <!-- Dots Indicator -->
+        <div class="album-dots" id="album-dots"></div>
+
+        <!-- Thumbnails Strip -->
+        <div class="album-thumbs-container">
+          <div class="album-thumbs-track" id="album-thumbs-track">
+            <div class="album-thumb-item active" data-index="0">
+              <img src="assets/images/gallery_1.jpg" alt="Ảnh nhỏ 1" draggable="false">
+            </div>
+            <div class="album-thumb-item" data-index="1">
+              <img src="assets/images/gallery_2.jpg" alt="Ảnh nhỏ 2" draggable="false">
+            </div>
+            <div class="album-thumb-item" data-index="2">
+              <img src="assets/images/gallery_3.jpg" alt="Ảnh nhỏ 3" draggable="false">
+            </div>
+            <div class="album-thumb-item" data-index="3">
+              <img src="assets/images/gallery_4.jpg" alt="Ảnh nhỏ 4" draggable="false">
+            </div>
+            <div class="album-thumb-item" data-index="4">
+              <img src="assets/images/gallery_5.jpg" alt="Ảnh nhỏ 5" draggable="false">
+            </div>
+            <div class="album-thumb-item" data-index="5">
+              <img src="assets/images/gallery_6.jpg" alt="Ảnh nhỏ 6" draggable="false">
+            </div>
+            <div class="album-thumb-item" data-index="6">
+              <img src="assets/images/gallery_7.jpg" alt="Ảnh nhỏ 7" draggable="false">
+            </div>
+            <div class="album-thumb-item" data-index="7">
+              <img src="assets/images/gallery_8.jpg" alt="Ảnh nhỏ 8" draggable="false">
+            </div>
+          </div>
         </div>
 
-        <div class="gallery-item" data-caption="Chiếc váy cưới trắng tinh khôi">
-          <img src="assets/images/gallery_3.jpg" alt="Ảnh cưới 3" loading="lazy">
-          <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+        <div class="album-swipe-hint">
+          <span>👈 <strong>Dùng chuột kéo</strong> hoặc <strong>vuốt ngón tay</strong> sang trái/phải để chuyển ảnh 👉</span>
         </div>
+      </div>
 
-        <div class="gallery-item item-wide" data-caption="Hoàng hôn lãng mạn trên bãi biển">
-          <img src="assets/images/gallery_4.jpg" alt="Ảnh cưới 4" loading="lazy">
-          <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
-        </div>
+      <!-- 2. GRID VIEW (FALLBACK / ALL-PHOTOS) -->
+      <div class="album-grid-wrapper" id="album-grid-wrapper" style="display: none;">
+        <div class="gallery-grid">
+          <div class="gallery-item item-large" data-caption="Ánh mắt trao nhau lời thề nguyện">
+            <img src="assets/images/gallery_1.jpg" alt="Ảnh cưới 1" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+          </div>
 
-        <div class="gallery-item" data-caption="Nụ cười rạng rỡ của nàng dâu">
-          <img src="assets/images/gallery_5.jpg" alt="Ảnh cưới 5" loading="lazy">
-          <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
-        </div>
+          <div class="gallery-item" data-caption="Hạnh phúc giản đơn bên cạnh người mình yêu">
+            <img src="assets/images/gallery_2.jpg" alt="Ảnh cưới 2" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+          </div>
 
-        <div class="gallery-item" data-caption="Bó hoa cưới ngát hương tình">
-          <img src="assets/images/gallery_6.jpg" alt="Ảnh cưới 6" loading="lazy">
-          <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
-        </div>
+          <div class="gallery-item" data-caption="Chiếc váy cưới trắng tinh khôi">
+            <img src="assets/images/gallery_3.jpg" alt="Ảnh cưới 3" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+          </div>
 
-        <div class="gallery-item" data-caption="Trao nhau nhẫn cưới thiêng liêng">
-          <img src="assets/images/gallery_7.jpg" alt="Ảnh cưới 7" loading="lazy">
-          <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
-        </div>
+          <div class="gallery-item item-wide" data-caption="Hoàng hôn lãng mạn trên bãi biển">
+            <img src="assets/images/gallery_4.jpg" alt="Ảnh cưới 4" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+          </div>
 
-        <div class="gallery-item item-wide" data-caption="Cùng nhau bước vào lễ đường">
-          <img src="assets/images/gallery_8.jpg" alt="Ảnh cưới 8" loading="lazy">
-          <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+          <div class="gallery-item" data-caption="Nụ cười rạng rỡ của nàng dâu">
+            <img src="assets/images/gallery_5.jpg" alt="Ảnh cưới 5" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+          </div>
+
+          <div class="gallery-item" data-caption="Bó hoa cưới ngát hương tình">
+            <img src="assets/images/gallery_6.jpg" alt="Ảnh cưới 6" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+          </div>
+
+          <div class="gallery-item" data-caption="Trao nhau nhẫn cưới thiêng liêng">
+            <img src="assets/images/gallery_7.jpg" alt="Ảnh cưới 7" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+          </div>
+
+          <div class="gallery-item item-wide" data-caption="Cùng nhau bước vào lễ đường">
+            <img src="assets/images/gallery_8.jpg" alt="Ảnh cưới 8" loading="lazy">
+            <div class="gallery-overlay"><div class="gallery-zoom-icon">🔍</div></div>
+          </div>
         </div>
       </div>
     </div>
