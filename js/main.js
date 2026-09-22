@@ -1,6 +1,6 @@
 /**
  * LUXURY WEDDING INVITATION - INTERACTION ENGINE
- * Couple: Thái Bá Sang & Phạm Thị Kiều Thương
+ * Couple: Thái Bá Sang & Phạm Thị Thương
  * Enhanced with Dynamic Guest Personalization & Couple Config Manager
  */
 
