@@ -11,7 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Dancing+Script:wght@500;600;700&family=Ephesis&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&family=Pinyon+Script&family=Allura&display=swap" rel="stylesheet">
   
   <!-- html2canvas for instant export to PNG (300 DPI print quality) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="./js/html2canvas.min.js"></script>
+  <script>if (typeof html2canvas === 'undefined') { document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>'); }</script>
+  <!-- Pre-embedded Base64 Assets for Offline & Local file:// Canvas Export Security -->
+  <script src="./js/assets_base64.js"></script>
 
   <style>
     :root {
@@ -375,10 +378,7 @@
       position: relative;
       box-shadow:
         0 25px 60px rgba(0,0,0,0.55),
-        0 8px 20px rgba(0,0,0,0.25),
-        inset 0 0 0 0.6mm var(--card-accent),
-        inset 0 0 0 1.2mm var(--paper-cream),
-        inset 0 0 0 1.5mm var(--card-accent);
+        0 8px 20px rgba(0,0,0,0.25);
       box-sizing: border-box;
       border-radius: 1px;
       overflow: hidden;
@@ -390,43 +390,57 @@
       transform: translateY(-2px);
       box-shadow:
         0 30px 70px rgba(0,0,0,0.6),
-        0 10px 25px rgba(0,0,0,0.3),
-        inset 0 0 0 0.6mm var(--card-accent),
-        inset 0 0 0 1.2mm var(--paper-cream),
-        inset 0 0 0 1.5mm var(--card-accent);
+        0 10px 25px rgba(0,0,0,0.3);
     }
 
-    /* Luxury inner gold frame border */
-    .wedding-card::before {
-      content: "";
+    /* Luxury border frame elements (Rendered cleanly on screen and in export) */
+    .card-luxury-frame {
       position: absolute;
-      top: 3mm;
-      left: 3mm;
-      right: 3mm;
-      bottom: 3mm;
-      border: 0.3mm solid var(--card-accent);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       pointer-events: none;
-      z-index: 5;
+      z-index: 1;
+    }
+
+    .frame-outer-line {
+      position: absolute;
+      top: 0.8mm;
+      left: 0.8mm;
+      right: 0.8mm;
+      bottom: 0.8mm;
+      border: 0.45mm solid var(--card-accent);
+      box-sizing: border-box;
+      pointer-events: none;
+    }
+
+    .frame-inner-delicate {
+      position: absolute;
+      top: 3.0mm;
+      left: 3.0mm;
+      right: 3.0mm;
+      bottom: 3.0mm;
+      border: 0.25mm solid var(--card-accent);
       opacity: 0.35;
+      box-sizing: border-box;
+      pointer-events: none;
     }
 
-    /* Corner ornament dots */
-    .wedding-card::after {
-      content: "";
+    .frame-corner-dot {
       position: absolute;
-      top: 2.2mm;
-      left: 2.2mm;
-      right: 2.2mm;
-      bottom: 2.2mm;
-      pointer-events: none;
-      z-index: 5;
-      background:
-        radial-gradient(circle at 0% 0%, var(--card-accent) 1.2px, transparent 1.2px),
-        radial-gradient(circle at 100% 0%, var(--card-accent) 1.2px, transparent 1.2px),
-        radial-gradient(circle at 0% 100%, var(--card-accent) 1.2px, transparent 1.2px),
-        radial-gradient(circle at 100% 100%, var(--card-accent) 1.2px, transparent 1.2px);
+      width: 2.2px;
+      height: 2.2px;
+      background-color: var(--card-accent);
+      border-radius: 50%;
       opacity: 0.5;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
     }
+    .frame-corner-dot.corner-tl { top: 2.0mm; left: 2.0mm; }
+    .frame-corner-dot.corner-tr { top: 2.0mm; left: calc(100% - 2.0mm); }
+    .frame-corner-dot.corner-bl { top: calc(100% - 2.0mm); left: 2.0mm; }
+    .frame-corner-dot.corner-br { top: calc(100% - 2.0mm); left: calc(100% - 2.0mm); }
 
     /* Vertical Cards: 120mm x 180mm */
     .card-vertical {
@@ -1521,9 +1535,10 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         <span>🎨 Tỷ lệ 1:1 chuẩn xưởng in offset / kỹ thuật số</span>
       </div>
       <div class="preview-actions">
-        <button class="btn-export" onclick="exportCardToPng('cardParty', 'thiep_moi_tiec.png')">💾 Tải Ảnh Thiệp Mời</button>
-        <button class="btn-export" onclick="exportCardToPng('cardCover', 'bia_thiep_ngang.png')">💾 Tải Ảnh Bìa Ngang</button>
-        <button class="btn-export" onclick="exportCardToPng('cardCeremony', 'thiep_bao_tin.png')">💾 Tải Ảnh Báo Tin</button>
+        <button class="btn-export" onclick="exportCardToPng('cardParty', 'thiep_moi_tiec.png', this)">💾 Tải Mặt Mời Tiệc</button>
+        <button class="btn-export" onclick="exportCardToPng('cardCeremony', 'thiep_bao_tin.png', this)">💾 Tải Mặt Báo Tin</button>
+        <button class="btn-export" style="background: linear-gradient(135deg, #7a520a, #b8860b); color: #fff; font-weight: 700;" onclick="exportCombinedSpreadToPng(this)">🖼️ Tải File In Ngang Gập Đôi (240x180mm)</button>
+        <button class="btn-export" onclick="exportCardToPng('cardCover', 'bia_thiep_ngang.png', this)">💾 Tải Bìa Ngang</button>
       </div>
     </div>
 
@@ -1538,16 +1553,26 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           <button class="btn-card-save" onclick="exportCardToPng('cardParty', 'thiep_moi_tiec.png')">⬇️ Tải PNG</button>
         </div>
         <div class="wedding-card card-vertical card-vertical-watercolor" id="cardParty">
+          <!-- Luxury Card Border Frame -->
+          <div class="card-luxury-frame">
+            <div class="frame-outer-line"></div>
+            <div class="frame-inner-delicate"></div>
+            <div class="frame-corner-dot corner-tl"></div>
+            <div class="frame-corner-dot corner-tr"></div>
+            <div class="frame-corner-dot corner-bl"></div>
+            <div class="frame-corner-dot corner-br"></div>
+          </div>
+
           <!-- Top Left Floral Ornament -->
-          <img src="./assets/floral_top_left.jpg" class="card-bg-floral-top-left" alt="Top Left Floral">
+          <img src="./assets/floral_top_left.png" class="card-bg-floral-top-left" alt="Top Left Floral">
           <!-- Bottom Right Bride Illustration -->
-          <img src="./assets/bride_illustration.jpg" class="card-bg-bride" alt="Cô Dâu">
+          <img src="./assets/bride_illustration.png" class="card-bg-bride" alt="Cô Dâu">
 
           <div class="card-inner-content">
             
             <!-- Top Art: Vintage Chair with Velvet & Floral -->
             <div class="invitation-art-holder">
-              <img src="./assets/chair_decor.jpg" alt="Vintage Chair Decor" class="invitation-art-img" id="chairArtImg" onerror="this.src='https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80'">
+              <img src="./assets/chair_decor.png" alt="Vintage Chair Decor" class="invitation-art-img" id="chairArtImg" onerror="if(window.ASSET_BASE64&&window.ASSET_BASE64.chair)this.src=window.ASSET_BASE64.chair;">
             </div>
 
             <!-- Invitation Title -->
@@ -1650,10 +1675,20 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           <button class="btn-card-save" onclick="exportCardToPng('cardCeremony', 'thiep_bao_tin.png')">⬇️ Tải PNG</button>
         </div>
         <div class="wedding-card card-vertical card-vertical-watercolor" id="cardCeremony">
+          <!-- Luxury Card Border Frame -->
+          <div class="card-luxury-frame">
+            <div class="frame-outer-line"></div>
+            <div class="frame-inner-delicate"></div>
+            <div class="frame-corner-dot corner-tl"></div>
+            <div class="frame-corner-dot corner-tr"></div>
+            <div class="frame-corner-dot corner-bl"></div>
+            <div class="frame-corner-dot corner-br"></div>
+          </div>
+
           <!-- Bottom Left Groom Illustration -->
           <img src="./assets/groom_illustration.png" class="card-bg-groom" alt="Chú Rể">
           <!-- Bottom Right Floral Ornament -->
-          <img src="./assets/floral_bottom_right.jpg" class="card-bg-floral-bottom-right" alt="Bottom Right Floral">
+          <img src="./assets/floral_bottom_right.png" class="card-bg-floral-bottom-right" alt="Bottom Right Floral">
 
           <div class="card-inner-content">
             
@@ -1665,55 +1700,41 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
                 <div class="announcement-top-icon">
                   <div class="monogram-crest-wrapper">
                     <svg class="monogram-crest-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <!-- Gold Metallic Gradients Definition -->
-                      <defs>
-                        <linearGradient id="monogramGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stop-color="#7a520a" />
-                          <stop offset="25%" stop-color="#b8860b" />
-                          <stop offset="50%" stop-color="#e6be57" />
-                          <stop offset="75%" stop-color="#b8860b" />
-                          <stop offset="100%" stop-color="#6e4d08" />
-                        </linearGradient>
-                        <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
-                          <feDropShadow dx="0" dy="1" stdDeviation="0.8" flood-color="#7a520a" flood-opacity="0.3"/>
-                        </filter>
-                      </defs>
-
                       <!-- Outer Thin Gold Rings -->
-                      <circle cx="60" cy="60" r="56" stroke="url(#monogramGoldGrad)" stroke-width="0.7" opacity="0.6" />
-                      <circle cx="60" cy="60" r="52" stroke="url(#monogramGoldGrad)" stroke-width="1.4" opacity="0.95" stroke-dasharray="3 2" />
-                      <circle cx="60" cy="60" r="48" stroke="url(#monogramGoldGrad)" stroke-width="0.7" opacity="0.7" />
+                      <circle cx="60" cy="60" r="56" stroke="#b8860b" stroke-width="0.7" opacity="0.6" />
+                      <circle cx="60" cy="60" r="52" stroke="#b8860b" stroke-width="1.4" opacity="0.95" stroke-dasharray="3 2" />
+                      <circle cx="60" cy="60" r="48" stroke="#b8860b" stroke-width="0.7" opacity="0.7" />
                       
                       <!-- 4 Ornamental Diamond Accents -->
-                      <polygon points="60,2 64,5 60,8 56,5" fill="url(#monogramGoldGrad)" />
-                      <polygon points="60,112 64,115 60,118 56,115" fill="url(#monogramGoldGrad)" />
-                      <polygon points="2,60 5,64 8,60 5,56" fill="url(#monogramGoldGrad)" />
-                      <polygon points="112,60 115,64 118,60 115,56" fill="url(#monogramGoldGrad)" />
+                      <polygon points="60,2 64,5 60,8 56,5" fill="#b8860b" />
+                      <polygon points="60,112 64,115 60,118 56,115" fill="#b8860b" />
+                      <polygon points="2,60 5,64 8,60 5,56" fill="#b8860b" />
+                      <polygon points="112,60 115,64 118,60 115,56" fill="#b8860b" />
 
                       <!-- Botanical Laurel Wreath Lines -->
-                      <path d="M 20 60 C 18 42, 28 24, 48 16" stroke="url(#monogramGoldGrad)" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
-                      <path d="M 20 60 C 18 78, 28 96, 48 104" stroke="url(#monogramGoldGrad)" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
-                      <path d="M 100 60 C 102 42, 92 24, 72 16" stroke="url(#monogramGoldGrad)" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
-                      <path d="M 100 60 C 102 78, 92 96, 72 104" stroke="url(#monogramGoldGrad)" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
+                      <path d="M 20 60 C 18 42, 28 24, 48 16" stroke="#b8860b" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
+                      <path d="M 20 60 C 18 78, 28 96, 48 104" stroke="#b8860b" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
+                      <path d="M 100 60 C 102 42, 92 24, 72 16" stroke="#b8860b" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
+                      <path d="M 100 60 C 102 78, 92 96, 72 104" stroke="#b8860b" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
 
                       <!-- Laurel Leaves Left -->
-                      <path d="M 21 51 Q 14 47 23 42 Q 26 48 21 51 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
-                      <path d="M 26 37 Q 20 31 30 28 Q 32 35 26 37 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
-                      <path d="M 36 25 Q 31 18 41 17 Q 42 24 36 25 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
-                      <path d="M 21 69 Q 14 73 23 78 Q 26 72 21 69 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
-                      <path d="M 26 83 Q 20 89 30 92 Q 32 85 26 83 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
-                      <path d="M 36 95 Q 31 102 41 103 Q 42 96 36 95 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                      <path d="M 21 51 Q 14 47 23 42 Q 26 48 21 51 Z" fill="#b8860b" opacity="0.85"/>
+                      <path d="M 26 37 Q 20 31 30 28 Q 32 35 26 37 Z" fill="#b8860b" opacity="0.85"/>
+                      <path d="M 36 25 Q 31 18 41 17 Q 42 24 36 25 Z" fill="#b8860b" opacity="0.85"/>
+                      <path d="M 21 69 Q 14 73 23 78 Q 26 72 21 69 Z" fill="#b8860b" opacity="0.85"/>
+                      <path d="M 26 83 Q 20 89 30 92 Q 32 85 26 83 Z" fill="#b8860b" opacity="0.85"/>
+                      <path d="M 36 95 Q 31 102 41 103 Q 42 96 36 95 Z" fill="#b8860b" opacity="0.85"/>
 
                       <!-- Laurel Leaves Right -->
-                      <path d="M 99 51 Q 106 47 97 42 Q 94 48 99 51 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
-                      <path d="M 94 37 Q 100 31 90 28 Q 88 35 94 37 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
-                      <path d="M 84 25 Q 89 18 79 17 Q 78 24 84 25 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
-                      <path d="M 99 69 Q 106 73 97 78 Q 94 72 99 69 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
-                      <path d="M 94 83 Q 100 89 90 92 Q 88 85 94 83 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
-                      <path d="M 84 95 Q 89 102 79 103 Q 78 96 84 95 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                      <path d="M 99 51 Q 106 47 97 42 Q 94 48 99 51 Z" fill="#b8860b" opacity="0.85"/>
+                      <path d="M 94 37 Q 100 31 90 28 Q 88 35 94 37 Z" fill="#b8860b" opacity="0.85"/>
+                      <path d="M 84 25 Q 89 18 79 17 Q 78 24 84 25 Z" fill="#b8860b" opacity="0.85"/>
+                      <path d="M 99 69 Q 106 73 97 78 Q 94 72 99 69 Z" fill="#b8860b" opacity="0.85"/>
+                      <path d="M 94 83 Q 100 89 90 92 Q 88 85 94 83 Z" fill="#b8860b" opacity="0.85"/>
+                      <path d="M 84 95 Q 89 102 79 103 Q 78 96 84 95 Z" fill="#b8860b" opacity="0.85"/>
 
                       <!-- Monogram Text Calligraphy with Metallic Gold -->
-                      <text x="60" y="69" text-anchor="middle" font-family="'Great Vibes', 'Pinyon Script', 'Alex Brush', cursive" font-size="39" font-weight="bold" fill="url(#monogramGoldGrad)" stroke="none" id="monogramTextEl" filter="url(#goldGlow)">S &amp; T</text>
+                      <text x="60" y="69" text-anchor="middle" font-family="'Great Vibes', 'Pinyon Script', 'Alex Brush', cursive" font-size="39" font-weight="bold" fill="#b8860b" stroke="none" id="monogramTextEl">S &amp; T</text>
                     </svg>
                   </div>
                 </div>
@@ -1792,7 +1813,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
             <!-- Bottom Luxury QR Block (Balances card height & fills bottom gracefully) -->
             <div class="ceremony-qr-section">
               <div class="ceremony-qr-box">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&amp;data=https%3A%2F%2Fconchonha.github.io%2Fsang-thuong-wedding-2026%2Findex.html" alt="QR Code Online Invitation" class="ceremony-qr-img" id="ceremonyQrImg" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23ffffff\'/><rect x=\'10\' y=\'10\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'15\' y=\'15\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'20\' y=\'20\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'60\' y=\'10\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'65\' y=\'15\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'70\' y=\'20\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'10\' y=\'60\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'15\' y=\'65\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'20\' y=\'70\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'50\' y=\'50\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'70\' y=\'50\' width=\'20\' height=\'10\' fill=\'%23111111\'/><rect x=\'50\' y=\'70\' width=\'15\' height=\'20\' fill=\'%23111111\'/><rect x=\'75\' y=\'75\' width=\'15\' height=\'15\' fill=\'%23111111\'/></svg>'">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWAQMAAAAGz+OhAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABuElEQVRIibWWMY7DIBBFx6KgnBvEF4nMtVxEAmkLX8uRL8LegJLCYvYP7K5SpDKEirzChD//z0D0ZnkRIXsUJl9INvzKXWwlmnnbb4xvz2R3ok7my0xkJOWHk2QPbD7CWI5IEmiWbQjDZWbR9XruSKZaZVc4PxZ61e8i01rydnxDlwVF+K/vSNYMdxLq64TDiwmvMS9llnynpn2+q3FGM6KFcA8RKxKT3ad6j+vMyg6bYCvBReiC8Axna1XHfItWIWGT+pg/IXnz+AJdXKEPMHnGKnvrJTtx7mL2a0dm8Gk9g4OJqtVwVlDfc4JELkquWvUwj1pWJrrRen6ABUTew5PZP9WTN9Wvi00abUQFOUdla44Gs/Wh1kYvUU/C8dWnHUz9B2vDfyectzZdBrMV2U8eViRT6FerPjbhDBfJQiDOpuV8MENZpd7BoHnLOadOhhHL6KdcmxR6oM6ewUxX+/t6bkCO+libW/r54ATzvDANZ2t93mCbjaBxmb9302Wmb5BcezZyDl34Q2zTpwJ6rD4eaADL8B8hoOjZN03OaKbvnHDH2AVLVudZF6u1lPoG0bllIo9nb9YPaE9Td78WvWIAAAAASUVORK5CYII=" alt="QR Code Online Invitation" class="ceremony-qr-img" id="ceremonyQrImg" onerror="this.onerror=null;">
               </div>
               <div class="ceremony-qr-info">
                 <div class="ceremony-qr-label" id="ceremonyQrLabelText">💌 THIỆP MỜI ONLINE &amp; ALBUM KỶ NIỆM</div>
@@ -1823,6 +1844,16 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           <button class="btn-card-save" onclick="exportCardToPng('cardCover', 'bia_thiep_ngang.png')">⬇️ Tải PNG</button>
         </div>
         <div class="wedding-card card-horizontal" id="cardCover">
+          <!-- Luxury Card Border Frame -->
+          <div class="card-luxury-frame">
+            <div class="frame-outer-line"></div>
+            <div class="frame-inner-delicate"></div>
+            <div class="frame-corner-dot corner-tl"></div>
+            <div class="frame-corner-dot corner-tr"></div>
+            <div class="frame-corner-dot corner-bl"></div>
+            <div class="frame-corner-dot corner-br"></div>
+          </div>
+
           <div class="card-inner-content">
             <div class="cover-card-container">
               
@@ -1831,7 +1862,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
 
               <!-- Center Floral Arch with Couple -->
               <div class="cover-art-center">
-                <img src="./assets/couple_arch.jpg" alt="Wedding Couple Under Arch" class="cover-art-img" id="coupleArchImg" onerror="this.src='https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80'">
+                <img src="./assets/couple_arch.png" alt="Wedding Couple Under Arch" class="cover-art-img" id="coupleArchImg" onerror="if(window.ASSET_BASE64&&window.ASSET_BASE64.arch)this.src=window.ASSET_BASE64.arch;">
               </div>
 
               <!-- Calligraphy "Wedding" (Right) -->
@@ -2038,12 +2069,27 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       monogramTextEl.textContent = monogramInput.value || 'S & T';
     }
     
-    // QR Code updates
+    // QR Code updates (Converted to Base64 Data URI to avoid SecurityError: Tainted canvases)
     const qrUrlInput = document.getElementById('ceremonyQrUrlInput');
     const qrImg = document.getElementById('ceremonyQrImg');
     if (qrUrlInput && qrImg && !qrImg.dataset.customUploaded) {
       const targetUrl = qrUrlInput.value.trim() || 'https://conchonha.github.io/sang-thuong-wedding-2026/index.html';
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(targetUrl)}`;
+      if (qrImg.dataset.lastUrl !== targetUrl) {
+        qrImg.dataset.lastUrl = targetUrl;
+        const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(targetUrl)}`;
+        fetch(apiUrl)
+          .then(res => res.blob())
+          .then(blob => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              qrImg.src = reader.result;
+            };
+            reader.readAsDataURL(blob);
+          })
+          .catch(() => {
+            qrImg.src = apiUrl;
+          });
+      }
     }
 
     const qrLabel = document.getElementById('ceremonyQrLabelInput');
@@ -2138,24 +2184,348 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     mItem.style.display = (viewMode === 'all' || viewMode === 'card-ceremony') ? 'flex' : 'none';
   }
 
-  function exportCardToPng(elementId, filename) {
-    const cardEl = document.getElementById(elementId);
-    if (!cardEl) return;
+  /* ========================================================
+   * EXPORT HELPERS & RENDERING
+   * ======================================================== */
 
-    html2canvas(cardEl, {
-      scale: 3,
-      useCORS: true,
-      backgroundColor: null
-    }).then(canvas => {
-      const link = document.createElement('a');
-      link.download = filename || 'wedding-card.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+  /**
+   * Prepare cloned card elements for html2canvas export:
+   *  - Normalizes mix-blend-mode to avoid browser composition glitches
+   *  - Fixes calligraphy text: html2canvas does not support -webkit-background-clip: text,
+   *    which would render as a solid dark gradient rectangle. We set background to none and apply
+   *    a rich metallic gold text color so calligraphy is sharp, clean and seamless.
+   *  - Ensures all images use transparent PNG base64 assets without any rectangular backgrounds
+   */
+  function prepareCloneForExport(clone) {
+    // 1. Strip mix-blend-mode to avoid html2canvas composite bugs
+    clone.querySelectorAll('*').forEach(el => {
+      el.style.mixBlendMode = 'normal';
     });
+
+    // 2. Fix gold gradient text: html2canvas renders -webkit-background-clip: text as an opaque box
+    clone.querySelectorAll('.restaurant-name-calligraphy, .couple-name-calligraphy-announcement, .gold-highlight-text').forEach(el => {
+      el.style.setProperty('background', 'none', 'important');
+      el.style.setProperty('-webkit-background-clip', 'border-box', 'important');
+      el.style.setProperty('background-clip', 'border-box', 'important');
+      el.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
+      el.style.setProperty('color', '#a6741b', 'important');
+      el.style.setProperty('text-shadow', '0 1px 2px rgba(122, 82, 10, 0.35)', 'important');
+      el.style.setProperty('filter', 'none', 'important');
+    });
+
+    // 3. Ensure all cloned images use transparent PNG base64 assets
+    if (window.ASSET_BASE64) {
+      clone.querySelectorAll('.card-bg-floral-top-left').forEach(el => el.src = window.ASSET_BASE64.floral_tl);
+      clone.querySelectorAll('.card-bg-floral-bottom-right').forEach(el => el.src = window.ASSET_BASE64.floral_br);
+      clone.querySelectorAll('.card-bg-bride').forEach(el => el.src = window.ASSET_BASE64.bride);
+      clone.querySelectorAll('.card-bg-groom').forEach(el => el.src = window.ASSET_BASE64.groom);
+      const chairImg = clone.querySelector('#chairArtImg, .invitation-art-img');
+      if (chairImg && window.ASSET_BASE64.chair) chairImg.src = window.ASSET_BASE64.chair;
+      const archImg = clone.querySelector('#coupleArchImg, .cover-art-img');
+      if (archImg && window.ASSET_BASE64.arch) archImg.src = window.ASSET_BASE64.arch;
+    }
+
+    // 4. Remove onerror attributes on all cloned images to prevent external network fallbacks
+    clone.querySelectorAll('img').forEach(img => {
+      img.removeAttribute('onerror');
+    });
+
+    // 5. Sanitize SVG gradients, defs, and filter references (url(#...)) to prevent Chromium file:// security blocks
+    clone.querySelectorAll('.monogram-crest-svg, svg').forEach(svg => {
+      svg.querySelectorAll('defs').forEach(def => def.remove());
+      svg.querySelectorAll('[stroke*="url("]').forEach(el => el.setAttribute('stroke', '#b8860b'));
+      svg.querySelectorAll('[fill*="url("]').forEach(el => el.setAttribute('fill', '#b8860b'));
+      svg.querySelectorAll('[filter*="url("]').forEach(el => el.removeAttribute('filter'));
+    });
+
+    // 6. Ensure QR code uses inline base64/data URI instead of external http(s) URL
+    const qrImg = clone.querySelector('#ceremonyQrImg, .ceremony-qr-img');
+    if (qrImg) {
+      const liveQr = document.getElementById('ceremonyQrImg');
+      if (liveQr && liveQr.src && liveQr.src.startsWith('data:')) {
+        qrImg.src = liveQr.src;
+      } else if (liveQr && liveQr.complete && liveQr.naturalWidth > 0) {
+        try {
+          const cvs = document.createElement('canvas');
+          cvs.width = liveQr.naturalWidth;
+          cvs.height = liveQr.naturalHeight;
+          const ctx = cvs.getContext('2d');
+          ctx.drawImage(liveQr, 0, 0);
+          qrImg.src = cvs.toDataURL('image/png');
+        } catch(e) {
+          qrImg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23ffffff"/><rect x="10" y="10" width="30" height="30" fill="%23111111"/><rect x="15" y="15" width="20" height="20" fill="%23ffffff"/><rect x="20" y="20" width="10" height="10" fill="%23111111"/><rect x="60" y="10" width="30" height="30" fill="%23111111"/><rect x="65" y="15" width="20" height="20" fill="%23ffffff"/><rect x="70" y="20" width="10" height="10" fill="%23111111"/><rect x="10" y="60" width="30" height="30" fill="%23111111"/><rect x="15" y="65" width="20" height="20" fill="%23ffffff"/><rect x="20" y="70" width="10" height="10" fill="%23111111"/><rect x="50" y="50" width="10" height="10" fill="%23111111"/><rect x="70" y="50" width="20" height="10" fill="%23111111"/><rect x="50" y="70" width="15" height="20" fill="%23111111"/><rect x="75" y="75" width="15" height="15" fill="%23111111"/></svg>';
+        }
+      }
+    }
+  }
+
+  /* --------------------------------------------------------
+   * Export single card
+   * -------------------------------------------------------- */
+  function exportCardToPng(elementId, filename, btnEl) {
+    const cardEl = document.getElementById(elementId);
+    if (!cardEl) { alert('Không tìm thấy mặt thiệp!'); return; }
+
+    let origText = '';
+    if (btnEl) { origText = btnEl.innerText; btnEl.innerText = '⏳ Đang xuất...'; btnEl.style.opacity = '0.7'; }
+
+    const rect    = cardEl.getBoundingClientRect();
+    const cardW   = Math.round(rect.width);
+    const cardH   = Math.round(rect.height);
+    const paperBg = window.getComputedStyle(cardEl).backgroundColor || '#faf7f2';
+
+    // Clone, prepare, then render
+    const clone = cardEl.cloneNode(true);
+    clone.style.cssText += ';position:fixed;left:0;top:0;z-index:-99999;margin:0;box-shadow:none;transform:none;pointer-events:none;box-sizing:border-box;';
+    clone.style.width  = cardW + 'px';
+    clone.style.height = cardH + 'px';
+    clone.style.backgroundColor = paperBg;
+    prepareCloneForExport(clone);
+    document.body.appendChild(clone);
+
+    setTimeout(() => {
+      html2canvas(clone, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: paperBg,
+        logging: false
+      }).then(canvas => {
+        downloadCanvasAsPng(canvas, filename || 'wedding-card.png');
+      }).catch(err => {
+        console.error('Export error:', err);
+        alert('Lỗi xuất ảnh: ' + (err && err.message ? err.message : err));
+      }).finally(() => {
+        if (document.body.contains(clone)) document.body.removeChild(clone);
+        if (btnEl) { btnEl.innerText = origText; btnEl.style.opacity = '1'; }
+      });
+    }, 350);
+  }
+
+  /* --------------------------------------------------------
+   * Export combined 240x180mm spread (Card 1 + Card 2)
+   * -------------------------------------------------------- */
+  function exportCombinedSpreadToPng(btnEl) {
+    const cardParty    = document.getElementById('cardParty');
+    const cardCeremony = document.getElementById('cardCeremony');
+    if (!cardParty || !cardCeremony) { alert('Không tìm thấy 2 mặt thiệp!'); return; }
+
+    let origText = '';
+    if (btnEl) { origText = btnEl.innerText; btnEl.innerText = '⏳ Đang ghép & xuất file (240x180mm)...'; btnEl.style.opacity = '0.7'; }
+
+    const cardW   = Math.round(cardParty.getBoundingClientRect().width);
+    const cardH   = Math.round(cardParty.getBoundingClientRect().height);
+    const totalW  = cardW * 2;
+    const paperBg = window.getComputedStyle(cardParty).backgroundColor || '#faf7f2';
+
+    // Build spread container at fixed position behind page
+    const tempSpread = document.createElement('div');
+    tempSpread.style.cssText = [
+      'display:flex','flex-direction:row','align-items:stretch',
+      'width:'  + totalW + 'px',
+      'height:' + cardH + 'px',
+      'position:fixed','left:0','top:0','z-index:-99999','pointer-events:none',
+      'background:' + paperBg, 'overflow:hidden'
+    ].join(';');
+
+    const cloneParty    = cardParty.cloneNode(true);
+    const cloneCeremony = cardCeremony.cloneNode(true);
+
+    [cloneParty, cloneCeremony].forEach(clone => {
+      clone.style.margin          = '0';
+      clone.style.boxShadow       = 'none';
+      clone.style.transform       = 'none';
+      clone.style.flex            = '0 0 ' + cardW + 'px';
+      clone.style.width           = cardW + 'px';
+      clone.style.maxWidth        = cardW + 'px';
+      clone.style.minWidth        = cardW + 'px';
+      clone.style.height          = cardH + 'px';
+      clone.style.boxSizing       = 'border-box';
+      clone.style.backgroundColor = paperBg;
+      prepareCloneForExport(clone);
+    });
+
+    tempSpread.appendChild(cloneParty);
+    tempSpread.appendChild(cloneCeremony);
+    document.body.appendChild(tempSpread);
+
+    setTimeout(() => {
+      html2canvas(tempSpread, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: paperBg,
+        logging: false
+      }).then(canvas => {
+        const ctx = canvas.getContext('2d');
+        const s = 3;
+        const mm = 3.7795 * s;
+        const W1 = Math.round(canvas.width / 2);
+
+        // Center fold guideline (subtle dashed fold line)
+        ctx.save();
+        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--card-accent').trim() || '#111111';
+        ctx.globalAlpha = 0.25;
+        ctx.lineWidth = Math.max(1, Math.round(0.25 * mm));
+        ctx.setLineDash([4 * s, 4 * s]);
+        ctx.beginPath();
+        ctx.moveTo(W1, 0);
+        ctx.lineTo(W1, canvas.height);
+        ctx.stroke();
+        ctx.restore();
+
+        window.__latestExportDataUrl = canvas.toDataURL('image/png');
+        downloadCanvasAsPng(canvas, 'thiep_cuoi_ngang_gap_doi_240x180.png');
+      }).catch(err => {
+        console.error('Lỗi tạo file in gập đôi:', err);
+        alert('Không thể xuất file in gập đôi: ' + (err && err.message ? err.message : err));
+      }).finally(() => {
+        if (document.body.contains(tempSpread)) document.body.removeChild(tempSpread);
+        if (btnEl) { btnEl.innerText = origText; btnEl.style.opacity = '1'; }
+      });
+    }, 350);
+  }
+
+  /* --------------------------------------------------------
+   * File Download & Export Success Handler
+   * -------------------------------------------------------- */
+  function downloadCanvasAsPng(canvas, filename) {
+    const finalName = filename.endsWith('.png') ? filename : (filename + '.png');
+    
+    // Method 1: Blob URL (Most reliable in Chrome & macOS to preserve .png extension)
+    if (canvas.toBlob) {
+      canvas.toBlob(function(blob) {
+        if (!blob) {
+          fallbackDataUrlDownload(canvas, finalName);
+          return;
+        }
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        link.href = blobUrl;
+        link.download = finalName;
+        document.body.appendChild(link);
+        link.click();
+        
+        // Show interactive modal so user can also right-click save or view full-res
+        showExportSuccessModal(blobUrl, finalName);
+
+        setTimeout(() => {
+          if (document.body.contains(link)) document.body.removeChild(link);
+        }, 5000);
+      }, 'image/png');
+    } else {
+      fallbackDataUrlDownload(canvas, finalName);
+    }
+  }
+
+  function fallbackDataUrlDownload(canvas, filename) {
+    const dataUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.href = dataUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    showExportSuccessModal(dataUrl, filename);
+    setTimeout(() => {
+      if (document.body.contains(link)) document.body.removeChild(link);
+    }, 5000);
+  }
+
+  function showExportSuccessModal(imgUrl, filename) {
+    let modal = document.getElementById('exportSuccessModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'exportSuccessModal';
+      modal.style.cssText = [
+        'position:fixed', 'inset:0', 'z-index:999999',
+        'background:rgba(0,0,0,0.85)', 'backdrop-filter:blur(8px)',
+        'display:flex', 'align-items:center', 'justify-content:center',
+        'padding:20px', 'box-sizing:border-box'
+      ].join(';');
+      document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+      <div style="
+        background: #1e2229; border: 1px solid #3d4554; border-radius: 16px;
+        max-width: 920px; width: 100%; max-height: 92vh; display: flex; flex-direction: column;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); overflow: hidden; color: #f0ede6; font-family: 'Be Vietnam Pro', sans-serif;
+      ">
+        <!-- Header -->
+        <div style="padding: 16px 20px; border-bottom: 1px solid #2e3440; display: flex; align-items: center; justify-content: space-between; background: #16191f;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">🎉</span>
+            <div>
+              <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #e5b95f;">Xuất file in thành công!</h3>
+              <p style="margin: 2px 0 0 0; font-size: 12px; color: #9aa0a6;">Tên file: <strong style="color: #ffffff;">${filename}</strong> (Chuẩn 300 DPI siêu nét)</p>
+            </div>
+          </div>
+          <button onclick="closeExportModal()" style="
+            background: transparent; border: none; color: #9aa0a6; font-size: 26px;
+            cursor: pointer; padding: 4px 12px; border-radius: 8px; line-height: 1;
+          ">&times;</button>
+        </div>
+
+        <!-- Image Preview -->
+        <div style="flex: 1; overflow: auto; padding: 20px; text-align: center; background: #0f1115; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <img src="${imgUrl}" alt="Ảnh Thiệp Đã Xuất" style="
+            max-width: 100%; max-height: 54vh; object-fit: contain;
+            border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            background: #ffffff; border: 1px solid #333;
+          ">
+          <p style="margin: 14px 0 0 0; font-size: 13px; color: #cbd5e1; max-width: 650px; line-height: 1.5;">
+            ✨ <em>Trình duyệt đã tự động tải file <strong>${filename}</strong> về máy của bạn.</em><br>
+            <span style="color: #94a3b8; font-size: 12px;">Nếu máy tải file về mà bạn chưa mở được, bạn có thể click chuột phải vào ảnh bên trên rồi chọn <strong>"Lưu hình ảnh thành..."</strong> (Save Image As) để lưu file ảnh .png trực tiếp nhé!</span>
+          </p>
+        </div>
+
+        <!-- Action Footer -->
+        <div style="padding: 14px 20px; border-top: 1px solid #2e3440; display: flex; justify-content: flex-end; gap: 12px; background: #16191f; flex-wrap: wrap;">
+          <button onclick="closeExportModal()" style="
+            padding: 10px 18px; border-radius: 8px; background: #2d3340; color: #e2e8f0;
+            border: 1px solid #4a5568; font-size: 13px; font-weight: 600; cursor: pointer;
+          ">Đóng</button>
+          
+          <a href="${imgUrl}" target="_blank" style="
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 18px; border-radius: 8px; background: #374151; color: #ffffff;
+            text-decoration: none; border: 1px solid #4b5563; font-size: 13px; font-weight: 600;
+          ">👁️ Mở toàn màn hình</a>
+
+          <a href="${imgUrl}" download="${filename}" style="
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 22px; border-radius: 8px; background: linear-gradient(135deg, #d4a743, #a67c38);
+            color: #141414; text-decoration: none; font-size: 13px; font-weight: 700;
+            box-shadow: 0 4px 14px rgba(212, 167, 67, 0.4);
+          ">📥 Bấm Tải Lại (.PNG)</a>
+        </div>
+      </div>
+    `;
+    modal.style.display = 'flex';
+  }
+
+  function closeExportModal() {
+    const modal = document.getElementById('exportSuccessModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+
+  function applyBase64Assets() {
+    if (window.ASSET_BASE64) {
+      document.querySelectorAll('.card-bg-floral-top-left').forEach(el => el.src = window.ASSET_BASE64.floral_tl);
+      document.querySelectorAll('.card-bg-floral-bottom-right').forEach(el => el.src = window.ASSET_BASE64.floral_br);
+      document.querySelectorAll('.card-bg-bride').forEach(el => el.src = window.ASSET_BASE64.bride);
+      document.querySelectorAll('.card-bg-groom').forEach(el => el.src = window.ASSET_BASE64.groom);
+      const chairImg = document.getElementById('chairArtImg');
+      if (chairImg && window.ASSET_BASE64.chair) chairImg.src = window.ASSET_BASE64.chair;
+      const archImg = document.getElementById('coupleArchImg');
+      if (archImg && window.ASSET_BASE64.arch) archImg.src = window.ASSET_BASE64.arch;
+    }
   }
 
   // Initialize on load
   window.addEventListener('DOMContentLoaded', () => {
+    applyBase64Assets();
     updateLiveContent();
   });
 </script>
