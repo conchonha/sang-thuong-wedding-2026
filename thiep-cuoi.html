@@ -584,10 +584,14 @@
       font-family: 'Dancing Script', 'Ephesis', 'Alex Brush', cursive;
       font-size: 2.55rem;
       font-weight: 700;
-      color: var(--card-accent);
+      color: #996515;
+      background: linear-gradient(135deg, #7a520a 0%, #b8860b 25%, #e6be57 50%, #b8860b 75%, #6e4d08 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       line-height: 1.15;
       margin: 1.5mm 0 1mm;
       letter-spacing: 0.5px;
+      filter: drop-shadow(0 1px 1px rgba(122, 82, 10, 0.25));
     }
 
     .venue-hall-text {
@@ -840,14 +844,17 @@
 
     .announcement-top-icon {
       margin-top: 0 !important;
+      margin-bottom: 1.5mm;
     }
 
     .monogram-crest-wrapper {
-      width: 18mm;
-      height: 18mm;
+      width: 25mm;
+      height: 25mm;
       display: flex;
       align-items: center;
       justify-content: center;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+      transition: transform 0.3s ease;
     }
 
     .monogram-crest-svg {
@@ -919,11 +926,23 @@
 
     .couple-name-calligraphy-announcement {
       font-family: 'Dancing Script', 'Ephesis', 'Alex Brush', cursive;
-      font-size: 2.65rem;
+      font-size: 2.75rem;
       font-weight: 700;
-      color: var(--card-accent);
+      color: #996515;
+      background: linear-gradient(135deg, #7a520a 0%, #b8860b 25%, #e6be57 50%, #b8860b 75%, #6e4d08 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       line-height: 1.15;
       letter-spacing: 0.5px;
+      filter: drop-shadow(0 1px 1px rgba(122, 82, 10, 0.25));
+    }
+
+    .gold-highlight-text {
+      color: #996515;
+      background: linear-gradient(135deg, #7a520a 0%, #b8860b 25%, #e6be57 50%, #b8860b 75%, #6e4d08 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 1px 1px rgba(122, 82, 10, 0.25));
     }
 
     .couple-role-row {
@@ -1244,22 +1263,26 @@
       <div class="form-grid-2 form-row">
         <div>
           <label>Tên Chú Rể</label>
-          <input type="text" id="groomNameInput" value="Nguyễn Anh Kiệt" oninput="updateLiveContent()">
+          <input type="text" id="groomNameInput" value="Thái Bá Sang" oninput="updateLiveContent()">
         </div>
         <div>
           <label>Vai Vế Chú Rể</label>
-          <input type="text" id="groomRoleInput" value="Út Nam" oninput="updateLiveContent()">
+          <input type="text" id="groomRoleInput" value="Thứ Nam" oninput="updateLiveContent()">
         </div>
       </div>
       <div class="form-grid-2 form-row">
         <div>
           <label>Tên Cô Dâu</label>
-          <input type="text" id="brideNameInput" value="Huỳnh Kim Ngân" oninput="updateLiveContent()">
+          <input type="text" id="brideNameInput" value="Phạm Thị Kiều Thương" oninput="updateLiveContent()">
         </div>
         <div>
           <label>Vai Vế Cô Dâu</label>
-          <input type="text" id="brideRoleInput" value="Thứ Nữ" oninput="updateLiveContent()">
+          <input type="text" id="brideRoleInput" value="Trưởng Nữ" oninput="updateLiveContent()">
         </div>
+      </div>
+      <div class="form-row">
+        <label>Logo Monogram Viết Tắt (Bìa Thiệp Báo Tin)</label>
+        <input type="text" id="monogramInput" value="S & T" oninput="updateLiveContent()">
       </div>
     </div>
 
@@ -1268,19 +1291,19 @@
       <h3>👨‍👩‍👧‍👦 3. Đại Diện Hai Gia Đình</h3>
       <div class="form-row">
         <label>Bố Mẹ Nhà Trai (Ông & Bà, cách nhau bởi dấu /)</label>
-        <input type="text" id="groomParentsInput" value="PHẠM VĂN HAY / ĐẶNG THỊ MINH ĐỨC" oninput="updateLiveContent()">
+        <input type="text" id="groomParentsInput" value="THÁI VĂN HÙNG / PHẠM THỊ TRINH" oninput="updateLiveContent()">
       </div>
       <div class="form-row">
         <label>Quê Quán Nhà Trai (Thôn Xã / Tỉnh Thành)</label>
-        <input type="text" id="groomAddressInput" value="Hòa Phong - Hòa Vang / Đà Nẵng" oninput="updateLiveContent()">
+        <input type="text" id="groomAddressInput" value="Thôn Đại Mỹ - Thượng Đức / Đà Nẵng" oninput="updateLiveContent()">
       </div>
       <div class="form-row">
         <label>Bố Mẹ Nhà Gái (Ông & Bà, cách nhau bởi dấu /)</label>
-        <input type="text" id="brideParentsInput" value="HUỲNH VĂN CHÍNH / PHẠM THỊ LIÊN" oninput="updateLiveContent()">
+        <input type="text" id="brideParentsInput" value="PHẠM VĂN TÝ / TRẦN THỊ THOA" oninput="updateLiveContent()">
       </div>
       <div class="form-row">
         <label>Quê Quán Nhà Gái (Thôn Xã / Tỉnh Thành)</label>
-        <input type="text" id="brideAddressInput" value="Hòa Minh - Liên Chiểu / Đà Nẵng" oninput="updateLiveContent()">
+        <input type="text" id="brideAddressInput" value="Thôn 3 - Thượng Đức / Đà Nẵng" oninput="updateLiveContent()">
       </div>
     </div>
 
@@ -1294,11 +1317,11 @@
       <div class="form-grid-2 form-row">
         <div>
           <label>Giờ & Ngày Dương Lịch</label>
-          <input type="text" id="ceremonyDateTimeInput" value="VÀO LÚC 11 GIỜ 00 | 18.09.2099" oninput="updateLiveContent()">
+          <input type="text" id="ceremonyDateTimeInput" value="VÀO LÚC 10 GIỜ 00 | 20.12.2026" oninput="updateLiveContent()">
         </div>
         <div>
           <label>Ngày Âm Lịch</label>
-          <input type="text" id="ceremonyLunarDateInput" value="Tức ngày 27 tháng 07 năm Giáp Thìn" oninput="updateLiveContent()">
+          <input type="text" id="ceremonyLunarDateInput" value="Tức ngày 12 tháng 11 năm Bính Ngọ" oninput="updateLiveContent()">
         </div>
       </div>
       <div class="form-row">
@@ -1337,38 +1360,38 @@
       <h3>🥂 5. Tiệc Cưới & Đón Khách (Mặt Mời Tiệc)</h3>
       <div class="form-row">
         <label>Tên Nhà Hàng / Trung Tâm Tiệc</label>
-        <input type="text" id="partyRestaurantInput" value="New Orient" oninput="updateLiveContent()">
+        <input type="text" id="partyRestaurantInput" value="Tư Gia Nhà Trai" oninput="updateLiveContent()">
       </div>
       <div class="form-row">
         <label>Sảnh Tiệc & Tầng</label>
-        <input type="text" id="partyHallInput" value="SẢNH SAFFRON TẦNG 7" oninput="updateLiveContent()">
+        <input type="text" id="partyHallInput" value="SÂN VẬN ĐỘNG THÔN ĐẠI MỸ" oninput="updateLiveContent()">
       </div>
       <div class="form-row">
         <label>Địa Chỉ Nhà Hàng</label>
-        <input type="text" id="partyAddressInput" value="20 Đống Đa, P. Thuận Phước, Q. Hải Châu, Tp. Đà Nẵng" oninput="updateLiveContent()">
+        <input type="text" id="partyAddressInput" value="Sân vận động thôn Đại Mỹ, Xã Thượng Đức, TP. Đà Nẵng" oninput="updateLiveContent()">
       </div>
       <div class="form-grid-2 form-row">
         <div>
           <label>Thứ Trong Tuần</label>
-          <input type="text" id="partyDayWeekInput" value="THỨ BẢY" oninput="updateLiveContent()">
+          <input type="text" id="partyDayWeekInput" value="CHỦ NHẬT" oninput="updateLiveContent()">
         </div>
         <div>
           <label>Ngày Dương Lịch (Lớn)</label>
-          <input type="text" id="partyDateNumInput" value="07.09" oninput="updateLiveContent()">
+          <input type="text" id="partyDateNumInput" value="20.12" oninput="updateLiveContent()">
         </div>
       </div>
       <div class="form-row">
         <label>Ngày Âm Lịch Tiệc</label>
-        <input type="text" id="partyLunarInput" value="Nhằm 27.07 Âm Lịch" oninput="updateLiveContent()">
+        <input type="text" id="partyLunarInput" value="Nhằm 12.11 Âm Lịch" oninput="updateLiveContent()">
       </div>
       <div class="form-grid-2 form-row">
         <div>
           <label>Giờ Đón Khách</label>
-          <input type="text" id="partyWelcomeTimeInput" value="11 Giờ 00" oninput="updateLiveContent()">
+          <input type="text" id="partyWelcomeTimeInput" value="09 Giờ 30" oninput="updateLiveContent()">
         </div>
         <div>
           <label>Giờ Khai Tiệc</label>
-          <input type="text" id="partyDinnerTimeInput" value="11 Giờ 00" oninput="updateLiveContent()">
+          <input type="text" id="partyDinnerTimeInput" value="10 Giờ 00" oninput="updateLiveContent()">
         </div>
       </div>
       <div class="form-row">
@@ -1383,7 +1406,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       <h3>💌 6. Bìa Thiệp Ngang (Happy Wedding)</h3>
       <div class="form-row">
         <label>Ngày In Trên Bìa</label>
-        <input type="text" id="coverDateInput" value="26 . 09 . 2099" oninput="updateLiveContent()">
+        <input type="text" id="coverDateInput" value="20 . 12 . 2026" oninput="updateLiveContent()">
       </div>
     </div>
 
@@ -1449,18 +1472,18 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
 
             <!-- Venue Info -->
             <div>
-              <div class="restaurant-name-calligraphy" id="partyRestaurantText">New Orient</div>
-              <div class="venue-hall-text" id="partyHallText">SẢNH SAFFRON TẦNG 7</div>
-              <div class="venue-address-text" id="partyAddressText">20 Đống Đa, P. Thuận Phước, Q. Hải Châu, Tp. Đà Nẵng</div>
+              <div class="restaurant-name-calligraphy" id="partyRestaurantText">Tư Gia Nhà Trai</div>
+              <div class="venue-hall-text" id="partyHallText">SÂN VẬN ĐỘNG THÔN ĐẠI MỸ</div>
+              <div class="venue-address-text" id="partyAddressText">Sân vận động thôn Đại Mỹ, Xã Thượng Đức, TP. Đà Nẵng</div>
             </div>
 
             <!-- Schedule: Date & Times with Divider -->
             <div class="party-schedule-grid">
               <!-- Left: Date -->
               <div class="schedule-col-date">
-                <div class="day-of-week" id="partyDayWeekText">THỨ BẢY</div>
-                <div class="big-date-number" id="partyDateNumText">07.09</div>
-                <div class="lunar-sub-text" id="partyLunarText">Nhằm 27.07 Âm Lịch</div>
+                <div class="day-of-week" id="partyDayWeekText">CHỦ NHẬT</div>
+                <div class="big-date-number" id="partyDateNumText">20.12</div>
+                <div class="lunar-sub-text" id="partyLunarText">Nhằm 12.11 Âm Lịch</div>
               </div>
 
               <!-- Center Vertical Line -->
@@ -1479,7 +1502,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
                     </svg>
                   </div>
                   <div class="time-badge-label">Đón Khách</div>
-                  <div class="time-badge-value" id="partyWelcomeTimeText">11 Giờ 00</div>
+                  <div class="time-badge-value" id="partyWelcomeTimeText">09 Giờ 30</div>
                 </div>
 
                 <!-- Toast / Dinner Badge -->
@@ -1495,7 +1518,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
                     </svg>
                   </div>
                   <div class="time-badge-label">Khai Tiệc</div>
-                  <div class="time-badge-value" id="partyDinnerTimeText">11 Giờ 00</div>
+                  <div class="time-badge-value" id="partyDinnerTimeText">10 Giờ 00</div>
                 </div>
               </div>
             </div>
@@ -1534,14 +1557,56 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
             <!-- Top Luxury Monogram Crest Logo -->
             <div class="announcement-top-icon">
               <div class="monogram-crest-wrapper">
-                <svg class="monogram-crest-svg" viewBox="0 0 100 100" fill="none" stroke="var(--card-accent)" stroke-width="0.8">
-                  <circle cx="50" cy="50" r="38" stroke-dasharray="2 2" opacity="0.6" />
-                  <circle cx="50" cy="50" r="44" stroke-width="0.5" opacity="0.4" />
-                  <!-- Laurel Wreath Flourishes -->
-                  <path d="M 20 50 C 20 30, 32 18, 50 14 M 20 50 C 20 70, 32 82, 50 86" opacity="0.75" stroke-linecap="round" />
-                  <path d="M 80 50 C 80 30, 68 18, 50 14 M 80 50 C 80 70, 68 82, 50 86" opacity="0.75" stroke-linecap="round" />
-                  <!-- Monogram Text -->
-                  <text x="50" y="58" text-anchor="middle" font-family="'Alex Brush', 'Dancing Script', cursive" font-size="28" fill="var(--card-accent)" stroke="none">K & N</text>
+                <svg class="monogram-crest-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Gold Metallic Gradients Definition -->
+                  <defs>
+                    <linearGradient id="monogramGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#7a520a" />
+                      <stop offset="25%" stop-color="#b8860b" />
+                      <stop offset="50%" stop-color="#e6be57" />
+                      <stop offset="75%" stop-color="#b8860b" />
+                      <stop offset="100%" stop-color="#6e4d08" />
+                    </linearGradient>
+                    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="0" dy="1" stdDeviation="0.8" flood-color="#7a520a" flood-opacity="0.3"/>
+                    </filter>
+                  </defs>
+
+                  <!-- Outer Thin Gold Rings -->
+                  <circle cx="60" cy="60" r="56" stroke="url(#monogramGoldGrad)" stroke-width="0.7" opacity="0.6" />
+                  <circle cx="60" cy="60" r="52" stroke="url(#monogramGoldGrad)" stroke-width="1.4" opacity="0.95" stroke-dasharray="3 2" />
+                  <circle cx="60" cy="60" r="48" stroke="url(#monogramGoldGrad)" stroke-width="0.7" opacity="0.7" />
+                  
+                  <!-- 4 Ornamental Diamond Accents -->
+                  <polygon points="60,2 64,5 60,8 56,5" fill="url(#monogramGoldGrad)" />
+                  <polygon points="60,112 64,115 60,118 56,115" fill="url(#monogramGoldGrad)" />
+                  <polygon points="2,60 5,64 8,60 5,56" fill="url(#monogramGoldGrad)" />
+                  <polygon points="112,60 115,64 118,60 115,56" fill="url(#monogramGoldGrad)" />
+
+                  <!-- Botanical Laurel Wreath Lines -->
+                  <path d="M 20 60 C 18 42, 28 24, 48 16" stroke="url(#monogramGoldGrad)" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
+                  <path d="M 20 60 C 18 78, 28 96, 48 104" stroke="url(#monogramGoldGrad)" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
+                  <path d="M 100 60 C 102 42, 92 24, 72 16" stroke="url(#monogramGoldGrad)" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
+                  <path d="M 100 60 C 102 78, 92 96, 72 104" stroke="url(#monogramGoldGrad)" stroke-width="1.2" fill="none" opacity="0.9" stroke-linecap="round"/>
+
+                  <!-- Laurel Leaves Left -->
+                  <path d="M 21 51 Q 14 47 23 42 Q 26 48 21 51 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                  <path d="M 26 37 Q 20 31 30 28 Q 32 35 26 37 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                  <path d="M 36 25 Q 31 18 41 17 Q 42 24 36 25 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                  <path d="M 21 69 Q 14 73 23 78 Q 26 72 21 69 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                  <path d="M 26 83 Q 20 89 30 92 Q 32 85 26 83 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                  <path d="M 36 95 Q 31 102 41 103 Q 42 96 36 95 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+
+                  <!-- Laurel Leaves Right -->
+                  <path d="M 99 51 Q 106 47 97 42 Q 94 48 99 51 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                  <path d="M 94 37 Q 100 31 90 28 Q 88 35 94 37 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                  <path d="M 84 25 Q 89 18 79 17 Q 78 24 84 25 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                  <path d="M 99 69 Q 106 73 97 78 Q 94 72 99 69 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                  <path d="M 94 83 Q 100 89 90 92 Q 88 85 94 83 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+                  <path d="M 84 95 Q 89 102 79 103 Q 78 96 84 95 Z" fill="url(#monogramGoldGrad)" opacity="0.85"/>
+
+                  <!-- Monogram Text Calligraphy with Metallic Gold -->
+                  <text x="60" y="69" text-anchor="middle" font-family="'Great Vibes', 'Pinyon Script', 'Alex Brush', cursive" font-size="39" font-weight="bold" fill="url(#monogramGoldGrad)" stroke="none" id="monogramTextEl" filter="url(#goldGlow)">S &amp; T</text>
                 </svg>
               </div>
             </div>
@@ -1552,10 +1617,10 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
               <div class="parents-column">
                 <div class="parents-side-title">Nhà Trai</div>
                 <div id="groomParentsContainer">
-                  <div class="parent-name">PHẠM VĂN HAY</div>
-                  <div class="parent-name">ĐẶNG THỊ MINH ĐỨC</div>
+                  <div class="parent-name">THÁI VĂN HÙNG</div>
+                  <div class="parent-name">PHẠM THỊ TRINH</div>
                 </div>
-                <div class="parent-location" id="groomAddressLine1">Hòa Phong - Hòa Vang</div>
+                <div class="parent-location" id="groomAddressLine1">Thôn Đại Mỹ - Thượng Đức</div>
                 <div class="parent-location" id="groomAddressLine2">Đà Nẵng</div>
               </div>
 
@@ -1563,10 +1628,10 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
               <div class="parents-column">
                 <div class="parents-side-title">Nhà Gái</div>
                 <div id="brideParentsContainer">
-                  <div class="parent-name">HUỲNH VĂN CHÍNH</div>
-                  <div class="parent-name">PHẠM THỊ LIÊN</div>
+                  <div class="parent-name">PHẠM VĂN TÝ</div>
+                  <div class="parent-name">TRẦN THỊ THOA</div>
                 </div>
-                <div class="parent-location" id="brideAddressLine1">Hòa Minh - Liên Chiểu</div>
+                <div class="parent-location" id="brideAddressLine1">Thôn 3 - Thượng Đức</div>
                 <div class="parent-location" id="brideAddressLine2">Đà Nẵng</div>
               </div>
             </div>
@@ -1588,15 +1653,15 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
 
             <!-- Couple Names and Roles -->
             <div class="couple-names-section">
-              <div class="couple-name-calligraphy-announcement" id="groomNameAnnounceText">Nguyễn Anh Kiệt</div>
+              <div class="couple-name-calligraphy-announcement" id="groomNameAnnounceText">Thái Bá Sang</div>
               
               <div class="couple-role-row">
-                <span class="role-badge" id="groomRoleAnnounceText">Út Nam</span>
+                <span class="role-badge" id="groomRoleAnnounceText">Thứ Nam</span>
                 <span class="role-ampersand">&</span>
-                <span class="role-badge" id="brideRoleAnnounceText">Thứ Nữ</span>
+                <span class="role-badge" id="brideRoleAnnounceText">Trưởng Nữ</span>
               </div>
 
-              <div class="couple-name-calligraphy-announcement" id="brideNameAnnounceText">Huỳnh Kim Ngân</div>
+              <div class="couple-name-calligraphy-announcement" id="brideNameAnnounceText">Phạm Thị Kiều Thương</div>
             </div>
 
             <!-- Ceremony Info -->
@@ -1605,10 +1670,10 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
                 HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ TRAI
               </div>
               <div class="ceremony-datetime-lead" id="ceremonyDateTimeText">
-                VÀO LÚC 11 GIỜ 00 | 18.09.2099
+                VÀO LÚC 10 GIỜ 00 | 20.12.2026
               </div>
               <div class="ceremony-lunar-date" id="ceremonyLunarDateText">
-                Tức ngày 27 tháng 07 năm Giáp Thìn
+                Tức ngày 12 tháng 11 năm Bính Ngọ
               </div>
             </div>
 
@@ -1666,7 +1731,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
                   <span>TRÂN TRỌNG KÍNH MỜI:</span>
                   <span class="guest-line-dots"></span>
                 </div>
-                <div class="cover-date-big" id="coverDateText">26 . 09 . 2099</div>
+                <div class="cover-date-big" id="coverDateText">20 . 12 . 2026</div>
               </div>
 
             </div>
@@ -1853,6 +1918,13 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     document.getElementById('ceremonyPlaceLeadText').innerText = document.getElementById('ceremonyPlaceLeadInput').value;
     document.getElementById('ceremonyDateTimeText').innerText = document.getElementById('ceremonyDateTimeInput').value;
     document.getElementById('ceremonyLunarDateText').innerText = document.getElementById('ceremonyLunarDateInput').value;
+
+    // Monogram Crest update
+    const monogramInput = document.getElementById('monogramInput');
+    const monogramTextEl = document.getElementById('monogramTextEl');
+    if (monogramInput && monogramTextEl) {
+      monogramTextEl.textContent = monogramInput.value || 'S & T';
+    }
     
     // QR Code updates
     const qrUrlInput = document.getElementById('ceremonyQrUrlInput');
