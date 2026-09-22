@@ -470,6 +470,89 @@
       text-align: center;
     }
 
+    /* 4. Combined Horizontal Bi-Fold Spread: 240mm x 180mm */
+    .view-item-combined {
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card-combined-spread {
+      width: 240mm;
+      height: 180mm;
+      min-width: 240mm;
+      min-height: 180mm;
+      max-width: 240mm;
+      max-height: 180mm;
+      display: flex;
+      flex-direction: row;
+      position: relative;
+      background-color: var(--paper-cream);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.55), 0 8px 20px rgba(0,0,0,0.25);
+      border-radius: 2px;
+      overflow: hidden;
+      box-sizing: border-box;
+      margin: 0 auto;
+    }
+
+    .card-combined-half {
+      width: 120mm !important;
+      min-width: 120mm !important;
+      max-width: 120mm !important;
+      height: 180mm !important;
+      min-height: 180mm !important;
+      max-height: 180mm !important;
+      box-shadow: none !important;
+      transform: none !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      border: none !important;
+      position: relative;
+      box-sizing: border-box;
+      flex: 0 0 120mm;
+      padding: 7mm 8mm 6mm !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+    }
+
+    /* Hide internal individual card frames inside the combined spread so center vertical lines are removed */
+    .card-combined-spread .card-combined-half .card-luxury-frame {
+      display: none !important;
+    }
+
+    .card-combined-fold-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 120mm;
+      width: 0;
+      border-left: 1px dashed var(--card-accent);
+      opacity: 0.35;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .fold-guide-tag {
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(26, 29, 34, 0.85);
+      color: #dfbe75;
+      font-size: 8px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 6px;
+      white-space: nowrap;
+      border: 1px solid rgba(223, 190, 117, 0.35);
+      letter-spacing: 0.5px;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
     .card-inner-content {
       position: relative;
       z-index: 2;
@@ -588,7 +671,8 @@
     /* =======================================================
        CARD 1: THIỆP MỜI DỰ TIỆC (PARTY INVITATION)
        ======================================================= */
-    #cardParty .card-inner-content {
+    #cardParty .card-inner-content,
+    #combinedHalfParty .card-inner-content {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -597,16 +681,19 @@
       padding: 1mm 0;
     }
 
-    #cardParty .card-inner-content > * {
+    #cardParty .card-inner-content > *,
+    #combinedHalfParty .card-inner-content > * {
       margin-top: auto;
       margin-bottom: auto;
     }
 
-    #cardParty .invitation-art-holder {
+    #cardParty .invitation-art-holder,
+    #combinedHalfParty .invitation-art-holder {
       margin-top: 0 !important;
     }
 
-    #cardParty .luxury-footer-ornament {
+    #cardParty .luxury-footer-ornament,
+    #combinedHalfParty .luxury-footer-ornament {
       margin-bottom: 0 !important;
       margin-top: auto !important;
     }
@@ -905,7 +992,8 @@
     /* =======================================================
        CARD 2: THIỆP BÁO HỶ / THÀNH HÔN (CEREMONY ANNOUNCEMENT)
        ======================================================= */
-    #cardCeremony .card-inner-content {
+    #cardCeremony .card-inner-content,
+    #combinedHalfCeremony .card-inner-content {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -914,7 +1002,8 @@
       padding: 1mm 0;
     }
 
-    #cardCeremony .card-inner-content > * {
+    #cardCeremony .card-inner-content > *,
+    #combinedHalfCeremony .card-inner-content > * {
       margin-top: auto;
       margin-bottom: auto;
     }
@@ -1181,7 +1270,8 @@
       opacity: 0.85;
     }
 
-    #cardCeremony .luxury-footer-ornament {
+    #cardCeremony .luxury-footer-ornament,
+    #combinedHalfCeremony .luxury-footer-ornament {
       margin-bottom: 0 !important;
       margin-top: auto !important;
     }
@@ -1286,8 +1376,9 @@
     <div class="tab-view-selector">
       <button class="tab-btn active" onclick="switchView('all')">Tất Cả (Full Bộ)</button>
       <button class="tab-btn" onclick="switchView('card-party')">Thiệp Mời Tiệc</button>
+      <button class="tab-btn" onclick="switchView('card-ceremony')">Thiệp Báo Tin</button>
       <button class="tab-btn" onclick="switchView('card-cover')">Bìa Ngang</button>
-      <button class="tab-btn" onclick="switchView('card-ceremony')">Thiệp Báo Hỷ</button>
+      <button class="tab-btn" onclick="switchView('card-combined')">4. Thiết Kế Kết Hợp</button>
     </div>
 
     <!-- 1. Bảng Màu & Tone Giấy -->
@@ -1882,6 +1973,44 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         </div>
       </div>
 
+      <!-- =============================================== -->
+      <!-- CARD 4: THIẾT KẾ KẾT HỢP (IN NGANG GẬP ĐÔI)      -->
+      <!-- =============================================== -->
+      <div class="item-wrapper view-item-combined">
+        <div class="item-title-bar" style="width: 240mm; max-width: 100%; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <span>📖 4. Thiết Kế Kết Hợp (Bản Ghép Đôi In Ngang Gập Đôi 240 x 180 mm)</span>
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <label style="display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: #a0aec0; cursor: pointer; user-select: none;" title="Mặc định tắt để in thiệp sạch đẹp, xưởng in tự cấn cơ học. Bật nếu muốn in đường nét đứt để làm mốc canh.">
+              <input type="checkbox" id="toggleFoldGuideCheckbox" onchange="toggleFoldGuide(this.checked)">
+              <span>In đường nếp gấp</span>
+            </label>
+            <button class="btn-card-save" style="color: #dfbe75; font-weight: 600;" onclick="exportCombinedSpreadToPng(this)">⬇️ Tải PNG Gập Đôi</button>
+          </div>
+        </div>
+        <div class="wedding-card card-combined-spread" id="cardCombinedSpread">
+          <!-- Continuous Unified Luxury Frame across the entire 240x180mm spread -->
+          <div class="card-luxury-frame" style="z-index: 5;">
+            <div class="frame-outer-line"></div>
+            <div class="frame-inner-delicate"></div>
+            <div class="frame-corner-dot corner-tl"></div>
+            <div class="frame-corner-dot corner-tr"></div>
+            <div class="frame-corner-dot corner-bl"></div>
+            <div class="frame-corner-dot corner-br"></div>
+          </div>
+
+          <!-- Left Half: Mặt Mời Tiệc (120 x 180 mm) -->
+          <div class="wedding-card card-vertical card-vertical-watercolor card-combined-half" id="combinedHalfParty"></div>
+          
+          <!-- Center Fold Crease Line -->
+          <div class="card-combined-fold-line">
+            <span class="fold-guide-tag">Đường gân gấp</span>
+          </div>
+
+          <!-- Right Half: Mặt Báo Tin (120 x 180 mm) -->
+          <div class="wedding-card card-vertical card-vertical-watercolor card-combined-half" id="combinedHalfCeremony"></div>
+        </div>
+      </div>
+
 
 
     </div>
@@ -2116,6 +2245,9 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     // Cover Card
     const coverDate = document.getElementById('coverDateInput').value;
     document.getElementById('coverDateText').innerText = coverDate;
+
+    // Sync Section 4 Combined Bi-Fold Spread
+    syncCombinedSpread();
   }
 
   function uploadQrImage(e) {
@@ -2175,13 +2307,44 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     const pItem = document.querySelector('.view-item-party');
     const cItem = document.querySelector('.view-item-cover');
     const mItem = document.querySelector('.view-item-ceremony');
+    const combItem = document.querySelector('.view-item-combined');
     
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    if (window.event && window.event.currentTarget) {
+      window.event.currentTarget.classList.add('active');
+    }
 
-    pItem.style.display = (viewMode === 'all' || viewMode === 'card-party') ? 'flex' : 'none';
-    cItem.style.display = (viewMode === 'all' || viewMode === 'card-cover') ? 'flex' : 'none';
-    mItem.style.display = (viewMode === 'all' || viewMode === 'card-ceremony') ? 'flex' : 'none';
+    if (pItem) pItem.style.display = (viewMode === 'all' || viewMode === 'card-party') ? 'flex' : 'none';
+    if (cItem) cItem.style.display = (viewMode === 'all' || viewMode === 'card-cover') ? 'flex' : 'none';
+    if (mItem) mItem.style.display = (viewMode === 'all' || viewMode === 'card-ceremony') ? 'flex' : 'none';
+    if (combItem) combItem.style.display = (viewMode === 'all' || viewMode === 'card-combined') ? 'flex' : 'none';
+  }
+
+  function syncCombinedSpread() {
+    const partyOrigin = document.getElementById('cardParty');
+    const ceremonyOrigin = document.getElementById('cardCeremony');
+    const partySlot = document.getElementById('combinedHalfParty');
+    const ceremonySlot = document.getElementById('combinedHalfCeremony');
+
+    if (partyOrigin && partySlot) {
+      partySlot.innerHTML = partyOrigin.innerHTML;
+      partySlot.style.backgroundColor = partyOrigin.style.backgroundColor || '';
+    }
+    if (ceremonyOrigin && ceremonySlot) {
+      ceremonySlot.innerHTML = ceremonyOrigin.innerHTML;
+      ceremonySlot.style.backgroundColor = ceremonyOrigin.style.backgroundColor || '';
+    }
+    const spread = document.getElementById('cardCombinedSpread');
+    if (spread && partyOrigin) {
+      spread.style.backgroundColor = partyOrigin.style.backgroundColor || '';
+    }
+  }
+
+  function toggleFoldGuide(isChecked) {
+    const line = document.querySelector('.card-combined-fold-line');
+    if (line) {
+      line.style.opacity = isChecked ? '0.6' : '0.25';
+    }
   }
 
   /* ========================================================
@@ -2344,8 +2507,27 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       prepareCloneForExport(clone);
     });
 
+    // Strip individual card frames from the clones so they don't draw vertical lines in the middle
+    cloneParty.querySelectorAll('.card-luxury-frame').forEach(f => f.remove());
+    cloneCeremony.querySelectorAll('.card-luxury-frame').forEach(f => f.remove());
+
     tempSpread.appendChild(cloneParty);
     tempSpread.appendChild(cloneCeremony);
+
+    // Add continuous unified luxury frame across the whole 240x180mm spread
+    const unifiedFrame = document.createElement('div');
+    unifiedFrame.className = 'card-luxury-frame';
+    unifiedFrame.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:5;';
+    unifiedFrame.innerHTML = `
+      <div class="frame-outer-line"></div>
+      <div class="frame-inner-delicate"></div>
+      <div class="frame-corner-dot corner-tl"></div>
+      <div class="frame-corner-dot corner-tr"></div>
+      <div class="frame-corner-dot corner-bl"></div>
+      <div class="frame-corner-dot corner-br"></div>
+    `;
+    tempSpread.appendChild(unifiedFrame);
+
     document.body.appendChild(tempSpread);
 
     setTimeout(() => {
@@ -2360,17 +2542,20 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         const mm = 3.7795 * s;
         const W1 = Math.round(canvas.width / 2);
 
-        // Center fold guideline (subtle dashed fold line)
-        ctx.save();
-        ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--card-accent').trim() || '#111111';
-        ctx.globalAlpha = 0.25;
-        ctx.lineWidth = Math.max(1, Math.round(0.25 * mm));
-        ctx.setLineDash([4 * s, 4 * s]);
-        ctx.beginPath();
-        ctx.moveTo(W1, 0);
-        ctx.lineTo(W1, canvas.height);
-        ctx.stroke();
-        ctx.restore();
+        // Center fold guideline (only drawn onto export file if user checks "In đường nếp gấp")
+        const shouldDrawFold = document.getElementById('toggleFoldGuideCheckbox') && document.getElementById('toggleFoldGuideCheckbox').checked;
+        if (shouldDrawFold) {
+          ctx.save();
+          ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--card-accent').trim() || '#111111';
+          ctx.globalAlpha = 0.25;
+          ctx.lineWidth = Math.max(1, Math.round(0.25 * mm));
+          ctx.setLineDash([4 * s, 4 * s]);
+          ctx.beginPath();
+          ctx.moveTo(W1, 0);
+          ctx.lineTo(W1, canvas.height);
+          ctx.stroke();
+          ctx.restore();
+        }
 
         window.__latestExportDataUrl = canvas.toDataURL('image/png');
         downloadCanvasAsPng(canvas, 'thiep_cuoi_ngang_gap_doi_240x180.png');
