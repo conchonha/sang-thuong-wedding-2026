@@ -29,8 +29,26 @@ document.addEventListener('DOMContentLoaded', () => {
      ========================================================================== */
   const urlParams = new URLSearchParams(window.location.search);
   const rawGuestName = urlParams.get('to') || urlParams.get('guest') || urlParams.get('name') || '';
-  const guestSide = urlParams.get('side') || '';
-  const guestEvent = urlParams.get('event') || '';
+  const rawSideParam = urlParams.get('side') || '';
+  const rawTypeParam = (urlParams.get('type') || urlParams.get('event') || '').trim();
+
+  // Logic phân loại hiển thị sự kiện theo URL:
+  // 1. type=VK (hoặc type=vk, naptai, bride, gai, nhagai) -> Chỉ hiển thị Lễ Nạp Tài (Nhà Gái), ẩn Lễ Thành Hôn (Nhà Trai).
+  // 2. type=all -> Hiển thị cả 2 buổi lễ.
+  // 3. Mặc định (mở link index.html bình thường hoặc type=VT / vuquy / groom / nhatrai) -> Chỉ hiển thị Lễ Thành Hôn (Nhà Trai), ẩn Lễ Nạp Tài (Nhà Gái).
+  let guestEvent = 'vuquy';
+  const typeUpper = rawTypeParam.toUpperCase();
+  const typeLower = rawTypeParam.toLowerCase();
+
+  if (typeUpper === 'VK' || typeLower === 'naptai' || typeLower === 'bride' || typeLower === 'gai' || typeLower === 'nhagai') {
+    guestEvent = 'naptai';
+  } else if (typeLower === 'all') {
+    guestEvent = 'all';
+  } else {
+    guestEvent = 'vuquy';
+  }
+
+  const guestSide = rawSideParam || (guestEvent === 'naptai' ? 'bride' : 'groom');
 
   const guestName = rawGuestName.trim();
 

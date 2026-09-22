@@ -1302,8 +1302,17 @@
         </div>
       </div>
       <div class="form-row">
+        <label>Chọn Nhanh Link Mã QR Thiệp Online</label>
+        <select id="ceremonyQrPresetSelect" onchange="applyQrPreset()">
+          <option value="https://conchonha.github.io/sang-thuong-wedding-2026/index.html" selected>1. Thiệp Nhà Trai (Lễ Thành Hôn)</option>
+          <option value="https://conchonha.github.io/sang-thuong-wedding-2026/index.html?type=all">2. Thiệp Cả Hai Nhà (type=all)</option>
+          <option value="https://conchonha.github.io/sang-thuong-wedding-2026/index.html?type=VK">3. Thiệp Nhà Gái (type=VK)</option>
+          <option value="custom">-- Tự Nhập Link Tùy Chỉnh --</option>
+        </select>
+      </div>
+      <div class="form-row">
         <label>Đường Dẫn Thiệp Online (Tự Động Tạo Mã QR)</label>
-        <input type="text" id="ceremonyQrUrlInput" value="https://conchonha.github.io/sang-thuong-wedding-2026/index.html" oninput="updateLiveContent()">
+        <input type="text" id="ceremonyQrUrlInput" value="https://conchonha.github.io/sang-thuong-wedding-2026/index.html" oninput="onQrUrlInputChange()">
       </div>
       <div class="form-row">
         <label>Tiêu Đề Mã QR</label>
@@ -1890,6 +1899,36 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       }
       reader.readAsDataURL(file);
     }
+  }
+
+  function applyQrPreset() {
+    const select = document.getElementById('ceremonyQrPresetSelect');
+    const urlInput = document.getElementById('ceremonyQrUrlInput');
+    if (select && urlInput) {
+      if (select.value !== 'custom') {
+        urlInput.value = select.value;
+      }
+      const qrImg = document.getElementById('ceremonyQrImg');
+      if (qrImg) {
+        delete qrImg.dataset.customUploaded;
+      }
+      updateLiveContent();
+    }
+  }
+
+  function onQrUrlInputChange() {
+    const select = document.getElementById('ceremonyQrPresetSelect');
+    const urlInput = document.getElementById('ceremonyQrUrlInput');
+    if (select && urlInput) {
+      const val = urlInput.value.trim();
+      const matched = Array.from(select.options).find(opt => opt.value === val);
+      select.value = matched ? matched.value : 'custom';
+    }
+    const qrImg = document.getElementById('ceremonyQrImg');
+    if (qrImg) {
+      delete qrImg.dataset.customUploaded;
+    }
+    updateLiveContent();
   }
 
   function updateLiveFont() {
