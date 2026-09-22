@@ -1302,11 +1302,23 @@
         </div>
       </div>
       <div class="form-row">
-        <label>Tiêu Đề Mã QR</label>
-        <input type="text" id="ceremonyQrLabelInput" value="📍 BẢN ĐỒ CHỈ ĐƯỜNG" oninput="updateLiveContent()">
+        <label>Đường Dẫn Thiệp Online (Tự Động Tạo Mã QR)</label>
+        <input type="text" id="ceremonyQrUrlInput" value="https://conchonha.github.io/sang-thuong-wedding-2026/index.html" oninput="updateLiveContent()">
       </div>
       <div class="form-row">
-        <label>Tải Ảnh Mã QR Mới (Bản Đồ / Mừng Cưới / VietQR)</label>
+        <label>Tiêu Đề Mã QR</label>
+        <input type="text" id="ceremonyQrLabelInput" value="💌 THIỆP MỜI ONLINE &amp; ALBUM KỶ NIỆM" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Mô Tả Nội Dung Thiệp</label>
+        <input type="text" id="ceremonyQrDescInput" value="Album Ảnh Cưới, Video &amp; Thước Phim Hành Trình Yêu" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Lời Nhắn Quét Mã</label>
+        <input type="text" id="ceremonyQrSubtextInput" value="Quét mã QR bằng Camera điện thoại để mở Thiệp Online 💕" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Tải Ảnh Mã QR Thủ Công (Nếu có ảnh sẵn)</label>
         <input type="file" id="ceremonyQrFileInput" accept="image/*" onchange="uploadQrImage(event)">
       </div>
     </div>
@@ -1594,12 +1606,12 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
             <!-- Bottom Luxury QR Block (Balances card height & fills bottom gracefully) -->
             <div class="ceremony-qr-section">
               <div class="ceremony-qr-box">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://maps.google.com" alt="QR Code Map" class="ceremony-qr-img" id="ceremonyQrImg" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23ffffff\'/><rect x=\'10\' y=\'10\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'15\' y=\'15\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'20\' y=\'20\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'60\' y=\'10\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'65\' y=\'15\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'70\' y=\'20\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'10\' y=\'60\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'15\' y=\'65\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'20\' y=\'70\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'50\' y=\'50\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'70\' y=\'50\' width=\'20\' height=\'10\' fill=\'%23111111\'/><rect x=\'50\' y=\'70\' width=\'15\' height=\'20\' fill=\'%23111111\'/><rect x=\'75\' y=\'75\' width=\'15\' height=\'15\' fill=\'%23111111\'/></svg>'">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&amp;data=https%3A%2F%2Fconchonha.github.io%2Fsang-thuong-wedding-2026%2Findex.html" alt="QR Code Online Invitation" class="ceremony-qr-img" id="ceremonyQrImg" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23ffffff\'/><rect x=\'10\' y=\'10\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'15\' y=\'15\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'20\' y=\'20\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'60\' y=\'10\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'65\' y=\'15\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'70\' y=\'20\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'10\' y=\'60\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'15\' y=\'65\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'20\' y=\'70\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'50\' y=\'50\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'70\' y=\'50\' width=\'20\' height=\'10\' fill=\'%23111111\'/><rect x=\'50\' y=\'70\' width=\'15\' height=\'20\' fill=\'%23111111\'/><rect x=\'75\' y=\'75\' width=\'15\' height=\'15\' fill=\'%23111111\'/></svg>'">
               </div>
               <div class="ceremony-qr-info">
-                <div class="ceremony-qr-label" id="ceremonyQrLabelText">📍 BẢN ĐỒ CHỈ ĐƯỜNG</div>
-                <div class="ceremony-qr-address" id="ceremonyAddressDetailText">Tư gia: Hòa Phong - Hòa Vang, Đà Nẵng</div>
-                <div class="ceremony-qr-subtext">Quét mã QR để xem vị trí cử hành hôn lễ</div>
+                <div class="ceremony-qr-label" id="ceremonyQrLabelText">💌 THIỆP MỜI ONLINE &amp; ALBUM KỶ NIỆM</div>
+                <div class="ceremony-qr-address" id="ceremonyAddressDetailText">Album Ảnh Cưới, Video &amp; Thước Phim Hành Trình Yêu</div>
+                <div class="ceremony-qr-subtext" id="ceremonyQrSubtextText">Quét mã QR bằng Camera điện thoại để mở Thiệp Online 💕</div>
               </div>
             </div>
 
@@ -1805,8 +1817,15 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     
     const fullGroomAddr = [line1, line2].filter(Boolean).join(' - ');
     const ceremAddrEl = document.getElementById('ceremonyAddressDetailText');
+    const qrDescInput = document.getElementById('ceremonyQrDescInput');
     if (ceremAddrEl) {
-      ceremAddrEl.innerText = fullGroomAddr ? `📍 Tư gia nhà trai: ${fullGroomAddr}` : '📍 Rất hân hạnh được đón tiếp Quý Khách!';
+      if (qrDescInput && qrDescInput.value.trim()) {
+        ceremAddrEl.innerText = qrDescInput.value;
+      } else if (fullGroomAddr) {
+        ceremAddrEl.innerText = `📍 Tư gia nhà trai: ${fullGroomAddr}`;
+      } else {
+        ceremAddrEl.innerText = '📍 Rất hân hạnh được đón tiếp Quý Khách!';
+      }
     }
 
     // Parents Nhà Gái
@@ -1825,9 +1844,23 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     document.getElementById('ceremonyPlaceLeadText').innerText = document.getElementById('ceremonyPlaceLeadInput').value;
     document.getElementById('ceremonyDateTimeText').innerText = document.getElementById('ceremonyDateTimeInput').value;
     document.getElementById('ceremonyLunarDateText').innerText = document.getElementById('ceremonyLunarDateInput').value;
+    
+    // QR Code updates
+    const qrUrlInput = document.getElementById('ceremonyQrUrlInput');
+    const qrImg = document.getElementById('ceremonyQrImg');
+    if (qrUrlInput && qrImg && !qrImg.dataset.customUploaded) {
+      const targetUrl = qrUrlInput.value.trim() || 'https://conchonha.github.io/sang-thuong-wedding-2026/index.html';
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(targetUrl)}`;
+    }
+
     const qrLabel = document.getElementById('ceremonyQrLabelInput');
     if (qrLabel && document.getElementById('ceremonyQrLabelText')) {
       document.getElementById('ceremonyQrLabelText').innerText = qrLabel.value;
+    }
+
+    const qrSubtext = document.getElementById('ceremonyQrSubtextInput');
+    if (qrSubtext && document.getElementById('ceremonyQrSubtextText')) {
+      document.getElementById('ceremonyQrSubtextText').innerText = qrSubtext.value;
     }
 
     // Party Invitation
@@ -1851,7 +1884,9 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     if (file) {
       const reader = new FileReader();
       reader.onload = function(evt) {
-        document.getElementById('ceremonyQrImg').src = evt.target.result;
+        const qrImg = document.getElementById('ceremonyQrImg');
+        qrImg.src = evt.target.result;
+        qrImg.dataset.customUploaded = "true";
       }
       reader.readAsDataURL(file);
     }

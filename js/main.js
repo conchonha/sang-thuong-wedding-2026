@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cardNapTai) cardNapTai.style.display = 'none';
     if (cardVuQuy) cardVuQuy.style.display = 'flex';
 
-    if (sectionTitle) sectionTitle.innerText = 'LỊCH TRÌNH LỄ VU QUY (NHÀ TRAI)';
+    if (sectionTitle) sectionTitle.innerText = 'LỊCH TRÌNH LỄ THÀNH HÔN (NHÀ TRAI)';
     if (sectionSubtitle) {
       sectionSubtitle.innerText = guestSide === 'bride' ? 'Nhà Gái Kính Mời' : 'Nhà Trai Kính Mời';
     }
@@ -234,11 +234,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // RSVP: Chỉ hiển thị Lễ Vu Quy
+    // RSVP: Chỉ hiển thị Lễ Thành Hôn
     if (rsvpNapTai) rsvpNapTai.style.display = 'none';
     if (rsvpBoth) rsvpBoth.style.display = 'none';
     if (rsvpVuQuy) rsvpVuQuy.style.display = 'inline-flex';
-    const r = document.querySelector('input[name="rsvp-event"][value="Lễ Vu Quy"]');
+    const r = document.querySelector('input[name="rsvp-event"][value="Lễ Thành Hôn"]') || document.querySelector('input[name="rsvp-event"][value="Lễ Vu Quy"]');
     if (r) r.checked = true;
 
   } else if (guestEvent === 'naptai') {
