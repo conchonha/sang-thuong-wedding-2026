@@ -467,6 +467,69 @@
       justify-content: space-between;
     }
 
+    /* Watercolor Alpha Tint Background for Vertical Cards */
+    .card-vertical-watercolor {
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(246, 224, 218, 0.45) 0%, transparent 60%),
+        radial-gradient(circle at 90% 90%, rgba(248, 226, 215, 0.45) 0%, transparent 60%);
+      background-color: var(--paper-cream);
+    }
+
+    /* Top-Left Floral Watercolor Ornament (Card 1) */
+    .card-bg-floral-top-left {
+      position: absolute;
+      top: -2mm;
+      left: -2mm;
+      width: 48mm;
+      height: 48mm;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.88;
+    }
+
+    /* Bottom-Right Floral Watercolor Ornament (Card 2) */
+    .card-bg-floral-bottom-right {
+      position: absolute;
+      bottom: -2mm;
+      right: -2mm;
+      width: 50mm;
+      height: 50mm;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.88;
+    }
+
+    /* Couple Watercolor Illustration (Bride on Card 1 right, Groom on Card 2 left) */
+    .card-bg-bride {
+      position: absolute;
+      bottom: -1mm;
+      right: -5mm;
+      height: 56mm;
+      width: auto;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.95;
+    }
+
+    .card-bg-groom {
+      position: absolute;
+      bottom: 5mm;
+      left: -6mm;
+      height: 56mm;
+      width: auto;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.95;
+    }
+
     /* Luxury Decorative Elements */
     .luxury-divider {
       display: flex;
@@ -1444,7 +1507,12 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           <span>🍷 1. Mặt Thiệp Mời Dự Tiệc Cưới (Khổ Đứng 120 x 180 mm)</span>
           <button class="btn-card-save" onclick="exportCardToPng('cardParty', 'thiep_moi_tiec.png')">⬇️ Tải PNG</button>
         </div>
-        <div class="wedding-card card-vertical" id="cardParty">
+        <div class="wedding-card card-vertical card-vertical-watercolor" id="cardParty">
+          <!-- Top Left Floral Ornament -->
+          <img src="./assets/floral_top_left.jpg" class="card-bg-floral-top-left" alt="Top Left Floral">
+          <!-- Bottom Right Bride Illustration -->
+          <img src="./assets/bride_illustration.jpg" class="card-bg-bride" alt="Cô Dâu">
+
           <div class="card-inner-content">
             
             <!-- Top Art: Vintage Chair with Velvet & Floral -->
@@ -1551,7 +1619,12 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           <span>🕊️ 2. Mặt Thiệp Báo Tin / Lễ Thành Hôn (Khổ Đứng 120 x 180 mm)</span>
           <button class="btn-card-save" onclick="exportCardToPng('cardCeremony', 'thiep_bao_tin.png')">⬇️ Tải PNG</button>
         </div>
-        <div class="wedding-card card-vertical" id="cardCeremony">
+        <div class="wedding-card card-vertical card-vertical-watercolor" id="cardCeremony">
+          <!-- Bottom Left Groom Illustration -->
+          <img src="./assets/groom_illustration.jpg" class="card-bg-groom" alt="Chú Rể">
+          <!-- Bottom Right Floral Ornament -->
+          <img src="./assets/floral_bottom_right.jpg" class="card-bg-floral-bottom-right" alt="Bottom Right Floral">
+
           <div class="card-inner-content">
             
             <!-- Top Luxury Monogram Crest Logo -->
