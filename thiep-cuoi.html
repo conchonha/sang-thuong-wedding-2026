@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mẫu Thiệp Cưới STVAN - Phong Cách Màu Nước Sang Trọng</title>
+  
+  <!-- Google Fonts: Pairings optimized for Vietnamese Typography & Calligraphy -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Dancing+Script:wght@500;600;700&family=Ephesis&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&family=Pinyon+Script&family=Allura&display=swap" rel="stylesheet">
+  
+  <!-- html2canvas for instant export to PNG (300 DPI print quality) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --bg-app: #121417;
+      --sidebar-bg: #1a1d22;
+      --sidebar-border: #2b2f38;
+      --text-main: #f0ede6;
+      --text-muted: #9aa0a6;
+      --gold-primary: #a67c38;
+      --gold-light: #dfbe75;
+      --ink-black: #141414;
+      --ink-dark: #222222;
+      --ink-gray: #4a4a4a;
+      --paper-cream: #faf7f2;
+      --paper-white: #ffffff;
+      --paper-warm: #f5efe6;
+
+      /* Card color theme (overridden by JS) */
+      --card-accent: #111111;
+      --card-accent-light: #333333;
+      --card-badge-bg: #111111;
+      --card-badge-fg: #ffffff;
+      --card-divider: #555555;
+      --card-header-line: #555555;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background-color: var(--bg-app);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      display: flex;
+      width: 100vw;
+      min-height: 100vh;
+    }
+
+    /* LEFT SIDEBAR CONTROLS */
+    .sidebar {
+      width: 440px;
+      min-width: 400px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+      height: 100vh;
+      overflow-y: auto;
+      padding: 24px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      z-index: 20;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: #333842;
+      border-radius: 3px;
+    }
+
+    .sidebar-header {
+      margin-bottom: 16px;
+    }
+
+    .sidebar-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.28rem;
+      color: #dfbe75;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-header p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* TABS */
+    .tab-view-selector {
+      display: flex;
+      background: #101215;
+      padding: 4px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      gap: 3px;
+      border: 1px solid #292d35;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px 3px;
+      font-size: 0.71rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: #8f95a0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .tab-btn.active {
+      background: #2b303a;
+      color: #fce8a6;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    /* CONTROL GROUPS */
+    .control-group {
+      margin-bottom: 18px;
+      border-bottom: 1px dashed #2f343e;
+      padding-bottom: 16px;
+    }
+
+    .control-group:last-of-type {
+      border-bottom: none;
+    }
+
+    .control-group h3 {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #dfbe75;
+      margin-bottom: 10px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-row {
+      margin-bottom: 9px;
+    }
+
+    .form-row label {
+      display: block;
+      font-size: 0.71rem;
+      font-weight: 500;
+      color: #9aa0a6;
+      margin-bottom: 3px;
+    }
+
+    .form-row input, .form-row select, .form-row textarea {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid #383e4c;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      background: #14161a;
+      color: #f3f4f6;
+      transition: all 0.2s;
+    }
+
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+      outline: none;
+      border-color: #dfbe75;
+      box-shadow: 0 0 0 2px rgba(223, 190, 117, 0.2);
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .paper-tone-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tone-btn {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #383e4c;
+      background: #16181d;
+      color: #d1d5db;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .tone-btn.active {
+      border-color: #dfbe75;
+      background: #27251e;
+      color: #fce8a6;
+    }
+
+    .tone-color-circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .btn-action-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-print {
+      flex: 1;
+      background: linear-gradient(135deg, #dfbe75, #a67c38);
+      color: #111;
+      border: none;
+      padding: 12px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(223, 190, 117, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-print:hover {
+      background: linear-gradient(135deg, #ebd090, #ba8c42);
+      transform: translateY(-1px);
+    }
+
+    .btn-export {
+      background: #22262f;
+      color: #e5e7eb;
+      border: 1px solid #3c4250;
+      padding: 8px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-export:hover {
+      background: #2e3441;
+      border-color: #dfbe75;
+      color: #dfbe75;
+    }
+
+    /* RIGHT PREVIEW WORKSPACE */
+    .preview-workspace {
+      flex: 1;
+      padding: 24px 30px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: radial-gradient(#262a33 15%, transparent 16%) 0 0 / 28px 28px, #0f1114;
+    }
+
+    .preview-toolbar {
+      width: 100%;
+      max-width: 1280px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 12px 18px;
+      background: rgba(26, 29, 35, 0.92);
+      border-radius: 10px;
+      backdrop-filter: blur(8px);
+      border: 1px solid #2d323c;
+    }
+
+    .preview-info {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preview-info span strong {
+      color: #dfbe75;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .cards-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 36px;
+      justify-content: center;
+      max-width: 1350px;
+      padding-bottom: 60px;
+    }
+
+    .item-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .item-title-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #e5e7eb;
+      background: #1d2127;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid #333944;
+    }
+
+    .btn-card-save {
+      background: none;
+      border: none;
+      color: #dfbe75;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .btn-card-save:hover {
+      background: rgba(223, 190, 117, 0.15);
+    }
+
+    /* =======================================================
+       CARD COMMON BASE (LUXURY PAPER SIMULATION)
+       ======================================================= */
+    .wedding-card {
+      background-color: var(--paper-cream);
+      position: relative;
+      box-shadow:
+        0 25px 60px rgba(0,0,0,0.55),
+        0 8px 20px rgba(0,0,0,0.25),
+        inset 0 0 0 0.6mm var(--card-accent),
+        inset 0 0 0 1.2mm var(--paper-cream),
+        inset 0 0 0 1.5mm var(--card-accent);
+      box-sizing: border-box;
+      border-radius: 1px;
+      overflow: hidden;
+      color: var(--ink-black);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .wedding-card:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 30px 70px rgba(0,0,0,0.6),
+        0 10px 25px rgba(0,0,0,0.3),
+        inset 0 0 0 0.6mm var(--card-accent),
+        inset 0 0 0 1.2mm var(--paper-cream),
+        inset 0 0 0 1.5mm var(--card-accent);
+    }
+
+    /* Luxury inner gold frame border */
+    .wedding-card::before {
+      content: "";
+      position: absolute;
+      top: 3mm;
+      left: 3mm;
+      right: 3mm;
+      bottom: 3mm;
+      border: 0.3mm solid var(--card-accent);
+      pointer-events: none;
+      z-index: 5;
+      opacity: 0.35;
+    }
+
+    /* Corner ornament dots */
+    .wedding-card::after {
+      content: "";
+      position: absolute;
+      top: 2.2mm;
+      left: 2.2mm;
+      right: 2.2mm;
+      bottom: 2.2mm;
+      pointer-events: none;
+      z-index: 5;
+      background:
+        radial-gradient(circle at 0% 0%, var(--card-accent) 1.2px, transparent 1.2px),
+        radial-gradient(circle at 100% 0%, var(--card-accent) 1.2px, transparent 1.2px),
+        radial-gradient(circle at 0% 100%, var(--card-accent) 1.2px, transparent 1.2px),
+        radial-gradient(circle at 100% 100%, var(--card-accent) 1.2px, transparent 1.2px);
+      opacity: 0.5;
+    }
+
+    /* Vertical Cards: 120mm x 180mm */
+    .card-vertical {
+      width: 120mm;
+      height: 180mm;
+      min-width: 120mm;
+      min-height: 180mm;
+      padding: 7mm 8mm 6mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    /* Landscape Cover Card: 180mm x 120mm */
+    .card-horizontal {
+      width: 180mm;
+      height: 120mm;
+      min-width: 180mm;
+      min-height: 120mm;
+      padding: 6mm 9mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    .card-inner-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Luxury Decorative Elements */
+    .luxury-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3mm;
+      width: 80%;
+      margin: 1mm auto;
+    }
+
+    .luxury-divider-line {
+      flex: 1;
+      height: 0.3px;
+      background: var(--card-accent);
+      opacity: 0.5;
+    }
+
+    .luxury-divider-diamond {
+      width: 4px;
+      height: 4px;
+      background: var(--card-accent);
+      transform: rotate(45deg);
+      opacity: 0.6;
+      flex-shrink: 0;
+    }
+
+    .luxury-footer-ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      margin-top: auto;
+      padding-top: 1mm;
+    }
+
+    .luxury-footer-ornament svg {
+      width: 18mm;
+      height: 4mm;
+      opacity: 0.4;
+    }
+
+    /* =======================================================
+       CARD 1: THIỆP MỜI DỰ TIỆC (PARTY INVITATION)
+       ======================================================= */
+    #cardParty .card-inner-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      padding: 1mm 0;
+    }
+
+    #cardParty .card-inner-content > * {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+
+    #cardParty .invitation-art-holder {
+      margin-top: 0 !important;
+    }
+
+    #cardParty .luxury-footer-ornament {
+      margin-bottom: 0 !important;
+      margin-top: auto !important;
+    }
+
+    .invitation-art-holder {
+      width: 100%;
+      height: 44mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .invitation-art-img {
+      max-width: 90%;
+      max-height: 100%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      filter: contrast(1.05) brightness(0.97) saturate(0.95);
+    }
+
+    .invitation-header-title {
+      font-family: 'Playfair Display', 'Cormorant Garamond', serif;
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: var(--card-accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5mm;
+    }
+
+    .invitation-header-line {
+      width: 65%;
+      height: 1px;
+      background: var(--card-header-line);
+      margin: 0 auto 2.5mm;
+      opacity: 0.85;
+    }
+
+    .invitation-body-lead {
+      font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+      font-size: 0.74rem;
+      letter-spacing: 1.8px;
+      line-height: 1.6;
+      color: var(--card-accent-light);
+      text-transform: uppercase;
+      margin-bottom: 2mm;
+      font-weight: 600;
+    }
+
+    .restaurant-name-calligraphy {
+      font-family: 'Dancing Script', 'Ephesis', 'Alex Brush', cursive;
+      font-size: 2.55rem;
+      font-weight: 700;
+      color: var(--card-accent);
+      line-height: 1.15;
+      margin: 1.5mm 0 1mm;
+      letter-spacing: 0.5px;
+    }
+
+    .venue-hall-text {
+      font-family: 'Playfair Display', 'Cormorant Garamond', serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      color: var(--card-accent);
+      text-transform: uppercase;
+      margin-top: 0.5mm;
+    }
+
+    .venue-address-text {
+      font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+      font-size: 0.72rem;
+      color: var(--card-accent-light);
+      line-height: 1.45;
+      margin-top: 1mm;
+      max-width: 95%;
+      font-weight: 500;
+      font-style: italic;
+    }
+
+    /* Date and Timeline Grid */
+    .party-schedule-grid {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      margin: 2.5mm 0;
+      padding: 1.5mm 0;
+    }
+
+    .schedule-col-date {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-right: 3mm;
+    }
+
+    .day-of-week {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      color: var(--card-accent);
+      text-transform: uppercase;
+      margin-bottom: 1px;
+    }
+
+    .big-date-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.3rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--card-accent);
+      letter-spacing: -0.5px;
+    }
+
+    .lunar-sub-text {
+      font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+      font-size: 0.68rem;
+      color: var(--card-accent-light);
+      margin-top: 2px;
+      font-style: italic;
+    }
+
+    .schedule-divider-line {
+      width: 1px;
+      height: 15mm;
+      background: var(--card-divider);
+      opacity: 0.75;
+    }
+
+    .schedule-col-times {
+      flex: 1.25;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      padding-left: 3mm;
+    }
+
+    .time-badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .badge-icon-circle {
+      width: 9mm;
+      height: 9mm;
+      background: var(--card-badge-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+    }
+
+    .badge-icon-circle svg {
+      width: 5.2mm;
+      height: 5.2mm;
+      stroke: var(--card-badge-fg);
+      fill: none;
+    }
+
+    .time-badge-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.64rem;
+      font-weight: 700;
+      color: var(--card-accent);
+      margin-top: 2px;
+      letter-spacing: 0.5px;
+    }
+
+    .time-badge-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.6rem;
+      color: var(--card-accent-light);
+      font-weight: 600;
+    }
+
+    .invitation-quote-script {
+      font-family: 'Dancing Script', 'Alex Brush', cursive;
+      font-size: 1.05rem;
+      color: var(--card-accent);
+      line-height: 1.45;
+      margin-top: 1.5mm;
+      font-weight: 600;
+      font-style: italic;
+    }
+
+    /* =======================================================
+       CARD 3: BÌA THIỆP NGANG (HAPPY WEDDING COVER)
+       ======================================================= */
+    .cover-card-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cover-art-center {
+      position: absolute;
+      top: 1mm;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 76%;
+      height: 84mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .cover-art-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      filter: contrast(1.02) brightness(0.99);
+    }
+
+    /* Calligraphy "Happy" and "Wedding" flanking the arch */
+    .cover-script-happy {
+      position: absolute;
+      top: 12mm;
+      left: 3mm;
+      font-family: 'Alex Brush', 'Great Vibes', 'Allura', cursive;
+      font-size: 3.6rem;
+      color: var(--card-accent);
+      z-index: 3;
+      transform: rotate(-8deg);
+      line-height: 1;
+      font-weight: 400;
+    }
+
+    .cover-script-wedding {
+      position: absolute;
+      top: 28mm;
+      right: 3mm;
+      font-family: 'Alex Brush', 'Great Vibes', 'Allura', cursive;
+      font-size: 3.8rem;
+      color: var(--card-accent);
+      z-index: 3;
+      transform: rotate(-6deg);
+      line-height: 1;
+      font-weight: 400;
+    }
+
+    .cover-bottom-row {
+      position: absolute;
+      bottom: 2mm;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      z-index: 4;
+      padding: 0 2mm;
+    }
+
+    .cover-guest-line {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--card-accent);
+      letter-spacing: 1px;
+    }
+
+    .guest-line-dots {
+      display: inline-block;
+      min-width: 34mm;
+      border-bottom: 1px solid var(--card-divider);
+      height: 12px;
+    }
+
+    .cover-date-big {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--card-accent);
+      letter-spacing: 1.5px;
+    }
+
+    /* =======================================================
+       CARD 2: THIỆP BÁO HỶ / THÀNH HÔN (CEREMONY ANNOUNCEMENT)
+       ======================================================= */
+    #cardCeremony .card-inner-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      padding: 1mm 0;
+    }
+
+    #cardCeremony .card-inner-content > * {
+      margin-top: auto;
+      margin-bottom: auto;
+    }
+
+    .announcement-top-icon {
+      margin-top: 0 !important;
+    }
+
+    .monogram-crest-wrapper {
+      width: 18mm;
+      height: 18mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .monogram-crest-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .parents-section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+      gap: 4mm;
+    }
+
+    .parents-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.45;
+    }
+
+    .parents-side-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--card-accent);
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      margin-bottom: 1.2mm;
+    }
+
+    .parent-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--card-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .parent-location {
+      font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.7rem;
+      color: var(--card-accent-light);
+      margin-top: 2px;
+    }
+
+    .announcement-title-box {
+      text-align: center;
+    }
+
+    .announcement-main-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      color: var(--card-accent);
+      text-transform: uppercase;
+      line-height: 1.55;
+    }
+
+    .couple-names-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .couple-name-calligraphy-announcement {
+      font-family: 'Dancing Script', 'Ephesis', 'Alex Brush', cursive;
+      font-size: 2.65rem;
+      font-weight: 700;
+      color: var(--card-accent);
+      line-height: 1.15;
+      letter-spacing: 0.5px;
+    }
+
+    .couple-role-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6mm;
+      width: 80%;
+      margin: 1.5mm 0;
+    }
+
+    .role-badge {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--card-accent-light);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .role-ampersand {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.35rem;
+      color: var(--card-accent);
+      line-height: 1;
+    }
+
+    .ceremony-info-box {
+      width: 100%;
+      padding: 1mm 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .ceremony-place-lead {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--card-accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5mm;
+    }
+
+    .ceremony-datetime-lead {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.94rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--card-accent);
+      margin-bottom: 1mm;
+      text-transform: uppercase;
+    }
+
+    .ceremony-lunar-date {
+      font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+      font-size: 0.74rem;
+      color: var(--card-accent-light);
+      font-style: italic;
+    }
+
+    /* Clean Minimalist VIP QR Block (No heavy boxes) */
+    .ceremony-qr-section {
+      width: 90%;
+      padding: 1.5mm 0;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4mm;
+      box-shadow: none;
+    }
+
+    .ceremony-qr-box {
+      width: 16mm;
+      height: 16mm;
+      min-width: 16mm;
+      min-height: 16mm;
+      padding: 0.8mm;
+      background: #ffffff;
+      border: 0.4px solid var(--card-divider);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .ceremony-qr-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .ceremony-qr-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .ceremony-qr-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: var(--card-accent);
+      text-transform: uppercase;
+      margin-bottom: 0.5mm;
+    }
+
+    .ceremony-qr-address {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.68rem;
+      color: var(--card-accent-light);
+      font-weight: 600;
+      line-height: 1.35;
+      font-style: italic;
+    }
+
+    .ceremony-qr-subtext {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.62rem;
+      color: var(--card-accent-light);
+      margin-top: 0.5mm;
+      opacity: 0.85;
+    }
+
+    #cardCeremony .luxury-footer-ornament {
+      margin-bottom: 0 !important;
+      margin-top: auto !important;
+    }
+
+    /* Serial footer removed - replaced by luxury ornaments */
+
+    /* Color Theme Presets */
+    .theme-color-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .color-theme-btn {
+      padding: 7px 6px;
+      border-radius: 8px;
+      border: 1.5px solid #383e4c;
+      background: #16181d;
+      color: #d1d5db;
+      font-size: 0.68rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .color-theme-btn.active {
+      border-color: var(--gold-light);
+      background: #27251e;
+      color: #fce8a6;
+      box-shadow: 0 0 0 1px var(--gold-light);
+    }
+
+    .color-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      flex-shrink: 0;
+    }
+
+    /* PRINT LAYOUT OPTIMIZATIONS */
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      .sidebar, .preview-toolbar, .item-title-bar {
+        display: none !important;
+      }
+      .app-container {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .preview-workspace {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: none !important;
+        display: block !important;
+      }
+      .cards-flow {
+        display: block;
+        gap: 0;
+      }
+      .item-wrapper {
+        margin: 0 auto;
+        padding: 0;
+        page-break-after: always;
+        break-after: page;
+      }
+      .wedding-card {
+        box-shadow: none !important;
+        margin: 0 auto !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      @page {
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  
+  <!-- =============================================== -->
+  <!-- LEFT SIDEBAR: CONTROLS & FORM                   -->
+  <!-- =============================================== -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>💍 Mẫu Thiệp Cưới STVAN</h1>
+      <p>Mẫu thiệp cưới thực tế theo ảnh: Ruột thiệp mời dự tiệc + Bìa thiệp ngang Happy Wedding + Thiệp báo tin thành hôn.</p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tab-view-selector">
+      <button class="tab-btn active" onclick="switchView('all')">Tất Cả (Full Bộ)</button>
+      <button class="tab-btn" onclick="switchView('card-party')">Thiệp Mời Tiệc</button>
+      <button class="tab-btn" onclick="switchView('card-cover')">Bìa Ngang</button>
+      <button class="tab-btn" onclick="switchView('card-ceremony')">Thiệp Báo Hỷ</button>
+    </div>
+
+    <!-- 1. Bảng Màu & Tone Giấy -->
+    <div class="control-group">
+      <h3>🎨 1. Bảng Màu Chủ Đạo</h3>
+      <div class="form-row">
+        <label>Chọn Tone Màu Thiệp</label>
+        <div class="theme-color-grid">
+          <button class="color-theme-btn active" onclick="setColorTheme('classic')">
+            <span class="color-swatch" style="background: #111111;"></span>
+            Đen Cổ Điển
+          </button>
+          <button class="color-theme-btn" onclick="setColorTheme('gold')">
+            <span class="color-swatch" style="background: linear-gradient(135deg, #9d7830, #dfbe75);"></span>
+            Vàng Gold
+          </button>
+          <button class="color-theme-btn" onclick="setColorTheme('rose')">
+            <span class="color-swatch" style="background: linear-gradient(135deg, #8e4a5e, #d4899c);"></span>
+            Hồng Rose
+          </button>
+          <button class="color-theme-btn" onclick="setColorTheme('sage')">
+            <span class="color-swatch" style="background: linear-gradient(135deg, #3d5e48, #7fa88a);"></span>
+            Xanh Sage
+          </button>
+          <button class="color-theme-btn" onclick="setColorTheme('navy')">
+            <span class="color-swatch" style="background: linear-gradient(135deg, #1e2d4a, #4a6a8f);"></span>
+            Xanh Navy
+          </button>
+          <button class="color-theme-btn" onclick="setColorTheme('burgundy')">
+            <span class="color-swatch" style="background: linear-gradient(135deg, #5a1a2a, #8b3a4a);"></span>
+            Đỏ Rượu Vang
+          </button>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top: 10px;">
+        <label>Tone Giấy Mỹ Thuật</label>
+        <div class="paper-tone-row">
+          <button class="tone-btn active" onclick="setPaperTone('cream')">
+            <span class="tone-color-circle" style="background: #faf7f2;"></span>
+            Kem Ngà
+          </button>
+          <button class="tone-btn" onclick="setPaperTone('white')">
+            <span class="tone-color-circle" style="background: #ffffff;"></span>
+            Trắng Thuần
+          </button>
+          <button class="tone-btn" onclick="setPaperTone('warm')">
+            <span class="tone-color-circle" style="background: #f5efe6;"></span>
+            Kraft Ấm
+          </button>
+          <button class="tone-btn" onclick="setPaperTone('blush')">
+            <span class="tone-color-circle" style="background: #fdf2f0;"></span>
+            Hồng Nhạt
+          </button>
+          <button class="tone-btn" onclick="setPaperTone('mint')">
+            <span class="tone-color-circle" style="background: #f0f7f4;"></span>
+            Xanh Mint
+          </button>
+          <button class="tone-btn" onclick="setPaperTone('silver')">
+            <span class="tone-color-circle" style="background: #f3f3f5;"></span>
+            Xám Bạc
+          </button>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top: 10px;">
+        <label>Font Chữ Thư Pháp Tên CD & CR</label>
+        <select id="calligraphyFontSelect" onchange="updateLiveFont()">
+          <option value="'Dancing Script', cursive">Dancing Script (Mặc định nét bút chuẩn mẫu)</option>
+          <option value="'Ephesis', cursive">Ephesis (Thanh thoát phong nhã)</option>
+          <option value="'Alex Brush', cursive">Alex Brush (Cổ điển tinh tế)</option>
+          <option value="'Great Vibes', cursive">Great Vibes (Uốn lượn bay bổng)</option>
+          <option value="'Pinyon Script', cursive">Pinyon Script (Quý tộc phương Tây)</option>
+          <option value="'Allura', cursive">Allura (Luxury mềm mại)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 2. Thông tin Cô Dâu & Chú Rể -->
+    <div class="control-group">
+      <h3>👰 🤵 2. Tên Cô Dâu & Chú Rể</h3>
+      <div class="form-grid-2 form-row">
+        <div>
+          <label>Tên Chú Rể</label>
+          <input type="text" id="groomNameInput" value="Nguyễn Anh Kiệt" oninput="updateLiveContent()">
+        </div>
+        <div>
+          <label>Vai Vế Chú Rể</label>
+          <input type="text" id="groomRoleInput" value="Út Nam" oninput="updateLiveContent()">
+        </div>
+      </div>
+      <div class="form-grid-2 form-row">
+        <div>
+          <label>Tên Cô Dâu</label>
+          <input type="text" id="brideNameInput" value="Huỳnh Kim Ngân" oninput="updateLiveContent()">
+        </div>
+        <div>
+          <label>Vai Vế Cô Dâu</label>
+          <input type="text" id="brideRoleInput" value="Thứ Nữ" oninput="updateLiveContent()">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Hai Bên Gia Đình -->
+    <div class="control-group">
+      <h3>👨‍👩‍👧‍👦 3. Đại Diện Hai Gia Đình</h3>
+      <div class="form-row">
+        <label>Bố Mẹ Nhà Trai (Ông & Bà, cách nhau bởi dấu /)</label>
+        <input type="text" id="groomParentsInput" value="PHẠM VĂN HAY / ĐẶNG THỊ MINH ĐỨC" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Quê Quán Nhà Trai (Thôn Xã / Tỉnh Thành)</label>
+        <input type="text" id="groomAddressInput" value="Hòa Phong - Hòa Vang / Đà Nẵng" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Bố Mẹ Nhà Gái (Ông & Bà, cách nhau bởi dấu /)</label>
+        <input type="text" id="brideParentsInput" value="HUỲNH VĂN CHÍNH / PHẠM THỊ LIÊN" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Quê Quán Nhà Gái (Thôn Xã / Tỉnh Thành)</label>
+        <input type="text" id="brideAddressInput" value="Hòa Minh - Liên Chiểu / Đà Nẵng" oninput="updateLiveContent()">
+      </div>
+    </div>
+
+    <!-- 4. Lễ Thành Hôn / Gia Tiên (Mặt 3) -->
+    <div class="control-group">
+      <h3>🏛️ 4. Lễ Thành Hôn (Mặt Báo Tin & Mã QR)</h3>
+      <div class="form-row">
+        <label>Địa điểm cử hành</label>
+        <input type="text" id="ceremonyPlaceLeadInput" value="HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ TRAI" oninput="updateLiveContent()">
+      </div>
+      <div class="form-grid-2 form-row">
+        <div>
+          <label>Giờ & Ngày Dương Lịch</label>
+          <input type="text" id="ceremonyDateTimeInput" value="VÀO LÚC 11 GIỜ 00 | 18.09.2099" oninput="updateLiveContent()">
+        </div>
+        <div>
+          <label>Ngày Âm Lịch</label>
+          <input type="text" id="ceremonyLunarDateInput" value="Tức ngày 27 tháng 07 năm Giáp Thìn" oninput="updateLiveContent()">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Tiêu Đề Mã QR</label>
+        <input type="text" id="ceremonyQrLabelInput" value="📍 BẢN ĐỒ CHỈ ĐƯỜNG" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Tải Ảnh Mã QR Mới (Bản Đồ / Mừng Cưới / VietQR)</label>
+        <input type="file" id="ceremonyQrFileInput" accept="image/*" onchange="uploadQrImage(event)">
+      </div>
+    </div>
+
+    <!-- 5. Tiệc Mời Cưới (Mặt 1) -->
+    <div class="control-group">
+      <h3>🥂 5. Tiệc Cưới & Đón Khách (Mặt Mời Tiệc)</h3>
+      <div class="form-row">
+        <label>Tên Nhà Hàng / Trung Tâm Tiệc</label>
+        <input type="text" id="partyRestaurantInput" value="New Orient" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Sảnh Tiệc & Tầng</label>
+        <input type="text" id="partyHallInput" value="SẢNH SAFFRON TẦNG 7" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Địa Chỉ Nhà Hàng</label>
+        <input type="text" id="partyAddressInput" value="20 Đống Đa, P. Thuận Phước, Q. Hải Châu, Tp. Đà Nẵng" oninput="updateLiveContent()">
+      </div>
+      <div class="form-grid-2 form-row">
+        <div>
+          <label>Thứ Trong Tuần</label>
+          <input type="text" id="partyDayWeekInput" value="THỨ BẢY" oninput="updateLiveContent()">
+        </div>
+        <div>
+          <label>Ngày Dương Lịch (Lớn)</label>
+          <input type="text" id="partyDateNumInput" value="07.09" oninput="updateLiveContent()">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Ngày Âm Lịch Tiệc</label>
+        <input type="text" id="partyLunarInput" value="Nhằm 27.07 Âm Lịch" oninput="updateLiveContent()">
+      </div>
+      <div class="form-grid-2 form-row">
+        <div>
+          <label>Giờ Đón Khách</label>
+          <input type="text" id="partyWelcomeTimeInput" value="11 Giờ 00" oninput="updateLiveContent()">
+        </div>
+        <div>
+          <label>Giờ Khai Tiệc</label>
+          <input type="text" id="partyDinnerTimeInput" value="11 Giờ 00" oninput="updateLiveContent()">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Lời cảm ơn chân thành</label>
+        <textarea id="partyQuoteInput" rows="2" oninput="updateLiveContent()">Sự hiện diện của Quý Khách
+là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
+      </div>
+    </div>
+
+    <!-- 6. Bìa Thiệp Ngang (Mặt 2) -->
+    <div class="control-group">
+      <h3>💌 6. Bìa Thiệp Ngang (Happy Wedding)</h3>
+      <div class="form-row">
+        <label>Ngày In Trên Bìa</label>
+        <input type="text" id="coverDateInput" value="26 . 09 . 2099" oninput="updateLiveContent()">
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="btn-action-row">
+      <button class="btn-print" onclick="window.print()">
+        🖨️ In Trọn Bộ (Xuất File In Ấn Chuẩn PDF)
+      </button>
+    </div>
+  </aside>
+
+  <!-- =============================================== -->
+  <!-- RIGHT PREVIEW WORKSPACE                         -->
+  <!-- =============================================== -->
+  <main class="preview-workspace">
+    <div class="preview-toolbar">
+      <div class="preview-info">
+        <span>📐 Kích thước chuẩn in: <strong>120 x 180 mm</strong> (Đứng) &nbsp;|&nbsp; <strong>180 x 120 mm</strong> (Ngang)</span>
+        <span>🎨 Tỷ lệ 1:1 chuẩn xưởng in offset / kỹ thuật số</span>
+      </div>
+      <div class="preview-actions">
+        <button class="btn-export" onclick="exportCardToPng('cardParty', 'thiep_moi_tiec.png')">💾 Tải Ảnh Thiệp Mời</button>
+        <button class="btn-export" onclick="exportCardToPng('cardCover', 'bia_thiep_ngang.png')">💾 Tải Ảnh Bìa Ngang</button>
+        <button class="btn-export" onclick="exportCardToPng('cardCeremony', 'thiep_bao_tin.png')">💾 Tải Ảnh Báo Tin</button>
+      </div>
+    </div>
+
+    <div class="cards-flow" id="cardsFlowContainer">
+      
+      <!-- =============================================== -->
+      <!-- CARD 1: MẶT 1 - THIỆP MỜI DỰ TIỆC               -->
+      <!-- =============================================== -->
+      <div class="item-wrapper view-item-party">
+        <div class="item-title-bar">
+          <span>🍷 1. Mặt Thiệp Mời Dự Tiệc Cưới (Khổ Đứng 120 x 180 mm)</span>
+          <button class="btn-card-save" onclick="exportCardToPng('cardParty', 'thiep_moi_tiec.png')">⬇️ Tải PNG</button>
+        </div>
+        <div class="wedding-card card-vertical" id="cardParty">
+          <div class="card-inner-content">
+            
+            <!-- Top Art: Vintage Chair with Velvet & Floral -->
+            <div class="invitation-art-holder">
+              <img src="./assets/chair_decor.jpg" alt="Vintage Chair Decor" class="invitation-art-img" id="chairArtImg" onerror="this.src='https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80'">
+            </div>
+
+            <!-- Invitation Title -->
+            <div>
+              <div class="invitation-header-title">TRÂN TRỌNG KÍNH MỜI:</div>
+              <div class="invitation-header-line"></div>
+              <div class="invitation-body-lead">
+                ĐẾN THAM DỰ BUỔI TIỆC<br>
+                CHUNG VUI CÙNG GIA ĐÌNH CHÚNG TÔI TẠI<br>
+                NHÀ HÀNG TIỆC CƯỚI
+              </div>
+            </div>
+
+            <!-- Luxury Divider -->
+            <div class="luxury-divider">
+              <div class="luxury-divider-line"></div>
+              <div class="luxury-divider-diamond"></div>
+              <div class="luxury-divider-line"></div>
+            </div>
+
+            <!-- Venue Info -->
+            <div>
+              <div class="restaurant-name-calligraphy" id="partyRestaurantText">New Orient</div>
+              <div class="venue-hall-text" id="partyHallText">SẢNH SAFFRON TẦNG 7</div>
+              <div class="venue-address-text" id="partyAddressText">20 Đống Đa, P. Thuận Phước, Q. Hải Châu, Tp. Đà Nẵng</div>
+            </div>
+
+            <!-- Schedule: Date & Times with Divider -->
+            <div class="party-schedule-grid">
+              <!-- Left: Date -->
+              <div class="schedule-col-date">
+                <div class="day-of-week" id="partyDayWeekText">THỨ BẢY</div>
+                <div class="big-date-number" id="partyDateNumText">07.09</div>
+                <div class="lunar-sub-text" id="partyLunarText">Nhằm 27.07 Âm Lịch</div>
+              </div>
+
+              <!-- Center Vertical Line -->
+              <div class="schedule-divider-line"></div>
+
+              <!-- Right: 2 Timeline Badges -->
+              <div class="schedule-col-times">
+                <!-- Welcome Guest Badge -->
+                <div class="time-badge-item">
+                  <div class="badge-icon-circle">
+                    <!-- Wedding Rings SVG Icon -->
+                    <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="8" cy="14" r="5" />
+                      <circle cx="15" cy="12" r="5" />
+                      <path d="M12 4 L14 7 L16 7 L14 10" stroke-width="1.2" />
+                    </svg>
+                  </div>
+                  <div class="time-badge-label">Đón Khách</div>
+                  <div class="time-badge-value" id="partyWelcomeTimeText">11 Giờ 00</div>
+                </div>
+
+                <!-- Toast / Dinner Badge -->
+                <div class="time-badge-item">
+                  <div class="badge-icon-circle">
+                    <!-- Clinking Glasses SVG Icon -->
+                    <svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M6 3 L10 11 L10 17 M8 17 L12 17" />
+                      <path d="M18 3 L14 11 L14 17 M12 17 L16 17" />
+                      <path d="M6 3 L10 3" />
+                      <path d="M14 3 L18 3" />
+                      <line x1="12" y1="6" x2="12" y2="8" />
+                    </svg>
+                  </div>
+                  <div class="time-badge-label">Khai Tiệc</div>
+                  <div class="time-badge-value" id="partyDinnerTimeText">11 Giờ 00</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Quote -->
+            <div>
+              <div class="invitation-quote-script" id="partyQuoteText">
+                Sự hiện diện của Quý Khách<br>là niềm vinh hạnh cho gia đình chúng tôi!
+              </div>
+            </div>
+
+            <!-- Bottom Luxury Ornament -->
+            <div class="luxury-footer-ornament">
+              <svg viewBox="0 0 120 20" fill="none" stroke="var(--card-accent)" stroke-width="0.8">
+                <line x1="10" y1="10" x2="48" y2="10" />
+                <rect x="52" y="7" width="6" height="6" transform="rotate(45 55 10)" fill="var(--card-accent)" stroke="none" opacity="0.4" />
+                <line x1="62" y1="10" x2="100" y2="10" />
+              </svg>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- =============================================== -->
+      <!-- CARD 2: THIỆP BÁO TIN & LỄ THÀNH HÔN             -->
+      <!-- =============================================== -->
+      <div class="item-wrapper view-item-ceremony">
+        <div class="item-title-bar">
+          <span>🕊️ 2. Mặt Thiệp Báo Tin / Lễ Thành Hôn (Khổ Đứng 120 x 180 mm)</span>
+          <button class="btn-card-save" onclick="exportCardToPng('cardCeremony', 'thiep_bao_tin.png')">⬇️ Tải PNG</button>
+        </div>
+        <div class="wedding-card card-vertical" id="cardCeremony">
+          <div class="card-inner-content">
+            
+            <!-- Top Luxury Monogram Crest Logo -->
+            <div class="announcement-top-icon">
+              <div class="monogram-crest-wrapper">
+                <svg class="monogram-crest-svg" viewBox="0 0 100 100" fill="none" stroke="var(--card-accent)" stroke-width="0.8">
+                  <circle cx="50" cy="50" r="38" stroke-dasharray="2 2" opacity="0.6" />
+                  <circle cx="50" cy="50" r="44" stroke-width="0.5" opacity="0.4" />
+                  <!-- Laurel Wreath Flourishes -->
+                  <path d="M 20 50 C 20 30, 32 18, 50 14 M 20 50 C 20 70, 32 82, 50 86" opacity="0.75" stroke-linecap="round" />
+                  <path d="M 80 50 C 80 30, 68 18, 50 14 M 80 50 C 80 70, 68 82, 50 86" opacity="0.75" stroke-linecap="round" />
+                  <!-- Monogram Text -->
+                  <text x="50" y="58" text-anchor="middle" font-family="'Alex Brush', 'Dancing Script', cursive" font-size="28" fill="var(--card-accent)" stroke="none">K & N</text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Parents Grid -->
+            <div class="parents-section-grid">
+              <!-- Groom Parents (Nhà Trai) -->
+              <div class="parents-column">
+                <div class="parents-side-title">Nhà Trai</div>
+                <div id="groomParentsContainer">
+                  <div class="parent-name">PHẠM VĂN HAY</div>
+                  <div class="parent-name">ĐẶNG THỊ MINH ĐỨC</div>
+                </div>
+                <div class="parent-location" id="groomAddressLine1">Hòa Phong - Hòa Vang</div>
+                <div class="parent-location" id="groomAddressLine2">Đà Nẵng</div>
+              </div>
+
+              <!-- Bride Parents (Nhà Gái) -->
+              <div class="parents-column">
+                <div class="parents-side-title">Nhà Gái</div>
+                <div id="brideParentsContainer">
+                  <div class="parent-name">HUỲNH VĂN CHÍNH</div>
+                  <div class="parent-name">PHẠM THỊ LIÊN</div>
+                </div>
+                <div class="parent-location" id="brideAddressLine1">Hòa Minh - Liên Chiểu</div>
+                <div class="parent-location" id="brideAddressLine2">Đà Nẵng</div>
+              </div>
+            </div>
+
+            <!-- Announcement Title -->
+            <div class="announcement-title-box">
+              <div class="announcement-main-title">
+                TRÂN TRỌNG BÁO TIN<br>
+                LỄ THÀNH HÔN CỦA CON CHÚNG TÔI
+              </div>
+            </div>
+
+            <!-- Luxury Divider -->
+            <div class="luxury-divider">
+              <div class="luxury-divider-line"></div>
+              <div class="luxury-divider-diamond"></div>
+              <div class="luxury-divider-line"></div>
+            </div>
+
+            <!-- Couple Names and Roles -->
+            <div class="couple-names-section">
+              <div class="couple-name-calligraphy-announcement" id="groomNameAnnounceText">Nguyễn Anh Kiệt</div>
+              
+              <div class="couple-role-row">
+                <span class="role-badge" id="groomRoleAnnounceText">Út Nam</span>
+                <span class="role-ampersand">&</span>
+                <span class="role-badge" id="brideRoleAnnounceText">Thứ Nữ</span>
+              </div>
+
+              <div class="couple-name-calligraphy-announcement" id="brideNameAnnounceText">Huỳnh Kim Ngân</div>
+            </div>
+
+            <!-- Ceremony Info -->
+            <div class="ceremony-info-box">
+              <div class="ceremony-place-lead" id="ceremonyPlaceLeadText">
+                HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ TRAI
+              </div>
+              <div class="ceremony-datetime-lead" id="ceremonyDateTimeText">
+                VÀO LÚC 11 GIỜ 00 | 18.09.2099
+              </div>
+              <div class="ceremony-lunar-date" id="ceremonyLunarDateText">
+                Tức ngày 27 tháng 07 năm Giáp Thìn
+              </div>
+            </div>
+
+            <!-- Bottom Luxury QR Block (Balances card height & fills bottom gracefully) -->
+            <div class="ceremony-qr-section">
+              <div class="ceremony-qr-box">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://maps.google.com" alt="QR Code Map" class="ceremony-qr-img" id="ceremonyQrImg" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23ffffff\'/><rect x=\'10\' y=\'10\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'15\' y=\'15\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'20\' y=\'20\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'60\' y=\'10\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'65\' y=\'15\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'70\' y=\'20\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'10\' y=\'60\' width=\'30\' height=\'30\' fill=\'%23111111\'/><rect x=\'15\' y=\'65\' width=\'20\' height=\'20\' fill=\'%23ffffff\'/><rect x=\'20\' y=\'70\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'50\' y=\'50\' width=\'10\' height=\'10\' fill=\'%23111111\'/><rect x=\'70\' y=\'50\' width=\'20\' height=\'10\' fill=\'%23111111\'/><rect x=\'50\' y=\'70\' width=\'15\' height=\'20\' fill=\'%23111111\'/><rect x=\'75\' y=\'75\' width=\'15\' height=\'15\' fill=\'%23111111\'/></svg>'">
+              </div>
+              <div class="ceremony-qr-info">
+                <div class="ceremony-qr-label" id="ceremonyQrLabelText">📍 BẢN ĐỒ CHỈ ĐƯỜNG</div>
+                <div class="ceremony-qr-address" id="ceremonyAddressDetailText">Tư gia: Hòa Phong - Hòa Vang, Đà Nẵng</div>
+                <div class="ceremony-qr-subtext">Quét mã QR để xem vị trí cử hành hôn lễ</div>
+              </div>
+            </div>
+
+            <!-- Bottom Luxury Ornament -->
+            <div class="luxury-footer-ornament">
+              <svg viewBox="0 0 120 20" fill="none" stroke="var(--card-accent)" stroke-width="0.8">
+                <line x1="10" y1="10" x2="48" y2="10" />
+                <rect x="52" y="7" width="6" height="6" transform="rotate(45 55 10)" fill="var(--card-accent)" stroke="none" opacity="0.4" />
+                <line x1="62" y1="10" x2="100" y2="10" />
+              </svg>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- =============================================== -->
+      <!-- CARD 3: BÌA THIỆP NGANG (HAPPY WEDDING)           -->
+      <!-- =============================================== -->
+      <div class="item-wrapper view-item-cover">
+        <div class="item-title-bar">
+          <span>💌 3. Bìa Thiệp Ngang (Khổ Ngang 180 x 120 mm)</span>
+          <button class="btn-card-save" onclick="exportCardToPng('cardCover', 'bia_thiep_ngang.png')">⬇️ Tải PNG</button>
+        </div>
+        <div class="wedding-card card-horizontal" id="cardCover">
+          <div class="card-inner-content">
+            <div class="cover-card-container">
+              
+              <!-- Calligraphy "Happy" (Left) -->
+              <div class="cover-script-happy">Happy</div>
+
+              <!-- Center Floral Arch with Couple -->
+              <div class="cover-art-center">
+                <img src="./assets/couple_arch.jpg" alt="Wedding Couple Under Arch" class="cover-art-img" id="coupleArchImg" onerror="this.src='https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80'">
+              </div>
+
+              <!-- Calligraphy "Wedding" (Right) -->
+              <div class="cover-script-wedding">Wedding</div>
+
+              <!-- Bottom Row: Guest Line & Date -->
+              <div class="cover-bottom-row">
+                <div class="cover-guest-line">
+                  <span>TRÂN TRỌNG KÍNH MỜI:</span>
+                  <span class="guest-line-dots"></span>
+                </div>
+                <div class="cover-date-big" id="coverDateText">26 . 09 . 2099</div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+    </div>
+  </main>
+
+</div>
+
+<script>
+  // Color theme definitions
+  const COLOR_THEMES = {
+    classic: {
+      accent: '#111111',
+      accentLight: '#333333',
+      badgeBg: '#111111',
+      badgeFg: '#ffffff',
+      divider: '#555555',
+      headerLine: '#555555',
+      calligraphy: '#111111',
+      coverText: '#1a1a1a'
+    },
+    gold: {
+      accent: '#8b6914',
+      accentLight: '#b8922a',
+      badgeBg: '#8b6914',
+      badgeFg: '#fff8e7',
+      divider: '#c9a84c',
+      headerLine: '#c9a84c',
+      calligraphy: '#7a5c10',
+      coverText: '#6e5223'
+    },
+    rose: {
+      accent: '#7a3b4e',
+      accentLight: '#a85c72',
+      badgeBg: '#7a3b4e',
+      badgeFg: '#fff0f3',
+      divider: '#c88a9b',
+      headerLine: '#c88a9b',
+      calligraphy: '#6b2f42',
+      coverText: '#5a2438'
+    },
+    sage: {
+      accent: '#3a5f44',
+      accentLight: '#5a8266',
+      badgeBg: '#3a5f44',
+      badgeFg: '#f0f7f2',
+      divider: '#8aac95',
+      headerLine: '#8aac95',
+      calligraphy: '#2e4e38',
+      coverText: '#2a4533'
+    },
+    navy: {
+      accent: '#1e3356',
+      accentLight: '#3a5a82',
+      badgeBg: '#1e3356',
+      badgeFg: '#eef3f9',
+      divider: '#6b8ab0',
+      headerLine: '#6b8ab0',
+      calligraphy: '#162848',
+      coverText: '#152040'
+    },
+    burgundy: {
+      accent: '#5a1a2a',
+      accentLight: '#8b3a4a',
+      badgeBg: '#5a1a2a',
+      badgeFg: '#fef0f0',
+      divider: '#b06070',
+      headerLine: '#b06070',
+      calligraphy: '#4a1220',
+      coverText: '#401018'
+    }
+  };
+
+  function setColorTheme(themeName) {
+    const theme = COLOR_THEMES[themeName];
+    if (!theme) return;
+
+    const root = document.documentElement;
+    root.style.setProperty('--card-accent', theme.accent);
+    root.style.setProperty('--card-accent-light', theme.accentLight);
+    root.style.setProperty('--card-badge-bg', theme.badgeBg);
+    root.style.setProperty('--card-badge-fg', theme.badgeFg);
+    root.style.setProperty('--card-divider', theme.divider);
+    root.style.setProperty('--card-header-line', theme.headerLine);
+
+    // Apply to calligraphy elements
+    document.querySelectorAll('.restaurant-name-calligraphy, .couple-name-calligraphy-announcement').forEach(el => {
+      el.style.color = theme.calligraphy;
+    });
+
+    // Cover text colors
+    document.querySelectorAll('.cover-script-happy, .cover-script-wedding').forEach(el => {
+      el.style.color = theme.coverText;
+    });
+
+    // Ornament icon
+    document.querySelectorAll('.announcement-ornament-svg').forEach(svg => {
+      svg.setAttribute('stroke', theme.accent);
+      svg.querySelectorAll('[fill]').forEach(el => {
+        if (el.getAttribute('fill') !== 'none') el.setAttribute('fill', theme.accent);
+      });
+    });
+
+    // Button states
+    document.querySelectorAll('.color-theme-btn').forEach(btn => btn.classList.remove('active'));
+    if (event && event.currentTarget) event.currentTarget.classList.add('active');
+  }
+
+  function setPaperTone(toneName) {
+    const cards = document.querySelectorAll('.wedding-card');
+    document.querySelectorAll('.tone-btn').forEach(btn => btn.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    let bgColor = '#faf7f2';
+    if (toneName === 'white') bgColor = '#ffffff';
+    if (toneName === 'warm') bgColor = '#f5efe6';
+    if (toneName === 'blush') bgColor = '#fdf2f0';
+    if (toneName === 'mint') bgColor = '#f0f7f4';
+    if (toneName === 'silver') bgColor = '#f3f3f5';
+
+    cards.forEach(card => {
+      card.style.backgroundColor = bgColor;
+    });
+  }
+
+  function updateLiveContent() {
+    const groom = document.getElementById('groomNameInput').value;
+    const bride = document.getElementById('brideNameInput').value;
+    const groomRole = document.getElementById('groomRoleInput').value;
+    const brideRole = document.getElementById('brideRoleInput').value;
+
+    // Names in Announcement
+    document.getElementById('groomNameAnnounceText').innerText = groom;
+    document.getElementById('brideNameAnnounceText').innerText = bride;
+    document.getElementById('groomRoleAnnounceText').innerText = groomRole;
+    document.getElementById('brideRoleAnnounceText').innerText = brideRole;
+
+    // Parents Nhà Trai
+    const groomParentsRaw = document.getElementById('groomParentsInput').value.split('/');
+    let groomParentsHtml = '';
+    groomParentsRaw.forEach(name => {
+      if(name.trim()) groomParentsHtml += `<div class="parent-name">${name.trim()}</div>`;
+    });
+    document.getElementById('groomParentsContainer').innerHTML = groomParentsHtml;
+
+    const groomAddrRaw = document.getElementById('groomAddressInput').value.split('/');
+    const line1 = groomAddrRaw[0] ? groomAddrRaw[0].trim() : '';
+    const line2 = groomAddrRaw[1] ? groomAddrRaw[1].trim() : '';
+    document.getElementById('groomAddressLine1').innerText = line1;
+    document.getElementById('groomAddressLine2').innerText = line2;
+    
+    const fullGroomAddr = [line1, line2].filter(Boolean).join(' - ');
+    const ceremAddrEl = document.getElementById('ceremonyAddressDetailText');
+    if (ceremAddrEl) {
+      ceremAddrEl.innerText = fullGroomAddr ? `📍 Tư gia nhà trai: ${fullGroomAddr}` : '📍 Rất hân hạnh được đón tiếp Quý Khách!';
+    }
+
+    // Parents Nhà Gái
+    const brideParentsRaw = document.getElementById('brideParentsInput').value.split('/');
+    let brideParentsHtml = '';
+    brideParentsRaw.forEach(name => {
+      if(name.trim()) brideParentsHtml += `<div class="parent-name">${name.trim()}</div>`;
+    });
+    document.getElementById('brideParentsContainer').innerHTML = brideParentsHtml;
+
+    const brideAddrRaw = document.getElementById('brideAddressInput').value.split('/');
+    document.getElementById('brideAddressLine1').innerText = brideAddrRaw[0] ? brideAddrRaw[0].trim() : '';
+    document.getElementById('brideAddressLine2').innerText = brideAddrRaw[1] ? brideAddrRaw[1].trim() : '';
+
+    // Ceremony
+    document.getElementById('ceremonyPlaceLeadText').innerText = document.getElementById('ceremonyPlaceLeadInput').value;
+    document.getElementById('ceremonyDateTimeText').innerText = document.getElementById('ceremonyDateTimeInput').value;
+    document.getElementById('ceremonyLunarDateText').innerText = document.getElementById('ceremonyLunarDateInput').value;
+    const qrLabel = document.getElementById('ceremonyQrLabelInput');
+    if (qrLabel && document.getElementById('ceremonyQrLabelText')) {
+      document.getElementById('ceremonyQrLabelText').innerText = qrLabel.value;
+    }
+
+    // Party Invitation
+    document.getElementById('partyRestaurantText').innerText = document.getElementById('partyRestaurantInput').value;
+    document.getElementById('partyHallText').innerText = document.getElementById('partyHallInput').value;
+    document.getElementById('partyAddressText').innerText = document.getElementById('partyAddressInput').value;
+    document.getElementById('partyDayWeekText').innerText = document.getElementById('partyDayWeekInput').value;
+    document.getElementById('partyDateNumText').innerText = document.getElementById('partyDateNumInput').value;
+    document.getElementById('partyLunarText').innerText = document.getElementById('partyLunarInput').value;
+    document.getElementById('partyWelcomeTimeText').innerText = document.getElementById('partyWelcomeTimeInput').value;
+    document.getElementById('partyDinnerTimeText').innerText = document.getElementById('partyDinnerTimeInput').value;
+    document.getElementById('partyQuoteText').innerHTML = document.getElementById('partyQuoteInput').value.replace(/\n/g, '<br>');
+
+    // Cover Card
+    const coverDate = document.getElementById('coverDateInput').value;
+    document.getElementById('coverDateText').innerText = coverDate;
+  }
+
+  function uploadQrImage(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        document.getElementById('ceremonyQrImg').src = evt.target.result;
+      }
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function updateLiveFont() {
+    const selectedFont = document.getElementById('calligraphyFontSelect').value;
+    
+    // Apply font to calligraphy elements
+    document.getElementById('partyRestaurantText').style.fontFamily = selectedFont;
+    document.getElementById('groomNameAnnounceText').style.fontFamily = selectedFont;
+    document.getElementById('brideNameAnnounceText').style.fontFamily = selectedFont;
+    document.getElementById('partyQuoteText').style.fontFamily = selectedFont;
+  }
+
+  function switchView(viewMode) {
+    const pItem = document.querySelector('.view-item-party');
+    const cItem = document.querySelector('.view-item-cover');
+    const mItem = document.querySelector('.view-item-ceremony');
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    pItem.style.display = (viewMode === 'all' || viewMode === 'card-party') ? 'flex' : 'none';
+    cItem.style.display = (viewMode === 'all' || viewMode === 'card-cover') ? 'flex' : 'none';
+    mItem.style.display = (viewMode === 'all' || viewMode === 'card-ceremony') ? 'flex' : 'none';
+  }
+
+  function exportCardToPng(elementId, filename) {
+    const cardEl = document.getElementById(elementId);
+    if (!cardEl) return;
+
+    html2canvas(cardEl, {
+      scale: 3,
+      useCORS: true,
+      backgroundColor: null
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = filename || 'wedding-card.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  }
+
+  // Initialize on load
+  window.addEventListener('DOMContentLoaded', () => {
+    updateLiveContent();
+  });
+</script>
+
+</body>
+</html>
