@@ -1764,10 +1764,10 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       </div>
       <div class="form-row">
         <label>Dòng Phụ Sự Kiện</label>
-        <input type="text" id="coverSubtitleInput" value="CHUNG VUI NHÀ CÔ DÂU" oninput="updateLiveContent()">
+        <input type="text" id="coverSubtitleInput" value="CHUNG VUI NHÀ CHÚ RỂ" oninput="updateLiveContent()">
         <div class="tag-quick-picks">
-          <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('CHUNG VUI NHÀ CÔ DÂU')">Nhà Cô Dâu</button>
           <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('CHUNG VUI NHÀ CHÚ RỂ')">Nhà Chú Rể</button>
+          <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('CHUNG VUI NHÀ CÔ DÂU')">Nhà Cô Dâu</button>
           <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('CHUNG VUI CÙNG GIA ĐÌNH')">Chung Vui</button>
           <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('LỄ THÀNH HÔN')">Thành Hôn</button>
           <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('LỄ VU QUY')">Vu Quy</button>
@@ -2128,7 +2128,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
                 <!-- Top: Hero Date & Subtitle -->
                 <div class="cover-header-group">
                   <div class="cover-date-hero" id="coverDateHeroText">08.12.26</div>
-                  <div class="cover-event-tag" id="coverEventTagText">CHUNG VUI NHÀ CÔ DÂU</div>
+                  <div class="cover-event-tag" id="coverEventTagText">CHUNG VUI NHÀ CHÚ RỂ</div>
                 </div>
 
                 <!-- Middle: Couple Calligraphy Names -->
@@ -3071,6 +3071,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
   // Initialize on load
   window.addEventListener('DOMContentLoaded', () => {
     applyBase64Assets();
+    applyQrPreset();
     updateLiveContent();
   });
 </script>
