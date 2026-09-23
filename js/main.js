@@ -52,6 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const guestName = rawGuestName.trim();
 
+  // Dynamic Page Title & OG Title Update
+  const dynamicTitle = guestName ? `Trân Trọng Kính Mời: ${guestName}` : 'Trân Trọng Kính Mời';
+  document.title = dynamicTitle;
+  const ogTitleMeta = document.querySelector('meta[property="og:title"]');
+  if (ogTitleMeta) ogTitleMeta.setAttribute('content', dynamicTitle);
+
   // Apply guest name to UI elements
   const envelopeGuestEl = document.getElementById('envelope-guest-name');
   const letterGuestEl = document.getElementById('letter-guest-name');
