@@ -907,101 +907,194 @@
     }
 
     /* =======================================================
-       CARD 3: BÌA THIỆP NGANG (HAPPY WEDDING COVER)
+       CARD 3: BÌA THIỆP NGANG (MODERN WEDDING ENVELOPE / COVER)
        ======================================================= */
+    #cardCover {
+      background-image: 
+        radial-gradient(circle at 6% 12%, rgba(246, 224, 218, 0.55) 0%, transparent 55%),
+        radial-gradient(circle at 94% 88%, rgba(248, 226, 215, 0.55) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, rgba(255, 248, 244, 0.35) 0%, transparent 70%);
+      background-color: var(--paper-cream);
+      padding: 0;
+      position: relative;
+    }
+
     .cover-card-container {
       position: relative;
       width: 100%;
       height: 100%;
+      overflow: hidden;
+    }
+
+    /* Left Column: Typography & Invitation details (Width ~88mm) */
+    .cover-left-col {
+      position: absolute;
+      left: 10mm;
+      top: 9mm;
+      bottom: 8mm;
+      width: 88mm;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      z-index: 3;
+      text-align: left;
     }
 
-    .cover-art-center {
-      position: absolute;
-      top: 1mm;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 76%;
-      height: 84mm;
+    /* Top: Hero Date & Subtitle */
+    .cover-header-group {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .cover-date-hero {
+      font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.15rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      line-height: 1;
+      color: var(--card-accent);
+      transition: color 0.3s ease;
+    }
+
+    .cover-event-tag {
+      font-family: 'Playfair Display', 'Be Vietnam Pro', serif;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--card-accent);
+      line-height: 1.25;
+      margin-top: 1.8mm;
+      padding-bottom: 0.5mm;
+      border-bottom: 1.5px solid var(--card-divider);
+      display: inline-block;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Middle: Bride & Groom Calligraphy Names */
+    .cover-names-group {
+      display: flex;
+      flex-direction: column;
       justify-content: center;
-      z-index: 2;
+      margin: auto 0;
+      padding: 2mm 0;
     }
 
-    .cover-art-img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      mix-blend-mode: multiply;
-      filter: contrast(1.02) brightness(0.99);
-    }
-
-    /* Calligraphy "Happy" and "Wedding" flanking the arch */
-    .cover-script-happy {
-      position: absolute;
-      top: 12mm;
-      left: 3mm;
-      font-family: 'Alex Brush', 'Great Vibes', 'Allura', cursive;
-      font-size: 3.6rem;
-      color: var(--card-accent);
-      z-index: 3;
-      transform: rotate(-8deg);
-      line-height: 1;
-      font-weight: 400;
-    }
-
-    .cover-script-wedding {
-      position: absolute;
-      top: 28mm;
-      right: 3mm;
-      font-family: 'Alex Brush', 'Great Vibes', 'Allura', cursive;
-      font-size: 3.8rem;
-      color: var(--card-accent);
-      z-index: 3;
-      transform: rotate(-6deg);
-      line-height: 1;
-      font-weight: 400;
-    }
-
-    .cover-bottom-row {
-      position: absolute;
-      bottom: 2mm;
-      left: 0;
-      right: 0;
+    .cover-couple-names {
+      font-family: 'Alex Brush', 'Dancing Script', 'Great Vibes', cursive;
+      font-size: 2.45rem;
+      line-height: 1.15;
+      color: var(--card-calligraphy, var(--card-accent));
+      text-align: left;
       display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      z-index: 4;
-      padding: 0 2mm;
+      flex-direction: column;
+      gap: 0;
+      transition: color 0.3s ease;
     }
 
-    .cover-guest-line {
+    .cover-name-line1,
+    .cover-name-line2 {
+      display: block;
+      white-space: nowrap;
+    }
+
+    /* Bottom: Invitation Line & Micro-Footer */
+    .cover-footer-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5mm;
+    }
+
+    .cover-invite-row {
       display: flex;
       align-items: baseline;
-      gap: 4px;
+      gap: 6px;
       font-family: 'Playfair Display', serif;
-      font-size: 0.68rem;
-      font-weight: 700;
+      font-size: 0.82rem;
+      font-weight: 600;
       color: var(--card-accent);
-      letter-spacing: 1px;
+      transition: color 0.3s ease;
     }
 
-    .guest-line-dots {
+    .cover-invite-label {
+      white-space: nowrap;
+      font-style: italic;
+    }
+
+    .cover-guest-slot {
       display: inline-block;
       min-width: 34mm;
-      border-bottom: 1px solid var(--card-divider);
-      height: 12px;
-    }
-
-    .cover-date-big {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.45rem;
+      flex-grow: 1;
+      max-width: 48mm;
+      border-bottom: 1px dotted var(--card-divider);
+      min-height: 14px;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--card-accent);
-      letter-spacing: 1.5px;
+      padding-left: 4px;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .cover-bottom-microtext {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.38rem;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--ink-gray);
+      opacity: 0.72;
+      line-height: 1.2;
+    }
+
+    /* Right Column: Romantic Couple & Bow Arch Illustration */
+    .cover-right-art {
+      position: absolute;
+      right: 0mm;
+      top: 0;
+      bottom: 0;
+      width: 90mm;
+      height: 120mm;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .cover-bow-arch-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: right center;
+      mix-blend-mode: multiply;
+      filter: contrast(1.02) saturate(1.04);
+    }
+
+    /* Quick preset chips for Sidebar */
+    .tag-quick-picks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .btn-tag-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--sidebar-border);
+      border-radius: 12px;
+      padding: 3px 8px;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-tag-chip:hover {
+      background: rgba(223, 190, 117, 0.2);
+      border-color: var(--gold-light);
+      color: var(--gold-light);
     }
 
     /* =======================================================
@@ -1650,12 +1743,39 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       </div>
     </div>
 
-    <!-- 6. Bìa Thiệp Ngang (Mặt 2) -->
+    <!-- 3. Bìa Thiệp Ngang (Khổ 180 x 120 mm) -->
     <div class="control-group">
-      <h3>💌 6. Bìa Thiệp Ngang (Happy Wedding)</h3>
+      <h3>💌 3. Bìa Thiệp Ngang (Khổ 180 x 120 mm)</h3>
       <div class="form-row">
-        <label>Ngày In Trên Bìa</label>
-        <input type="text" id="coverDateInput" value="20 . 12 . 2026" oninput="updateLiveContent()">
+        <label>Ngày In Bìa (Dạng Số Lớn)</label>
+        <input type="text" id="coverDateInput" value="08.12.26" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Dòng Phụ Sự Kiện</label>
+        <input type="text" id="coverSubtitleInput" value="CHUNG VUI NHÀ CÔ DÂU" oninput="updateLiveContent()">
+        <div class="tag-quick-picks">
+          <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('CHUNG VUI NHÀ CÔ DÂU')">Nhà Cô Dâu</button>
+          <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('CHUNG VUI NHÀ CHÚ RỂ')">Nhà Chú Rể</button>
+          <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('CHUNG VUI CÙNG GIA ĐÌNH')">Chung Vui</button>
+          <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('LỄ THÀNH HÔN')">Thành Hôn</button>
+          <button type="button" class="btn-tag-chip" onclick="setCoverSubtitle('LỄ VU QUY')">Vu Quy</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Tên Dâu - Rể Bìa (Chữ Nghệ Thuật)</label>
+        <input type="text" id="coverCoupleNamesInput" placeholder="Để trống tự động lấy tên Dâu Rể (hoặc gõ: Nhật Khánh & Minh Nguyệt)" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Tên Khách Mời In Bìa (Nếu in tên riêng)</label>
+        <input type="text" id="coverGuestNameInput" placeholder="Để trống sẽ in đường kẻ chấm để ghi tay" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Dòng Kính Mời Bìa</label>
+        <input type="text" id="coverInviteInput" value="Trân trọng kính mời:" oninput="updateLiveContent()">
+      </div>
+      <div class="form-row">
+        <label>Dòng Thông Điệp Đáy Bìa</label>
+        <input type="text" id="coverFooterInput" value="SỰ HIỆN DIỆN CỦA QUÝ KHÁCH LÀ NIỀM VINH HẠNH CHO GIA ĐÌNH CHÚNG TÔI" oninput="updateLiveContent()">
       </div>
     </div>
 
@@ -1970,7 +2090,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       </div>
 
       <!-- =============================================== -->
-      <!-- CARD 3: BÌA THIỆP NGANG (HAPPY WEDDING)           -->
+      <!-- CARD 3: BÌA THIỆP NGANG (KHỔ 180 x 120 MM)       -->
       <!-- =============================================== -->
       <div class="item-wrapper view-item-cover">
         <div class="item-title-bar">
@@ -1980,8 +2100,8 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         <div class="wedding-card card-horizontal" id="cardCover">
           <!-- Luxury Card Border Frame -->
           <div class="card-luxury-frame">
-            <div class="frame-outer-line"></div>
-            <div class="frame-inner-delicate"></div>
+            <div class="frame-outer-line" style="opacity: 0.65;"></div>
+            <div class="frame-inner-delicate" style="opacity: 0.5;"></div>
             <div class="frame-corner-dot corner-tl"></div>
             <div class="frame-corner-dot corner-tr"></div>
             <div class="frame-corner-dot corner-bl"></div>
@@ -1991,24 +2111,41 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           <div class="card-inner-content">
             <div class="cover-card-container">
               
-              <!-- Calligraphy "Happy" (Left) -->
-              <div class="cover-script-happy">Happy</div>
+              <!-- LEFT COLUMN: Typography & Content (Width ~88mm) -->
+              <div class="cover-left-col">
+                <!-- Top: Hero Date & Subtitle -->
+                <div class="cover-header-group">
+                  <div class="cover-date-hero" id="coverDateHeroText">08.12.26</div>
+                  <div class="cover-event-tag" id="coverEventTagText">CHUNG VUI NHÀ CÔ DÂU</div>
+                </div>
 
-              <!-- Center Floral Arch with Couple -->
-              <div class="cover-art-center">
-                <img src="./assets/couple_arch.png" alt="Wedding Couple Under Arch" class="cover-art-img" id="coupleArchImg" onerror="if(window.ASSET_BASE64&&window.ASSET_BASE64.arch)this.src=window.ASSET_BASE64.arch;">
+                <!-- Middle: Couple Calligraphy Names -->
+                <div class="cover-names-group">
+                  <div class="cover-couple-names" id="coverCoupleNamesText">
+                    <span class="cover-name-line1" id="coverNameLine1">Nhật Khánh &amp;</span>
+                    <span class="cover-name-line2" id="coverNameLine2">Minh Nguyệt</span>
+                  </div>
+                </div>
+
+                <!-- Bottom: Invitation Line & Micro-Footer -->
+                <div class="cover-footer-group">
+                  <div class="cover-invite-row">
+                    <span class="cover-invite-label" id="coverInviteLabelText">Trân trọng kính mời:</span>
+                    <span class="cover-guest-slot" id="coverGuestSlotText"></span>
+                  </div>
+                  <div class="cover-bottom-microtext" id="coverBottomMicrotext">
+                    SỰ HIỆN DIỆN CỦA QUÝ KHÁCH LÀ NIỀM VINH HẠNH CHO GIA ĐÌNH CHÚNG TÔI
+                  </div>
+                </div>
               </div>
 
-              <!-- Calligraphy "Wedding" (Right) -->
-              <div class="cover-script-wedding">Wedding</div>
-
-              <!-- Bottom Row: Guest Line & Date -->
-              <div class="cover-bottom-row">
-                <div class="cover-guest-line">
-                  <span>TRÂN TRỌNG KÍNH MỜI:</span>
-                  <span class="guest-line-dots"></span>
-                </div>
-                <div class="cover-date-big" id="coverDateText">20 . 12 . 2026</div>
+              <!-- RIGHT COLUMN: Romantic Couple & Bow Arch Illustration -->
+              <div class="cover-right-art">
+                <img src="./assets/couple_bow_arch.png" 
+                     alt="Wedding Couple Under Bow Arch" 
+                     class="cover-bow-arch-img" 
+                     id="coupleBowArchImg" 
+                     onerror="if(window.ASSET_BASE64&&window.ASSET_BASE64.couple_bow_arch)this.src=window.ASSET_BASE64.couple_bow_arch; else if(window.ASSET_BASE64&&window.ASSET_BASE64.arch)this.src=window.ASSET_BASE64.arch;">
               </div>
 
             </div>
@@ -2144,9 +2281,22 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     });
 
     // Cover text colors
-    document.querySelectorAll('.cover-script-happy, .cover-script-wedding').forEach(el => {
-      el.style.color = theme.coverText;
-    });
+    const coverDateHero = document.getElementById('coverDateHeroText');
+    if (coverDateHero) coverDateHero.style.color = theme.accent;
+    const coverEventTag = document.getElementById('coverEventTagText');
+    if (coverEventTag) {
+      coverEventTag.style.color = theme.accent;
+      coverEventTag.style.borderBottomColor = theme.divider;
+    }
+    const coverNames = document.getElementById('coverCoupleNamesText');
+    if (coverNames) coverNames.style.color = theme.calligraphy;
+    const coverInvite = document.getElementById('coverInviteLabelText');
+    if (coverInvite) coverInvite.style.color = theme.accent;
+    const coverGuest = document.getElementById('coverGuestSlotText');
+    if (coverGuest) {
+      coverGuest.style.color = theme.calligraphy;
+      coverGuest.style.borderBottomColor = theme.divider;
+    }
 
     // Ornament icon
     document.querySelectorAll('.announcement-ornament-svg').forEach(svg => {
@@ -2286,11 +2436,76 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     document.getElementById('partyQuoteText').innerHTML = document.getElementById('partyQuoteInput').value.replace(/\n/g, '<br>');
 
     // Cover Card
-    const coverDate = document.getElementById('coverDateInput').value;
-    document.getElementById('coverDateText').innerText = coverDate;
+    const coverDate = document.getElementById('coverDateInput')?.value || '';
+    const coverHero = document.getElementById('coverDateHeroText');
+    if (coverHero) coverHero.innerText = coverDate;
+
+    const coverSub = document.getElementById('coverSubtitleInput')?.value || '';
+    const coverTag = document.getElementById('coverEventTagText');
+    if (coverTag) coverTag.innerText = coverSub;
+
+    // Cover Couple Names
+    updateCoverNames();
+
+    // Cover Guest Name & Invite Line
+    const coverGuestName = document.getElementById('coverGuestNameInput')?.value || '';
+    const coverGuestSlot = document.getElementById('coverGuestSlotText');
+    if (coverGuestSlot) {
+      coverGuestSlot.innerText = coverGuestName;
+    }
+
+    const coverInvite = document.getElementById('coverInviteInput')?.value || 'Trân trọng kính mời:';
+    const coverInviteLabel = document.getElementById('coverInviteLabelText');
+    if (coverInviteLabel) coverInviteLabel.innerText = coverInvite;
+
+    const coverFooter = document.getElementById('coverFooterInput')?.value || '';
+    const coverBottomMicro = document.getElementById('coverBottomMicrotext');
+    if (coverBottomMicro) coverBottomMicro.innerText = coverFooter;
 
     // Sync Section 4 Combined Bi-Fold Spread
     syncCombinedSpread();
+  }
+
+  function updateCoverNames() {
+    const customInput = document.getElementById('coverCoupleNamesInput');
+    const groom = (document.getElementById('groomNameInput')?.value || '').trim();
+    const bride = (document.getElementById('brideNameInput')?.value || '').trim();
+    const line1 = document.getElementById('coverNameLine1');
+    const line2 = document.getElementById('coverNameLine2');
+    if (!line1 || !line2) return;
+
+    let val = customInput ? customInput.value.trim() : '';
+    if (!val) {
+      const eventType = (document.getElementById('coverSubtitleInput')?.value || '').toUpperCase();
+      if (eventType.includes('DÂU') || eventType.includes('GÁI') || eventType.includes('VU QUY')) {
+        line1.innerText = (bride || 'Cô Dâu') + ' &';
+        line2.innerText = (groom || 'Chú Rể');
+      } else {
+        line1.innerText = (groom || 'Chú Rể') + ' &';
+        line2.innerText = (bride || 'Cô Dâu');
+      }
+    } else {
+      if (val.includes('\n')) {
+        const parts = val.split('\n');
+        line1.innerText = parts[0].trim();
+        line2.innerText = parts.slice(1).join(' ').trim();
+      } else if (val.includes('&')) {
+        const parts = val.split('&');
+        line1.innerText = parts[0].trim() + ' &';
+        line2.innerText = parts.slice(1).join('&').trim();
+      } else {
+        line1.innerText = val;
+        line2.innerText = '';
+      }
+    }
+  }
+
+  function setCoverSubtitle(val) {
+    const input = document.getElementById('coverSubtitleInput');
+    if (input) {
+      input.value = val;
+      updateLiveContent();
+    }
   }
 
   function uploadQrImage(e) {
@@ -2344,6 +2559,11 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     document.getElementById('groomNameAnnounceText').style.fontFamily = selectedFont;
     document.getElementById('brideNameAnnounceText').style.fontFamily = selectedFont;
     document.getElementById('partyQuoteText').style.fontFamily = selectedFont;
+
+    const coverNames = document.getElementById('coverCoupleNamesText');
+    if (coverNames) {
+      coverNames.style.fontFamily = selectedFont;
+    }
   }
 
   function switchView(viewMode) {
@@ -2458,14 +2678,11 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     });
 
     // 2. Fix gold gradient text: html2canvas renders -webkit-background-clip: text as an opaque box
-    clone.querySelectorAll('.restaurant-name-calligraphy, .couple-name-calligraphy-announcement, .gold-highlight-text').forEach(el => {
+    clone.querySelectorAll('.restaurant-name-calligraphy, .couple-name-calligraphy-announcement, .gold-highlight-text, .cover-couple-names').forEach(el => {
       el.style.setProperty('background', 'none', 'important');
       el.style.setProperty('-webkit-background-clip', 'border-box', 'important');
       el.style.setProperty('background-clip', 'border-box', 'important');
       el.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
-      el.style.setProperty('color', '#a6741b', 'important');
-      el.style.setProperty('text-shadow', '0 1px 2px rgba(122, 82, 10, 0.35)', 'important');
-      el.style.setProperty('filter', 'none', 'important');
     });
 
     // 3. Ensure all cloned images use transparent PNG base64 assets
@@ -2478,6 +2695,8 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       if (chairImg && window.ASSET_BASE64.chair) chairImg.src = window.ASSET_BASE64.chair;
       const archImg = clone.querySelector('#coupleArchImg, .cover-art-img');
       if (archImg && window.ASSET_BASE64.arch) archImg.src = window.ASSET_BASE64.arch;
+      const bowArchImg = clone.querySelector('#coupleBowArchImg, .cover-bow-arch-img');
+      if (bowArchImg && window.ASSET_BASE64.couple_bow_arch) bowArchImg.src = window.ASSET_BASE64.couple_bow_arch;
     }
 
     // 4. Remove onerror attributes on all cloned images to prevent external network fallbacks
@@ -2797,6 +3016,8 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       if (chairImg && window.ASSET_BASE64.chair) chairImg.src = window.ASSET_BASE64.chair;
       const archImg = document.getElementById('coupleArchImg');
       if (archImg && window.ASSET_BASE64.arch) archImg.src = window.ASSET_BASE64.arch;
+      const bowArchImg = document.getElementById('coupleBowArchImg');
+      if (bowArchImg && window.ASSET_BASE64.couple_bow_arch) bowArchImg.src = window.ASSET_BASE64.couple_bow_arch;
     }
   }
 
