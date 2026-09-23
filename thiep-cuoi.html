@@ -2544,6 +2544,25 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       if (qrImg) {
         delete qrImg.dataset.customUploaded;
       }
+
+      // Tự động chuyển thông tin thiệp offline theo lựa chọn QR:
+      // Chọn Lễ Thành Hôn (Nhà Trai) -> Offline là Nhà Trai, Các tùy chọn còn lại -> Offline là Nhà Gái
+      const isNhaTrai = (select.selectedIndex === 0 || (select.value.indexOf('type=') === -1 && select.value !== 'custom'));
+      
+      const placeLeadInput = document.getElementById('ceremonyPlaceLeadInput');
+      const subtitleInput = document.getElementById('coverSubtitleInput');
+      const restaurantInput = document.getElementById('partyRestaurantInput');
+
+      if (isNhaTrai) {
+        if (placeLeadInput) placeLeadInput.value = "HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ TRAI";
+        if (subtitleInput) subtitleInput.value = "CHUNG VUI NHÀ CHÚ RỂ";
+        if (restaurantInput && restaurantInput.value.includes('Nhà Gái')) restaurantInput.value = "Tư Gia Nhà Trai";
+      } else {
+        if (placeLeadInput) placeLeadInput.value = "HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ GÁI";
+        if (subtitleInput) subtitleInput.value = "CHUNG VUI NHÀ CÔ DÂU";
+        if (restaurantInput && restaurantInput.value.includes('Nhà Trai')) restaurantInput.value = "Tư Gia Nhà Gái";
+      }
+
       updateLiveContent();
     }
   }
@@ -2555,6 +2574,22 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       const val = urlInput.value.trim();
       const matched = Array.from(select.options).find(opt => opt.value === val);
       select.value = matched ? matched.value : 'custom';
+
+      const isNhaTrai = (select.selectedIndex === 0 || (val.indexOf('type=VK') === -1 && val.indexOf('type=all') === -1 && val.indexOf('bride') === -1 && val.indexOf('naptai') === -1));
+
+      const placeLeadInput = document.getElementById('ceremonyPlaceLeadInput');
+      const subtitleInput = document.getElementById('coverSubtitleInput');
+      const restaurantInput = document.getElementById('partyRestaurantInput');
+
+      if (isNhaTrai) {
+        if (placeLeadInput) placeLeadInput.value = "HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ TRAI";
+        if (subtitleInput) subtitleInput.value = "CHUNG VUI NHÀ CHÚ RỂ";
+        if (restaurantInput && restaurantInput.value.includes('Nhà Gái')) restaurantInput.value = "Tư Gia Nhà Trai";
+      } else {
+        if (placeLeadInput) placeLeadInput.value = "HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ GÁI";
+        if (subtitleInput) subtitleInput.value = "CHUNG VUI NHÀ CÔ DÂU";
+        if (restaurantInput && restaurantInput.value.includes('Nhà Trai')) restaurantInput.value = "Tư Gia Nhà Gái";
+      }
     }
     const qrImg = document.getElementById('ceremonyQrImg');
     if (qrImg) {
