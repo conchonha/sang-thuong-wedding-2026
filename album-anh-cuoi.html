@@ -11,7 +11,7 @@
   <meta property="og:title" content="Album Ảnh Cưới | Thái Bá Sang &amp; Phạm Thị Thương">
   <meta property="og:description" content="Trọn bộ album ảnh cưới 1.479 khoảnh khắc hạnh phúc của Thái Bá Sang &amp; Phạm Thị Thương. Tìm kiếm, thả tim lưu ảnh yêu thích và tải về máy.">
   <meta property="og:image" content="album_anh_cuoi_thumbs/DSC04840.JPG">
-  <meta name="description" content="Album ảnh cưới trọn bộ của Thái Bá Sang &amp; Phạm Thị Thương với 1,479 hình ảnh sắc nét. Trình chiếu phóng to 10x, click chuột &amp; vuốt di chuyển tự do khi zoom, chế độ xem full màn ảnh ẩn nút chuyển, thả tim lưu danh sách yêu thích và tải ảnh chất lượng gốc.">
+  <meta name="description" content="Album ảnh cưới trọn bộ của Thái Bá Sang &amp; Phạm Thị Thương với 1,479 hình ảnh sắc nét. Trình chiếu phóng to 10x độ nét gốc 24MP, click chuột &amp; vuốt di chuyển tự do khi zoom, chế độ xem full màn ảnh ẩn nút chuyển, thả tim lưu danh sách yêu thích và tải ảnh chất lượng gốc.">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📸</text></svg>">
@@ -669,28 +669,24 @@
 
     .lb-image-container {
       position: relative;
-      max-width: 95vw;
-      max-height: 85vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      will-change: transform;
+      will-change: transform, width, height;
       transform-origin: center center;
-      transition: max-width 0.3s ease, max-height 0.3s ease;
     }
 
-    /* Disable native image drag on browser */
+    /* Ultra-High Resolution 24MP Original Image Display */
     .lb-image-container img {
-      max-width: 95vw;
-      max-height: 85vh;
-      object-fit: contain;
+      display: block;
       border-radius: 8px;
       box-shadow: 0 15px 50px rgba(0,0,0,0.8), 0 0 30px rgba(212, 175, 55, 0.15);
       user-select: none;
       -webkit-user-select: none;
       -webkit-user-drag: none;
       pointer-events: auto;
-      transition: max-width 0.3s ease, max-height 0.3s ease, border-radius 0.3s ease;
+      image-rendering: high-quality;
+      image-rendering: -webkit-optimize-contrast;
     }
 
     /* Nav Buttons on Desktop & Mobile */
@@ -780,23 +776,6 @@
       padding: 0;
     }
 
-    .lightbox-modal.is-stage-fullscreen .lb-image-container {
-      max-width: 100vw;
-      max-height: 100vh;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    .lightbox-modal.is-stage-fullscreen .lb-image-container img {
-      max-width: 100vw;
-      max-height: 100vh;
-      width: 100vw;
-      height: 100vh;
-      border-radius: 0;
-      box-shadow: none;
-      object-fit: contain;
-    }
-
     .lightbox-modal.is-stage-fullscreen .lb-header {
       position: absolute;
       top: 0;
@@ -872,7 +851,7 @@
       <h1 class="album-hero-title">ALBUM ẢNH CƯỚI TRỌN BỘ</h1>
       <p class="album-hero-desc">
         Tổng hợp tất cả khoảnh khắc rạng rỡ của <strong>Thái Bá Sang &amp; Phạm Thị Thương</strong>. 
-        Chạm vào ảnh bất kỳ để mở trình chiếu phóng to <strong>tối đa 10x</strong>, click giữ chuột hoặc chạm tay di chuyển tự do khi zoom, bật chế độ Full màn ảnh, thả tim lưu ảnh yêu thích và tải ảnh gốc về máy!
+        Chạm vào ảnh bất kỳ để mở trình chiếu phóng to <strong>tối đa 10x độ nét gốc 24MP</strong>, click giữ chuột hoặc chạm tay di chuyển tự do khi zoom, bật chế độ Full màn ảnh, thả tim lưu ảnh yêu thích và tải ảnh gốc về máy!
       </p>
 
       <!-- Filter Categories Bar: All vs Favorites -->
@@ -979,7 +958,7 @@
       <!-- Bottom Zoom & Gesture Control Bar -->
       <div class="lb-bottom-toolbar">
         <button class="lb-zoom-btn" id="lb-zoom-out" type="button" title="Thu nhỏ (-)">-</button>
-        <span class="lb-hint-text" id="lb-hint-text">🔍 Zoom (1x - 10x) | Click giữ chuột / Chạm tay di chuyển khi zoom</span>
+        <span class="lb-hint-text" id="lb-hint-text">🔍 Zoom độ nét gốc (1x - 10x) | Click giữ chuột / Chạm tay di chuyển</span>
         <button class="lb-zoom-btn" id="lb-zoom-in" type="button" title="Phóng to (+)">+</button>
         <button class="lb-zoom-btn" id="lb-zoom-reset" type="button" title="Đặt lại zoom (1x)" style="font-size: 0.75rem; width: auto; padding: 0 8px; border-radius: 12px;">1x</button>
       </div>
@@ -1145,12 +1124,31 @@
         }
       };
 
-      // Zoom & Pan state (MAX SCALE UP TO 10X)
+      // Zoom & Pan state (MAX SCALE UP TO 10X REAL 24MP CRISP RENDERING)
       const MIN_SCALE = 1.0;
       const MAX_SCALE = 10.0;
       let scale = 1.0;
       let panX = 0;
       let panY = 0;
+
+      // Calculate Fit Dimensions at 1x
+      function getFitDimensions() {
+        const stageW = lbStage.clientWidth || window.innerWidth;
+        const stageH = lbStage.clientHeight || window.innerHeight;
+
+        const natW = lbImage.naturalWidth || 1920;
+        const natH = lbImage.naturalHeight || 1080;
+
+        const maxW = stageW * (isStageFullscreen ? 1.0 : 0.95);
+        const maxH = stageH * (isStageFullscreen ? 1.0 : 0.85);
+
+        const ratio = Math.min(maxW / natW, maxH / natH, 1.0);
+
+        const fitW = natW * ratio;
+        const fitH = natH * ratio;
+
+        return { fitW, fitH, natW, natH, stageW, stageH };
+      }
 
       // Calculate Dynamic Pan Boundaries
       function clampPan() {
@@ -1160,27 +1158,44 @@
           return;
         }
 
-        const stageWidth = lbStage.clientWidth || window.innerWidth;
-        const stageHeight = lbStage.clientHeight || window.innerHeight;
+        const { fitW, fitH, stageW, stageH } = getFitDimensions();
+        const scaledW = fitW * scale;
+        const scaledH = fitH * scale;
 
-        const imgWidth = lbImage.offsetWidth || (stageWidth * 0.9);
-        const imgHeight = lbImage.offsetHeight || (stageHeight * 0.85);
-
-        const scaledW = imgWidth * scale;
-        const scaledH = imgHeight * scale;
-
-        const maxPanX = Math.max(0, (scaledW - stageWidth) / 2 + (stageWidth * 0.15));
-        const maxPanY = Math.max(0, (scaledH - stageHeight) / 2 + (stageHeight * 0.15));
+        const maxPanX = Math.max(0, (scaledW - stageW) / 2 + (stageW * 0.15));
+        const maxPanY = Math.max(0, (scaledH - stageH) / 2 + (stageH * 0.15));
 
         panX = Math.min(Math.max(panX, -maxPanX), maxPanX);
         panY = Math.min(Math.max(panY, -maxPanY), maxPanY);
       }
 
-      // Apply Zoom & Pan Transform Matrix
+      // Ultra-High Resolution Rendering Engine: Scaled DOM Pixels Sample Original 24MP File directly!
       function applyTransform(animate = false) {
         clampPan();
+
+        const { fitW, fitH, natW } = getFitDimensions();
+
+        lbImage.style.transition = animate ? 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none';
         lbImageContainer.style.transition = animate ? 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none';
-        lbImageContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+
+        if (scale <= 1.02) {
+          lbImage.style.width = `${fitW}px`;
+          lbImage.style.height = `${fitH}px`;
+          lbImage.style.maxWidth = `${fitW}px`;
+          lbImage.style.maxHeight = `${fitH}px`;
+          lbImageContainer.style.transform = `translate(${panX}px, ${panY}px)`;
+        } else {
+          // Render actual DOM pixel width up to original natural resolution (6000px)
+          const targetW = fitW * scale;
+          const targetH = fitH * scale;
+
+          lbImage.style.width = `${targetW}px`;
+          lbImage.style.height = `${targetH}px`;
+          lbImage.style.maxWidth = 'none';
+          lbImage.style.maxHeight = 'none';
+          lbImageContainer.style.transform = `translate(${panX}px, ${panY}px)`;
+        }
+
         lbZoomLevel.textContent = `${scale.toFixed(1)}x`;
 
         if (scale > 1.02) {
@@ -1242,7 +1257,6 @@
             card.classList.add('selected');
           }
 
-          // Use lightweight web thumbnail (60KB) for lightning-fast grid load, fallback to original if needed
           const thumbPath = `album_anh_cuoi_thumbs/${filename}`;
           const origPath = `album_anh_cuoi/${filename}`;
 
@@ -1383,6 +1397,7 @@
 
         lbImage.onload = function () {
           lbSpinner.style.display = 'none';
+          applyTransform(false);
         };
 
         lbImage.onerror = function () {
@@ -1425,6 +1440,8 @@
           lbFsText.textContent = 'Full Màn Ảnh';
           lbBtnFullscreen.title = 'Bật Full Màn Ảnh (Ẩn nút chuyển ảnh)';
         }
+
+        applyTransform(true);
       }
 
       lbBtnFullscreen.addEventListener('click', () => toggleStageFullscreen());
@@ -1476,6 +1493,7 @@
         panStartX = panX;
         panStartY = panY;
         lbStage.classList.add('grabbing');
+        lbImage.style.transition = 'none';
         lbImageContainer.style.transition = 'none';
       }
 
@@ -1535,6 +1553,7 @@
           touchMode = 'PINCH';
           initialPinchDist = getTouchDistance(e.touches);
           initialScale = scale;
+          lbImage.style.transition = 'none';
           lbImageContainer.style.transition = 'none';
         } else if (e.touches.length === 1) {
           const t = e.touches[0];
@@ -1546,6 +1565,7 @@
             dragStartX = t.clientX;
             dragStartY = t.clientY;
           }
+          lbImage.style.transition = 'none';
           lbImageContainer.style.transition = 'none';
         }
       }, { passive: false });
