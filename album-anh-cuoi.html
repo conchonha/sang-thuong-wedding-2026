@@ -1235,7 +1235,10 @@
         lbCanvas.style.width = stageW + 'px';
         lbCanvas.style.height = stageH + 'px';
 
+        // Source crop from original 24MP photo
         const sW = natW / scale, sH = natH / scale;
+
+        // Pan normalization
         const mPX = Math.max(1, (stageW * scale - stageW) / 2);
         const mPY = Math.max(1, (stageH * scale - stageH) / 2);
         const nPX = Math.min(Math.max(panX / mPX, -1), 1);
@@ -1243,11 +1246,25 @@
         const sx = Math.min(Math.max(0, (natW - sW) / 2 - nPX * (natW - sW) / 2), natW - sW);
         const sy = Math.min(Math.max(0, (natH - sH) / 2 - nPY * (natH - sH) / 2), natH - sH);
 
+        // Calculate destination rect preserving aspect ratio (no distortion!)
+        const imgAspect = sW / sH;
+        const canvasAspect = cW / cH;
+        let dw, dh, dx, dy;
+        if (imgAspect > canvasAspect) {
+          // Image wider than canvas → fit width
+          dw = cW; dh = cW / imgAspect;
+          dx = 0; dy = (cH - dh) / 2;
+        } else {
+          // Image taller than canvas → fit height
+          dh = cH; dw = cH * imgAspect;
+          dx = (cW - dw) / 2; dy = 0;
+        }
+
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
         ctx.fillStyle = '#080605';
         ctx.fillRect(0, 0, cW, cH);
-        ctx.drawImage(lbImage, sx, sy, sW, sH, 0, 0, cW, cH);
+        ctx.drawImage(lbImage, sx, sy, sW, sH, dx, dy, dw, dh);
       }
 
       function scheduleCanvasRender() {
