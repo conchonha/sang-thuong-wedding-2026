@@ -672,7 +672,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      will-change: transform, width, height;
       transform-origin: center center;
     }
 
@@ -686,7 +685,8 @@
       -webkit-user-drag: none;
       pointer-events: auto;
       image-rendering: high-quality;
-      image-rendering: -webkit-optimize-contrast;
+      image-rendering: smooth;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* Nav Buttons on Desktop & Mobile */
@@ -926,10 +926,10 @@
         </button>
 
         <!-- Download Button -->
-        <a id="lb-btn-download" href="#" download class="lb-btn lb-btn-download" title="Tải ảnh này về máy">
-          <span>📥</span>
-          <span class="lb-btn-text">Tải Ảnh</span>
-        </a>
+        <button id="lb-btn-download" class="lb-btn lb-btn-download" type="button" title="Tải ảnh gốc 24MP này về máy">
+          <span id="lb-dl-icon">📥</span>
+          <span class="lb-btn-text" id="lb-dl-text">Tải Ảnh</span>
+        </button>
 
         <!-- Close Button -->
         <button id="lb-btn-close" class="lb-btn lb-btn-close" type="button" aria-label="Đóng trình chiếu" title="Đóng (Esc)">
@@ -1158,9 +1158,9 @@
           return;
         }
 
-        const { fitW, fitH, stageW, stageH } = getFitDimensions();
-        const scaledW = fitW * scale;
-        const scaledH = fitH * scale;
+        const { fitW, fitH, natW, natH, stageW, stageH } = getFitDimensions();
+        const scaledW = natW > 0 ? Math.max(fitW * scale, fitW + (natW - fitW) * ((scale - 1) / 9.0)) : fitW * scale;
+        const scaledH = natH > 0 ? (scaledW * (natH / natW)) : (fitH * scale);
 
         const maxPanX = Math.max(0, (scaledW - stageW) / 2 + (stageW * 0.15));
         const maxPanY = Math.max(0, (scaledH - stageH) / 2 + (stageH * 0.15));
@@ -1173,7 +1173,7 @@
       function applyTransform(animate = false) {
         clampPan();
 
-        const { fitW, fitH, natW } = getFitDimensions();
+        const { fitW, fitH, natW, natH } = getFitDimensions();
 
         lbImage.style.transition = animate ? 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none';
         lbImageContainer.style.transition = animate ? 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none';
@@ -1185,9 +1185,10 @@
           lbImage.style.maxHeight = `${fitH}px`;
           lbImageContainer.style.transform = `translate(${panX}px, ${panY}px)`;
         } else {
-          // Render actual DOM pixel width up to original natural resolution (6000px)
-          const targetW = fitW * scale;
-          const targetH = fitH * scale;
+          // Scale dynamically up to full original 24MP camera sensor resolution (natW ~ 6000px)
+          const scaledW = natW > 0 ? Math.max(fitW * scale, fitW + (natW - fitW) * ((scale - 1) / 9.0)) : fitW * scale;
+          const targetW = Math.round(scaledW);
+          const targetH = Math.round(natH > 0 ? targetW * (natH / natW) : fitH * scale);
 
           lbImage.style.width = `${targetW}px`;
           lbImage.style.height = `${targetH}px`;
@@ -1221,6 +1222,67 @@
         scale = targetScale;
         applyTransform(animate);
       }
+
+      // Robust Mobile Download Engine via Binary Blob Stream
+      async function handleDownloadCurrentPhoto() {
+        if (displayedImages.length === 0 || currentIndex < 0 || currentIndex >= displayedImages.length) return;
+        const filename = displayedImages[currentIndex];
+        const imagePath = `album_anh_cuoi/${filename}`;
+
+        const dlIcon = document.getElementById('lb-dl-icon');
+        const dlText = document.getElementById('lb-dl-text');
+        const oldIcon = dlIcon ? dlIcon.textContent : '📥';
+        const oldText = dlText ? dlText.textContent : 'Tải Ảnh';
+
+        try {
+          if (dlIcon) dlIcon.textContent = '⏳';
+          if (dlText) dlText.textContent = 'Đang tải...';
+          lbBtnDownload.style.pointerEvents = 'none';
+
+          // Fetch binary blob stream directly
+          const response = await fetch(imagePath);
+          if (!response.ok) throw new Error('Network error ' + response.status);
+          const blob = await response.blob();
+
+          // Create blob URL representing binary file stream
+          const blobUrl = URL.createObjectURL(blob);
+
+          // Trigger native mobile OS file save prompt
+          const tempLink = document.createElement('a');
+          tempLink.style.display = 'none';
+          tempLink.href = blobUrl;
+          tempLink.download = filename;
+          document.body.appendChild(tempLink);
+          tempLink.click();
+          document.body.removeChild(tempLink);
+
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+
+          if (dlIcon) dlIcon.textContent = '✅';
+          if (dlText) dlText.textContent = 'Đã Tải!';
+
+          setTimeout(() => {
+            if (dlIcon) dlIcon.textContent = oldIcon;
+            if (dlText) dlText.textContent = oldText;
+            lbBtnDownload.style.pointerEvents = 'auto';
+          }, 2500);
+        } catch (err) {
+          console.warn('Blob download failed, fallback to direct open:', err);
+          const tempLink = document.createElement('a');
+          tempLink.href = imagePath;
+          tempLink.download = filename;
+          tempLink.target = '_blank';
+          document.body.appendChild(tempLink);
+          tempLink.click();
+          document.body.removeChild(tempLink);
+
+          if (dlIcon) dlIcon.textContent = oldIcon;
+          if (dlText) dlText.textContent = oldText;
+          lbBtnDownload.style.pointerEvents = 'auto';
+        }
+      }
+
+      lbBtnDownload.addEventListener('click', handleDownloadCurrentPhoto);
 
       // Render Gallery Grid with Web-Optimized Thumbnails & High-Res Fallback
       function renderGrid() {
@@ -1387,10 +1449,6 @@
 
         // Update Favorite Button State
         updateLightboxFavButton(filename);
-
-        // Update Download button link
-        lbBtnDownload.href = imagePath;
-        lbBtnDownload.download = filename;
 
         // Set image source to full resolution photo
         lbImage.src = imagePath;
