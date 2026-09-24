@@ -10,7 +10,7 @@
   <meta property="og:url" content="https://conchonha.github.io/sang-thuong-wedding-2026/album-anh-cuoi.html">
   <meta property="og:title" content="Album Ảnh Cưới | Thái Bá Sang &amp; Phạm Thị Thương">
   <meta property="og:description" content="Trọn bộ album ảnh cưới 1.479 khoảnh khắc hạnh phúc của Thái Bá Sang &amp; Phạm Thị Thương. Tìm kiếm, thả tim lưu ảnh yêu thích và tải về máy.">
-  <meta property="og:image" content="album_anh_cuoi/DSC04840.JPG">
+  <meta property="og:image" content="album_anh_cuoi_thumbs/DSC04840.JPG">
   <meta name="description" content="Album ảnh cưới trọn bộ của Thái Bá Sang &amp; Phạm Thị Thương với 1,479 hình ảnh sắc nét. Trình chiếu phóng to 10x, click chuột &amp; vuốt di chuyển tự do khi zoom, chế độ xem full màn ảnh ẩn nút chuyển, thả tim lưu danh sách yêu thích và tải ảnh chất lượng gốc.">
 
   <!-- Favicon -->
@@ -1207,7 +1207,7 @@
         applyTransform(animate);
       }
 
-      // Render Gallery Grid
+      // Render Gallery Grid with Web-Optimized Thumbnails & High-Res Fallback
       function renderGrid() {
         gridContainer.innerHTML = '';
 
@@ -1242,7 +1242,9 @@
             card.classList.add('selected');
           }
 
-          const imagePath = `album_anh_cuoi/${filename}`;
+          // Use lightweight web thumbnail (60KB) for lightning-fast grid load, fallback to original if needed
+          const thumbPath = `album_anh_cuoi_thumbs/${filename}`;
+          const origPath = `album_anh_cuoi/${filename}`;
 
           card.innerHTML = `
             <button 
@@ -1255,7 +1257,8 @@
             </button>
             <div class="card-img-wrapper">
               <img 
-                src="${imagePath}" 
+                src="${thumbPath}" 
+                onerror="this.onerror=null;this.src='${origPath}';"
                 alt="Ảnh cưới #${photoNum}" 
                 loading="lazy" 
                 decoding="async" 
@@ -1352,7 +1355,7 @@
         updateSelection(currentIndex, true);
       }
 
-      // Show Specific Image in Lightbox
+      // Show Specific Image in Lightbox - Loads Full Resolution Original Photo
       function showImageInLightbox(index) {
         if (displayedImages.length === 0) return;
         if (index < 0 || index >= displayedImages.length) return;
@@ -1375,7 +1378,7 @@
         lbBtnDownload.href = imagePath;
         lbBtnDownload.download = filename;
 
-        // Set image source
+        // Set image source to full resolution photo
         lbImage.src = imagePath;
 
         lbImage.onload = function () {
