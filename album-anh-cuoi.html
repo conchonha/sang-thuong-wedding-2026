@@ -1422,22 +1422,33 @@
 
       // ═══ PROGRESSIVE IMAGE LOADER ═══
       const thumbCache = {};
+      const highResCache = {};
       let currentHighResLoader = null;
       let highResUpgradeTimer = null;
 
       function preloadThumbnails(ci) {
         if (displayedImages.length <= 1) return;
-        const idxs = [
-          (ci + 1) % displayedImages.length,
-          (ci + 2) % displayedImages.length,
-          (ci + 3) % displayedImages.length,
-          (ci - 1 + displayedImages.length) % displayedImages.length,
-          (ci - 2 + displayedImages.length) % displayedImages.length,
-        ];
+        // Preload 7 ahead + 3 behind for ultra-smooth swiping
+        const idxs = [];
+        for (let d = 1; d <= 7; d++) idxs.push((ci + d) % displayedImages.length);
+        for (let d = 1; d <= 3; d++) idxs.push((ci - d + displayedImages.length) % displayedImages.length);
         idxs.forEach(i => {
           const fn = displayedImages[i];
-          if (fn && !thumbCache[fn]) { const im = new Image(); im.src = 'album_anh_cuoi_thumbs/' + fn; thumbCache[fn] = im; }
+          if (fn && !thumbCache[fn]) {
+            const im = new Image();
+            im.src = 'album_anh_cuoi_thumbs/' + fn;
+            thumbCache[fn] = im;
+          }
         });
+
+        // Also preload high-res for the NEXT image (most likely swipe direction)
+        const nextIdx = (ci + 1) % displayedImages.length;
+        const nextFn = displayedImages[nextIdx];
+        if (nextFn && !highResCache[nextFn]) {
+          const hr = new Image();
+          hr.src = 'album_anh_cuoi/' + nextFn;
+          highResCache[nextFn] = hr;
+        }
       }
 
       function showImageInLightbox(index) {
@@ -1448,7 +1459,7 @@
         const thumbPath = 'album_anh_cuoi_thumbs/' + filename;
         const highResPath = 'album_anh_cuoi/' + filename;
 
-        // Instant state reset
+        // ── INSTANTLY CLEAR OLD IMAGE → BLACK ──
         scale = 1.0; panX = 0; panY = 0;
         lbImage.style.display = 'block';
         if (lbCanvas) lbCanvas.style.display = 'none';
@@ -1457,7 +1468,12 @@
         lbZoomLevel.textContent = '1.0x';
         lbStage.classList.remove('grabbing');
 
-        // Update UI text instantly
+        // Wipe old image immediately — user sees black stage
+        lbImage.removeAttribute('src');
+        lbImage.style.width = '0'; lbImage.style.height = '0';
+        lbImage.style.maxWidth = '0'; lbImage.style.maxHeight = '0';
+
+        // Update UI text
         lbCounter.textContent = 'Ảnh ' + (index + 1) + ' / ' + displayedImages.length + ' (#' + pn + ')';
         updateLightboxFavButton(filename);
 
@@ -1465,8 +1481,6 @@
         if (currentHighResLoader) { currentHighResLoader.onload = null; currentHighResLoader.onerror = null; currentHighResLoader = null; }
         if (highResUpgradeTimer) { clearTimeout(highResUpgradeTimer); highResUpgradeTimer = null; }
 
-        // STEP 1: Show ~60KB thumbnail INSTANTLY
-        lbImage.src = thumbPath;
         lbSpinner.style.display = 'block';
 
         const quickFit = () => {
@@ -1477,15 +1491,49 @@
           lbImage.style.maxHeight = fitH + 'px';
         };
 
-        if (lbImage.complete && lbImage.naturalWidth > 0) { quickFit(); }
-        else { lbImage.onload = quickFit; }
+        // ── STEP 1: Check if high-res is already cached (preloaded from previous swipe) ──
+        const cachedHR = highResCache[filename];
+        if (cachedHR && cachedHR.complete && cachedHR.naturalWidth > 0) {
+          // High-res already in memory → show it instantly, skip thumbnail entirely
+          lbImage.src = highResPath;
+          lbSpinner.style.display = 'none';
+          quickFit();
+          preloadThumbnails(index);
+          updateSelection(index, false);
+          return;
+        }
 
-        // STEP 2: Load high-res after 250ms pause
+        // ── STEP 2: Use cached thumbnail if available (0ms from memory) ──
+        const cachedThumb = thumbCache[filename];
+        if (cachedThumb && cachedThumb.complete && cachedThumb.naturalWidth > 0) {
+          lbImage.src = cachedThumb.src;
+          quickFit();
+        } else {
+          // Fetch thumbnail from network
+          lbImage.src = thumbPath;
+          if (lbImage.complete && lbImage.naturalWidth > 0) { quickFit(); }
+          else { lbImage.onload = quickFit; }
+          // Cache it for future use
+          if (!thumbCache[filename]) { thumbCache[filename] = new Image(); thumbCache[filename].src = thumbPath; }
+        }
+
+        // ── STEP 3: Load high-res in background, upgrade when ready ──
         highResUpgradeTimer = setTimeout(() => {
           if (currentIndex !== index || !isLightboxOpen) return;
+
+          // Check if it was preloaded while we waited
+          const preloaded = highResCache[filename];
+          if (preloaded && preloaded.complete && preloaded.naturalWidth > 0) {
+            lbImage.src = highResPath;
+            lbSpinner.style.display = 'none';
+            quickFit();
+            return;
+          }
+
           const hr = new Image();
           currentHighResLoader = hr;
           hr.src = highResPath;
+          highResCache[filename] = hr;
           hr.onload = function () {
             if (currentIndex === index && isLightboxOpen) {
               lbImage.src = highResPath;
@@ -1494,9 +1542,9 @@
             }
           };
           hr.onerror = function () { if (currentIndex === index) lbSpinner.style.display = 'none'; };
-        }, 250);
+        }, 150);
 
-        // STEP 3: Preload adjacent
+        // ── STEP 4: Preload adjacent thumbnails + next high-res ──
         preloadThumbnails(index);
         updateSelection(index, false);
       }
