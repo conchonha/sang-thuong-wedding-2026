@@ -678,6 +678,11 @@
     /* Ultra-High Resolution 24MP Original Image Display */
     .lb-image-container img {
       display: block;
+      max-width: 95vw;
+      max-height: 85vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
       border-radius: 8px;
       box-shadow: 0 15px 50px rgba(0,0,0,0.8), 0 0 30px rgba(212, 175, 55, 0.15);
       user-select: none;
@@ -1566,7 +1571,24 @@
         updateSelection(currentIndex, true);
       }
 
-      // Show Specific Image in Lightbox - Loads Full Resolution Original Photo
+      // Progressive Fast Image Switcher + High-Res Upgrade
+      let currentHighResLoader = null;
+
+      function preloadAdjacentImages(centerIndex) {
+        if (displayedImages.length <= 1) return;
+        const next1 = (centerIndex + 1) % displayedImages.length;
+        const next2 = (centerIndex + 2) % displayedImages.length;
+        const prev1 = (centerIndex - 1 + displayedImages.length) % displayedImages.length;
+
+        [next1, next2, prev1].forEach(idx => {
+          if (displayedImages[idx]) {
+            const fname = displayedImages[idx];
+            const tImg = new Image();
+            tImg.src = `album_anh_cuoi_thumbs/${fname}`;
+          }
+        });
+      }
+
       function showImageInLightbox(index) {
         if (displayedImages.length === 0) return;
         if (index < 0 || index >= displayedImages.length) return;
@@ -1574,30 +1596,48 @@
         const filename = displayedImages[index];
         const originalIndex = allImages.indexOf(filename);
         const photoNum = originalIndex >= 0 ? originalIndex + 1 : index + 1;
-        const imagePath = `album_anh_cuoi/${filename}`;
+        const thumbPath = `album_anh_cuoi_thumbs/${filename}`;
+        const highResPath = `album_anh_cuoi/${filename}`;
 
         resetZoom(false);
         lbSpinner.style.display = 'block';
 
-        // Update text & counters
+        // Update text & counters instantly
         lbCounter.textContent = `Ảnh ${index + 1} / ${displayedImages.length} (#${photoNum})`;
-
-        // Update Favorite Button State
         updateLightboxFavButton(filename);
 
-        // Set image source to full resolution photo
-        lbImage.src = imagePath;
+        // Cancel previous high-res loader if active
+        if (currentHighResLoader) {
+          currentHighResLoader.onload = null;
+          currentHighResLoader.onerror = null;
+        }
 
-        lbImage.onload = function () {
-          lbSpinner.style.display = 'none';
-          applyTransform(false);
+        // 1. Show web-optimized ~60KB thumbnail INSTANTLY (0ms delay!)
+        lbImage.src = thumbPath;
+        applyTransform(false);
+
+        // 2. Load 5.2MB High-Res 24MP photo in background & upgrade when ready
+        const highResImg = new Image();
+        currentHighResLoader = highResImg;
+        highResImg.src = highResPath;
+
+        highResImg.onload = function () {
+          if (currentIndex === index && isLightboxOpen) {
+            lbImage.src = highResPath;
+            lbSpinner.style.display = 'none';
+            applyTransform(false);
+          }
         };
 
-        lbImage.onerror = function () {
-          lbSpinner.style.display = 'none';
+        highResImg.onerror = function () {
+          if (currentIndex === index) {
+            lbSpinner.style.display = 'none';
+          }
         };
 
-        // Sync grid selection silently while navigating inside lightbox
+        // 3. Preload adjacent thumbnails in background for zero-lag swipe
+        preloadAdjacentImages(index);
+
         updateSelection(index, false);
       }
 
