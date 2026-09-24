@@ -949,6 +949,7 @@
 
       <div class="lb-image-container" id="lb-image-container">
         <img id="lb-image" src="" alt="Ảnh cưới lớn" draggable="false" style="-webkit-user-drag: none; user-select: none;" />
+        <canvas id="lb-canvas" style="display: none; border-radius: 8px; box-shadow: 0 15px 50px rgba(0,0,0,0.8), 0 0 30px rgba(212, 175, 55, 0.15); pointer-events: auto;"></canvas>
       </div>
 
       <button class="lb-nav-btn lb-next" id="lb-btn-next" type="button" aria-label="Ảnh kế tiếp" title="Ảnh tiếp theo (Mũi tên phải)">
@@ -1169,32 +1170,85 @@
         panY = Math.min(Math.max(panY, -maxPanY), maxPanY);
       }
 
-      // Ultra-High Resolution Rendering Engine: Scaled DOM Pixels Sample Original 24MP File directly!
+      const lbCanvas = document.getElementById('lb-canvas');
+      const ctx = lbCanvas ? lbCanvas.getContext('2d', { alpha: false }) : null;
+
+      // Ultra-High Resolution 24MP Crop Engine on Canvas for 100% Optical Sharpness on Mobile
+      function renderCanvasZoom() {
+        if (!lbCanvas || !ctx || !lbImage || !lbImage.complete || lbImage.naturalWidth === 0) return;
+
+        const stageW = lbStage.clientWidth || window.innerWidth;
+        const stageH = lbStage.clientHeight || window.innerHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, 3); // Up to 3x Retina sampling
+
+        const natW = lbImage.naturalWidth;
+        const natH = lbImage.naturalHeight;
+
+        const canvasW = Math.round(stageW * dpr);
+        const canvasH = Math.round(stageH * dpr);
+
+        if (lbCanvas.width !== canvasW || lbCanvas.height !== canvasH) {
+          lbCanvas.width = canvasW;
+          lbCanvas.height = canvasH;
+        }
+
+        lbCanvas.style.width = `${stageW}px`;
+        lbCanvas.style.height = `${stageH}px`;
+
+        // Calculate source crop size [sW, sH] inside original 6000x4000 camera photo
+        const sW = natW / scale;
+        const sH = natH / scale;
+
+        // Calculate pan limits in screen space
+        const maxPanX = Math.max(1, (stageW * scale - stageW) / 2);
+        const maxPanY = Math.max(1, (stageH * scale - stageH) / 2);
+
+        // Normalize pan values (-1 .. +1)
+        const normPanX = Math.min(Math.max(panX / maxPanX, -1), 1);
+        const normPanY = Math.min(Math.max(panY / maxPanY, -1), 1);
+
+        const maxShiftX = (natW - sW) / 2;
+        const maxShiftY = (natH - sH) / 2;
+
+        const sx = Math.min(Math.max(0, (natW - sW) / 2 - normPanX * maxShiftX), natW - sW);
+        const sy = Math.min(Math.max(0, (natH - sH) / 2 - normPanY * maxShiftY), natH - sH);
+
+        // High-Quality bicubic canvas drawing directly from uncompressed 24MP image buffer
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.fillStyle = '#080605';
+        ctx.fillRect(0, 0, canvasW, canvasH);
+        ctx.drawImage(lbImage, sx, sy, sW, sH, 0, 0, canvasW, canvasH);
+      }
+
+      // Ultra-High Resolution Rendering Engine: Hybrid HTML Image (1x) + 24MP Canvas Crop (>1x)
       function applyTransform(animate = false) {
         clampPan();
 
-        const { fitW, fitH, natW, natH } = getFitDimensions();
-
-        lbImage.style.transition = animate ? 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none';
-        lbImageContainer.style.transition = animate ? 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none';
+        const { fitW, fitH } = getFitDimensions();
 
         if (scale <= 1.02) {
+          // Unzoomed 1x: Display standard HTML img for smooth transitions & swipe
+          lbImage.style.display = 'block';
+          if (lbCanvas) lbCanvas.style.display = 'none';
+
+          lbImage.style.transition = animate ? 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none';
+          lbImageContainer.style.transition = animate ? 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)' : 'none';
+
           lbImage.style.width = `${fitW}px`;
           lbImage.style.height = `${fitH}px`;
           lbImage.style.maxWidth = `${fitW}px`;
           lbImage.style.maxHeight = `${fitH}px`;
           lbImageContainer.style.transform = `translate(${panX}px, ${panY}px)`;
         } else {
-          // Scale dynamically up to full original 24MP camera sensor resolution (natW ~ 6000px)
-          const scaledW = natW > 0 ? Math.max(fitW * scale, fitW + (natW - fitW) * ((scale - 1) / 9.0)) : fitW * scale;
-          const targetW = Math.round(scaledW);
-          const targetH = Math.round(natH > 0 ? targetW * (natH / natW) : fitH * scale);
+          // Zoomed >1x: Render via 24MP Canvas Engine for 100% Razor-Sharp Retina Detail
+          lbImage.style.display = 'none';
+          if (lbCanvas) {
+            lbCanvas.style.display = 'block';
+          }
+          lbImageContainer.style.transform = 'none';
 
-          lbImage.style.width = `${targetW}px`;
-          lbImage.style.height = `${targetH}px`;
-          lbImage.style.maxWidth = 'none';
-          lbImage.style.maxHeight = 'none';
-          lbImageContainer.style.transform = `translate(${panX}px, ${panY}px)`;
+          renderCanvasZoom();
         }
 
         lbZoomLevel.textContent = `${scale.toFixed(1)}x`;
