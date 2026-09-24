@@ -1763,9 +1763,149 @@
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
-    body.sidebar-open .sidebar-overlay {
-      opacity: 1;
-      visibility: visible;
+    /* =======================================================
+       MOBILE & SMALL TABLET RESPONSIVE STYLES (Screen <= 768px)
+       ======================================================= */
+    @media (max-width: 768px) {
+      .btn-sidebar-toggle {
+        top: 10px;
+        left: 10px;
+        padding: 7px 12px;
+        font-size: 12px;
+      }
+
+      .sidebar {
+        width: 100vw;
+        max-width: 100vw;
+        padding: 16px 14px 36px;
+      }
+
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .theme-color-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+
+      .paper-tone-row {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .preview-workspace {
+        padding: 12px 10px 40px !important;
+        width: 100vw !important;
+        overflow-x: hidden !important;
+      }
+
+      .preview-toolbar {
+        padding: 10px 12px 10px 135px !important;
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .preview-info {
+        font-size: 11px;
+        line-height: 1.4;
+        text-align: left;
+      }
+
+      .preview-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+      }
+
+      .btn-export {
+        flex: 1 1 calc(50% - 6px);
+        font-size: 11px;
+        padding: 7px 8px;
+        justify-content: center;
+      }
+
+      .cards-flow {
+        width: 100% !important;
+        max-width: 100vw !important;
+        align-items: center !important;
+        overflow-x: hidden !important;
+        gap: 24px;
+      }
+
+      .item-wrapper {
+        width: 100% !important;
+        max-width: 100vw !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        overflow: hidden !important;
+      }
+
+      .item-title-bar {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        font-size: 12px;
+        padding: 8px 10px;
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 6px;
+      }
+
+      .tab-view-selector {
+        width: 100%;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
+        gap: 6px;
+      }
+
+      .tab-btn {
+        white-space: nowrap;
+        flex-shrink: 0;
+        padding: 6px 12px;
+        font-size: 11.5px;
+      }
+
+      /* CARD PREVIEW RESPONSIVE SCALING FOR MOBILE VIEWPORTS */
+      .card-vertical {
+        transform: scale(min(1, calc((100vw - 20px) / 453)));
+        transform-origin: top center;
+        margin-bottom: calc(-1 * (180mm * (1 - min(1, calc((100vw - 20px) / 453)))));
+      }
+
+      .card-horizontal {
+        transform: scale(min(1, calc((100vw - 20px) / 680)));
+        transform-origin: top center;
+        margin-bottom: calc(-1 * (120mm * (1 - min(1, calc((100vw - 20px) / 680)))));
+      }
+
+      .card-combined-spread {
+        transform: scale(min(1, calc((100vw - 20px) / 907)));
+        transform-origin: top center;
+        margin-bottom: calc(-1 * (180mm * (1 - min(1, calc((100vw - 20px) / 907)))));
+      }
+
+      /* PRINT GUIDE SECTION MOBILE OPTIMIZATIONS */
+      .print-guide-card {
+        padding: 16px 12px;
+      }
+
+      .guide-steps-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .guide-spec-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
     }
 
     /* PRINT LAYOUT OPTIMIZATIONS */
