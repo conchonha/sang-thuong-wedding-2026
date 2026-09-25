@@ -365,31 +365,61 @@
       top: 8px;
       left: 8px;
       z-index: 6;
-      width: 34px;
+      min-width: 34px;
       height: 34px;
-      border-radius: 50%;
-      background: rgba(18, 14, 11, 0.8);
+      padding: 0 8px;
+      border-radius: 17px;
+      background: rgba(18, 14, 11, 0.82);
       border: 1px solid rgba(212, 175, 55, 0.45);
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.05rem;
+      gap: 5px;
+      font-size: 1rem;
       color: #ffffff;
       cursor: pointer;
       backdrop-filter: blur(6px);
-      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s ease;
+      -webkit-backdrop-filter: blur(6px);
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      user-select: none;
     }
 
     .card-fav-btn:hover {
-      transform: scale(1.2);
+      transform: scale(1.12);
       background: rgba(0, 0, 0, 0.95);
+      border-color: rgba(212, 175, 55, 0.8);
     }
 
     .card-fav-btn.is-favorite {
-      background: rgba(220, 53, 69, 0.9);
+      background: rgba(220, 53, 69, 0.92);
       border-color: #ff4d6d;
       color: #ffffff;
-      box-shadow: 0 0 12px rgba(255, 77, 109, 0.7);
+      box-shadow: 0 0 14px rgba(255, 77, 109, 0.75);
+    }
+
+    .card-fav-btn.has-likes:not(.is-favorite) {
+      background: rgba(28, 22, 18, 0.88);
+      border-color: rgba(212, 175, 55, 0.7);
+    }
+
+    .card-fav-icon {
+      font-size: 1rem;
+      line-height: 1;
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+
+    .card-fav-btn:active .card-fav-icon {
+      transform: scale(1.3);
+    }
+
+    .card-fav-count {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1;
+      font-family: inherit;
+      letter-spacing: 0.2px;
     }
 
     .card-img-wrapper {
@@ -594,6 +624,21 @@
       background: rgba(255, 255, 255, 0.12);
       border: 1px solid rgba(255, 255, 255, 0.3);
       color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lb-fav-badge {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      line-height: 1.4;
+      display: inline-block;
     }
 
     .lb-btn-fav.active {
@@ -1292,6 +1337,7 @@
         <button id="lb-btn-fav" class="lb-btn lb-btn-fav" type="button" title="Lưu vào danh sách yêu thích">
           <span id="lb-fav-icon">🤍</span>
           <span class="lb-btn-text" id="lb-fav-text">Yêu thích</span>
+          <span class="lb-fav-badge" id="lb-fav-count" style="display: none;">0</span>
         </button>
 
         <!-- Slide Stage Fullscreen Toggle Button (Full Màn Ảnh - Ẩn nút Pre/Next) -->
@@ -1454,86 +1500,283 @@
       let isLightboxOpen = false;
       let isStageFullscreen = false;
 
-      // LocalStorage Key for Favorites
-      const FAV_STORAGE_KEY = 'wedding_album_favorites_v1';
+      // ════ GOOGLE SHEETS ONLINE LIKES CONFIGURATION (TRANG TÍNH MỚI) ════
+      const GOOGLE_ALBUM_SHEET_ID = '1IsgJXQ_QzPfXk0iqZGp9zssxqr-A6MB3KKtra8UBS04';
+      // URL Web App của Trang tính mới sau khi Deploy file google_apps_script_album.gs:
+      let GOOGLE_ALBUM_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyzfXOm2_VtWz3HQe4vHgRvvTWbfMTGvu6Y_rW-e93QPQ3S-Ps9HScfcW4IwHlpsIDWQ/exec';
 
-      function loadFavorites() {
+      // Lưu trữ lượt thích online từ Google Sheet: { 'DSC04840.JPG': 5, ... }
+      let photoLikesMap = {};
+
+      // Local tracking chỉ ghi nhớ những ảnh mà thiết bị này đang bấm yêu thích
+      const USER_LIKED_STORAGE_KEY = 'wedding_album_user_liked_v2';
+      function loadUserLikedSet() {
         try {
-          const stored = localStorage.getItem(FAV_STORAGE_KEY);
+          const stored = localStorage.getItem(USER_LIKED_STORAGE_KEY);
           return stored ? new Set(JSON.parse(stored)) : new Set();
         } catch (e) {
           return new Set();
         }
       }
 
-      function saveFavorites() {
+      function saveUserLikedSet() {
         try {
-          localStorage.setItem(FAV_STORAGE_KEY, JSON.stringify(Array.from(favoritesSet)));
+          localStorage.setItem(USER_LIKED_STORAGE_KEY, JSON.stringify(Array.from(userLikedSet)));
         } catch (e) {}
       }
 
-      const favoritesSet = loadFavorites();
+      const userLikedSet = loadUserLikedSet();
 
-      // Update counters
+      // Lấy link ảnh đầy đủ để đẩy lên Google Sheet
+      function getImageFullUrl(filename) {
+        try {
+          const loc = window.location;
+          const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/') + 1);
+          return `${loc.origin}${basePath}album_anh_cuoi/${filename}`;
+        } catch (e) {
+          return `album_anh_cuoi/${filename}`;
+        }
+      }
+
+      // Đếm và cập nhật số lượng badge
       function updateCounters() {
         if (totalBadge) totalBadge.textContent = `${totalImages.toLocaleString('vi-VN')} Ảnh`;
         if (pillAllCount) pillAllCount.textContent = totalImages.toLocaleString('vi-VN');
-        if (pillFavCount) pillFavCount.textContent = favoritesSet.size.toLocaleString('vi-VN');
+        const likedCount = Object.keys(photoLikesMap).filter(k => (photoLikesMap[k] || 0) > 0).length;
+        if (pillFavCount) pillFavCount.textContent = likedCount.toLocaleString('vi-VN');
       }
 
-      // Check if filename is favorited
-      function isFavorite(filename) {
-        return favoritesSet.has(filename);
+      // Kiểm tra ảnh đã được thiết bị này thích chưa
+      function isUserLiked(filename) {
+        return userLikedSet.has(filename);
       }
 
-      // Toggle favorite state
-      function toggleFavorite(filename, e) {
-        if (e) e.stopPropagation();
+      // Lấy số lượt thích online của ảnh
+      function getPhotoLikes(filename) {
+        return photoLikesMap[filename] || 0;
+      }
 
-        if (favoritesSet.has(filename)) {
-          favoritesSet.delete(filename);
-        } else {
-          favoritesSet.add(filename);
+      // Lấy danh sách ảnh đã thích, sắp xếp: nhiều lượt thích hiển thị trước, ít hiển thị sau
+      function getLikedImagesSorted() {
+        const liked = allImages.filter(fn => (photoLikesMap[fn] || 0) > 0);
+        liked.sort((a, b) => {
+          const likesA = photoLikesMap[a] || 0;
+          const likesB = photoLikesMap[b] || 0;
+          if (likesB !== likesA) return likesB - likesA; // Nhiều thích hơn xếp trước
+          return allImages.indexOf(a) - allImages.indexOf(b); // Bằng nhau thì xếp theo STT gốc
+        });
+        return liked;
+      }
+
+      // Đọc dữ liệu lượt thích từ Google Sheet Online (Dùng GViz API siêu tốc, hoàn toàn không bị CORS)
+      async function fetchOnlineLikes() {
+        try {
+          const gvizUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_ALBUM_SHEET_ID}/gviz/tq?tqx=out:json&t=${Date.now()}`;
+          const res = await fetch(gvizUrl);
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const text = await res.text();
+          const start = text.indexOf('{');
+          const end = text.lastIndexOf('}');
+          if (start !== -1 && end !== -1) {
+            const json = JSON.parse(text.substring(start, end + 1));
+            applyGvizLikesData(json);
+            return;
+          }
+        } catch (err) {
+          console.warn('Lỗi đọc GViz, thử đọc qua Apps Script Web App:', err);
+          if (GOOGLE_ALBUM_SCRIPT_URL) {
+            try {
+              const res = await fetch(`${GOOGLE_ALBUM_SCRIPT_URL}?action=get_likes&t=${Date.now()}`);
+              const json = await res.json();
+              if (json && json.success && Array.isArray(json.data)) {
+                applyScriptLikesData(json.data);
+              }
+            } catch (e2) {
+              console.warn('Lỗi đọc Apps Script:', e2);
+            }
+          }
         }
+      }
 
-        saveFavorites();
-        updateCounters();
+      function applyGvizLikesData(json) {
+        if (!json || !json.table || !json.table.rows) return;
+        const rows = json.table.rows;
+        const newMap = {};
 
-        // Update card UI on grid
-        const cards = gridContainer.querySelectorAll(`[data-filename="${filename}"]`);
-        cards.forEach(card => {
-          const favBtn = card.querySelector('.card-fav-btn');
-          if (favBtn) {
-            const fav = isFavorite(filename);
-            favBtn.classList.toggle('is-favorite', fav);
-            favBtn.innerHTML = fav ? '❤️' : '🤍';
-            favBtn.title = fav ? 'Đã thích' : 'Thêm vào yêu thích';
+        rows.forEach(r => {
+          if (!r || !r.c) return;
+          const idVal = r.c[0] ? String(r.c[0].v !== undefined ? r.c[0].v : '').trim() : '';
+          const nameVal = r.c[2] ? String(r.c[2].v !== undefined ? r.c[2].v : '').trim() : '';
+          const likesVal = r.c[3] ? parseInt(r.c[3].v, 10) : 0;
+
+          // Bỏ qua dòng header nếu có
+          if (idVal.toLowerCase().includes('id') || nameVal.toLowerCase().includes('tên')) return;
+
+          if (likesVal > 0) {
+            if (nameVal) {
+              newMap[nameVal] = likesVal;
+            } else if (idVal) {
+              const num = parseInt(idVal, 10);
+              if (!isNaN(num) && num >= 1 && num <= allImages.length) {
+                newMap[allImages[num - 1]] = likesVal;
+              }
+            }
           }
         });
 
-        // Update Lightbox UI if open
-        if (isLightboxOpen && displayedImages[currentIndex] === filename) {
-          updateLightboxFavButton(filename);
-        }
-
-        // If currently in 'favorites' filter mode and unfavorited, re-render grid
+        photoLikesMap = newMap;
+        updateCounters();
+        refreshAllCardBadges();
         if (activeFilterMode === 'favorites') {
+          displayedImages = getLikedImagesSorted();
           renderGrid();
         }
       }
 
+      function applyScriptLikesData(list) {
+        const newMap = {};
+        list.forEach(item => {
+          const name = item.name;
+          const likes = parseInt(item.likes, 10) || 0;
+          if (name && likes > 0) newMap[name] = likes;
+        });
+        photoLikesMap = newMap;
+        updateCounters();
+        refreshAllCardBadges();
+        if (activeFilterMode === 'favorites') {
+          displayedImages = getLikedImagesSorted();
+          renderGrid();
+        }
+      }
+
+      // Bật/tắt yêu thích ảnh (Cộng dồn hoặc Giảm dần trên trang tính online)
+      function toggleFavorite(filename, e) {
+        if (e) e.stopPropagation();
+
+        const oi = allImages.indexOf(filename);
+        const pn = oi >= 0 ? oi + 1 : 1;
+        const photoLink = getImageFullUrl(filename);
+        const isCurrentlyLiked = userLikedSet.has(filename);
+
+        let currentLikes = photoLikesMap[filename] || 0;
+        let delta = 1;
+
+        if (isCurrentlyLiked) {
+          // BỎ THÍCH: Giảm dần lượt thích (-1)
+          delta = -1;
+          userLikedSet.delete(filename);
+          currentLikes = Math.max(0, currentLikes - 1);
+          if (currentLikes <= 0) {
+            delete photoLikesMap[filename];
+          } else {
+            photoLikesMap[filename] = currentLikes;
+          }
+          showToast(`🤍 Đã bỏ thích ảnh #${pn}`, 'info', '🤍', 2500);
+        } else {
+          // YÊU THÍCH: Cộng dồn lượt thích (+1)
+          delta = 1;
+          userLikedSet.add(filename);
+          currentLikes = currentLikes + 1;
+          photoLikesMap[filename] = currentLikes;
+          showToast(`❤️ Đã yêu thích ảnh #${pn}! (${currentLikes} lượt thích)`, 'success', '💖', 3000);
+        }
+
+        saveUserLikedSet();
+        updateCounters();
+        updateCardFavUI(filename);
+
+        // Cập nhật Lightbox nếu đang mở ảnh này
+        if (isLightboxOpen && displayedImages[currentIndex] === filename) {
+          updateLightboxFavButton(filename);
+        }
+
+        // Đẩy lên trang tính online theo thứ tự: id ảnh, link ảnh, tên ảnh, lượt thích
+        sendLikeToOnlineSheet(pn, photoLink, filename, delta);
+
+        // Nếu đang ở tab lọc 'favorites' (Đã thích), cập nhật lại danh sách sắp xếp theo nhiều like
+        if (activeFilterMode === 'favorites') {
+          displayedImages = getLikedImagesSorted();
+          renderGrid();
+        }
+      }
+
+      // Gửi yêu cầu cập nhật lên Google Sheet qua Apps Script Web App
+      function sendLikeToOnlineSheet(photoId, photoLink, filename, delta) {
+        if (!GOOGLE_ALBUM_SCRIPT_URL) return;
+
+        const actionName = delta > 0 ? 'like' : 'unlike';
+        const payload = {
+          action: actionName,
+          delta: delta,
+          id: String(photoId),
+          link: photoLink,
+          name: filename
+        };
+
+        // Gửi POST trước
+        fetch(GOOGLE_ALBUM_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          mode: 'no-cors'
+        }).catch(err => {
+          console.warn('POST failed, fallback sang GET:', err);
+          const getUrl = `${GOOGLE_ALBUM_SCRIPT_URL}?action=${actionName}&id=${encodeURIComponent(photoId)}&link=${encodeURIComponent(photoLink)}&name=${encodeURIComponent(filename)}&delta=${delta}`;
+          fetch(getUrl, { mode: 'no-cors' }).catch(e => console.warn('Lỗi GET:', e));
+        });
+      }
+
+      // Cập nhật giao diện card ảnh khi lượt thích thay đổi
+      function updateCardFavUI(filename) {
+        const cards = gridContainer.querySelectorAll(`[data-filename="${filename}"]`);
+        const userLiked = userLikedSet.has(filename);
+        const likesCount = photoLikesMap[filename] || 0;
+        const hasLikes = likesCount > 0;
+        const heartIcon = userLiked ? '❤️' : (hasLikes ? '💖' : '🤍');
+
+        cards.forEach(card => {
+          const favBtn = card.querySelector('.card-fav-btn');
+          if (favBtn) {
+            favBtn.classList.toggle('is-favorite', userLiked);
+            favBtn.classList.toggle('has-likes', hasLikes);
+            favBtn.title = (userLiked ? 'Đã thích' : 'Thêm vào yêu thích') + (hasLikes ? ` (${likesCount} lượt thích)` : '');
+            favBtn.innerHTML = `<span class="card-fav-icon">${heartIcon}</span>` + (hasLikes ? `<span class="card-fav-count">${likesCount}</span>` : '');
+          }
+        });
+      }
+
+      function refreshAllCardBadges() {
+        const cards = gridContainer.querySelectorAll('.album-full-card');
+        cards.forEach(card => {
+          const fn = card.dataset.filename;
+          if (fn) updateCardFavUI(fn);
+        });
+      }
+
       function updateLightboxFavButton(filename) {
-        const fav = isFavorite(filename);
-        if (fav) {
+        const userLiked = userLikedSet.has(filename);
+        const likesCount = photoLikesMap[filename] || 0;
+
+        if (userLiked) {
           lbBtnFav.classList.add('active');
           lbFavIcon.textContent = '❤️';
           lbFavText.textContent = 'Đã Thích';
           lbBtnFav.title = 'Bỏ thích tấm ảnh này';
         } else {
           lbBtnFav.classList.remove('active');
-          lbFavIcon.textContent = '🤍';
+          lbFavIcon.textContent = likesCount > 0 ? '💖' : '🤍';
           lbFavText.textContent = 'Yêu Thích';
           lbBtnFav.title = 'Lưu vào danh sách yêu thích';
+        }
+
+        const lbFavCount = document.getElementById('lb-fav-count');
+        if (lbFavCount) {
+          if (likesCount > 0) {
+            lbFavCount.style.display = 'inline-block';
+            lbFavCount.textContent = likesCount.toLocaleString('vi-VN');
+          } else {
+            lbFavCount.style.display = 'none';
+          }
         }
       }
 
@@ -1554,7 +1797,8 @@
         if (mode === 'all') {
           displayedImages = [...allImages];
         } else {
-          displayedImages = allImages.filter(f => favoritesSet.has(f));
+          // Lọc theo lượt thích: nhiều lượt thích hiển thị trước, ít hiển thị sau
+          displayedImages = getLikedImagesSorted();
         }
 
         renderGrid();
@@ -1932,7 +2176,7 @@
       function renderGrid() {
         gridContainer.innerHTML = '';
         if (displayedImages.length === 0 && activeFilterMode === 'favorites') {
-          gridContainer.innerHTML = '<div class="empty-state-box"><span class="empty-state-icon">💌</span><h3 class="empty-state-title">Chưa có ảnh yêu thích nào</h3><p class="empty-state-desc">Hãy nhấn vào biểu tượng ❤️ trên các tấm ảnh để lưu những khoảnh khắc đẹp nhất!</p></div>';
+          gridContainer.innerHTML = '<div class="empty-state-box"><span class="empty-state-icon">💌</span><h3 class="empty-state-title">Chưa có ảnh nào được yêu thích trên Google Sheet</h3><p class="empty-state-desc">Hãy nhấn vào biểu tượng ❤️ trên các tấm ảnh để thả tim lưu giữ những khoảnh khắc đẹp nhất lên trang tính online!</p></div>';
           if (selectedStatusText) selectedStatusText.innerHTML = 'Đang chọn: <strong>Không có ảnh</strong>';
           return;
         }
@@ -1940,12 +2184,38 @@
         displayedImages.forEach((filename, idx) => {
           const oi = allImages.indexOf(filename);
           const pn = oi >= 0 ? oi + 1 : idx + 1;
-          const fav = isFavorite(filename);
+          const userLiked = isUserLiked(filename);
+          const likesCount = getPhotoLikes(filename);
+          const hasLikes = likesCount > 0;
+
+          let btnClass = 'card-fav-btn';
+          if (userLiked) btnClass += ' is-favorite';
+          if (hasLikes) btnClass += ' has-likes';
+
+          const heartIcon = userLiked ? '❤️' : (hasLikes ? '💖' : '🤍');
+          const countHtml = hasLikes ? `<span class="card-fav-count">${likesCount}</span>` : '';
+
           const card = document.createElement('div');
-          card.className = 'album-full-card'; card.id = 'card-' + idx;
-          card.dataset.index = idx; card.dataset.filename = filename;
+          card.className = 'album-full-card';
+          card.id = 'card-' + idx;
+          card.dataset.index = idx;
+          card.dataset.filename = filename;
           if (idx === 0) card.classList.add('selected');
-          card.innerHTML = '<button class="card-fav-btn ' + (fav ? 'is-favorite' : '') + '" type="button" title="' + (fav ? 'Đã thích' : 'Thêm vào yêu thích') + '" aria-label="Yêu thích ảnh ' + pn + '">' + (fav ? '❤️' : '🤍') + '</button><div class="card-img-wrapper"><img src="album_anh_cuoi_thumbs/' + filename + '" onerror="this.onerror=null;this.src=\'album_anh_cuoi/' + filename + '\';" alt="Ảnh cưới #' + pn + '" loading="lazy" decoding="async" /><div class="card-number-badge">#' + pn + '</div><div class="card-overlay"><span class="card-overlay-icon">🔍</span><span class="card-overlay-text">Xem Phóng To</span></div></div>';
+
+          card.innerHTML = `
+            <button class="${btnClass}" type="button" title="${userLiked ? 'Đã thích' : 'Thêm vào yêu thích'}${hasLikes ? ' (' + likesCount + ' lượt thích)' : ''}" aria-label="Yêu thích ảnh ${pn}">
+              <span class="card-fav-icon">${heartIcon}</span>${countHtml}
+            </button>
+            <div class="card-img-wrapper">
+              <img src="album_anh_cuoi_thumbs/${filename}" onerror="this.onerror=null;this.src='album_anh_cuoi/${filename}';" alt="Ảnh cưới #${pn}" loading="lazy" decoding="async" />
+              <div class="card-number-badge">#${pn}</div>
+              <div class="card-overlay">
+                <span class="card-overlay-icon">🔍</span>
+                <span class="card-overlay-text">Xem Phóng To</span>
+              </div>
+            </div>
+          `;
+
           card.querySelector('.card-fav-btn').addEventListener('click', (e) => toggleFavorite(filename, e));
           card.addEventListener('click', () => openLightbox(idx));
           frag.appendChild(card);
@@ -2284,9 +2554,16 @@
       lbBtnPrev.addEventListener('click', prevImage);
 
       document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (saveModalEl && saveModalEl.classList.contains('active')) {
+            closeSavePhotoModal();
+            return;
+          }
+          if (isLightboxOpen) closeLightbox();
+          return;
+        }
         if (!isLightboxOpen) return;
-        if (e.key === 'Escape') closeLightbox();
-        else if (e.key === 'ArrowRight') nextImage();
+        if (e.key === 'ArrowRight') nextImage();
         else if (e.key === 'ArrowLeft') prevImage();
         else if (e.key === '+' || e.key === '=') setScale(scale + 1.0, true);
         else if (e.key === '-') setScale(scale - 1.0, true);
@@ -2314,8 +2591,18 @@
       };
 
       // Initialize
+      initInAppBanner();
       updateCounters();
       renderGrid();
+      fetchOnlineLikes();
+
+      // Tự động cập nhật lượt thích mới khi người dùng quay lại tab hoặc định kỳ mỗi 45s
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          fetchOnlineLikes();
+        }
+      });
+      setInterval(fetchOnlineLikes, 45000);
     })();
   </script>
 </body>
