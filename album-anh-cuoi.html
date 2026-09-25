@@ -840,7 +840,43 @@
       opacity: 0.85;
     }
 
-    /* Responsive Adjustments */
+    /* ══ TỐI ƯU GIAO DIỆN SLIDE ẢNH TRÊN MÁY TÍNH (DESKTOP) ══ */
+    @media (min-width: 769px) {
+      .lb-stage {
+        padding: 0;
+      }
+
+      .lb-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 25;
+        background: linear-gradient(180deg, rgba(8, 6, 5, 0.88) 0%, rgba(8, 6, 5, 0.35) 60%, transparent 100%);
+        pointer-events: none;
+      }
+
+      .lb-header > * {
+        pointer-events: auto;
+      }
+
+      .lb-image-container img {
+        max-width: 96vw;
+        max-height: 94vh;
+        border-radius: 10px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(212, 175, 55, 0.2);
+      }
+
+      .lb-bottom-toolbar {
+        bottom: 24px;
+        z-index: 25;
+        background: rgba(18, 14, 11, 0.92);
+        border: 1px solid rgba(212, 175, 55, 0.45);
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7);
+      }
+    }
+
+    /* Responsive Adjustments (GIỮ NGUYÊN CHO ĐIỆN THOẠI) */
     @media (max-width: 768px) {
       .lb-nav-btn {
         width: 42px;
@@ -1833,9 +1869,13 @@
         const stageH = lbStage.clientHeight || window.innerHeight;
         const natW = lbImage.naturalWidth || 1920;
         const natH = lbImage.naturalHeight || 1080;
-        const maxW = stageW * (isStageFullscreen ? 1.0 : 0.95);
-        const maxH = stageH * (isStageFullscreen ? 1.0 : 0.85);
-        const ratio = Math.min(maxW / natW, maxH / natH, 1.0);
+        const isDesktop = stageW > 768;
+
+        // Trên máy tính, cho phép ảnh hiển thị to tối đa (96% rộng, 95% cao)
+        const maxW = stageW * (isStageFullscreen ? 1.0 : (isDesktop ? 0.96 : 0.95));
+        const maxH = stageH * (isStageFullscreen ? 1.0 : (isDesktop ? 0.95 : 0.85));
+
+        const ratio = Math.min(maxW / natW, maxH / natH);
         return { fitW: natW * ratio, fitH: natH * ratio, natW, natH, stageW, stageH };
       }
 
@@ -1843,14 +1883,33 @@
       function clampPan() {
         if (scale <= 1.02) { panX = 0; panY = 0; return; }
         const { fitW, fitH, stageW, stageH } = getFitDimensions();
-        const sW = fitW * scale, sH = fitH * scale;
-        const mX = Math.max(0, (sW - stageW) / 2 + stageW * 0.1);
-        const mY = Math.max(0, (sH - stageH) / 2 + stageH * 0.1);
-        panX = Math.min(Math.max(panX, -mX), mX);
-        panY = Math.min(Math.max(panY, -mY), mY);
+        const isDesktop = stageW > 768;
+
+        if (isDesktop) {
+          // PHẠM VI DI CHUYỂN TRÊN MÁY TÍNH: Cuộn và kéo mượt mà trong toàn bộ kích thước ảnh phóng to
+          const sW = fitW * scale;
+          const sH = fitH * scale;
+
+          // Trục X: nếu ảnh sau khi zoom to hơn màn hình thì cho phép pan từ mép trái qua mép phải
+          // Nếu ảnh hẹp hơn màn hình (ảnh dọc trên màn ngang), cho phép pan nhẹ 60px
+          const mX = sW > stageW ? (sW - stageW) / 2 + 60 : Math.max(0, (stageW - sW) * 0.15);
+
+          // Trục Y: nếu ảnh sau khi zoom cao hơn màn hình thì cho phép cuộn từ đỉnh tới chân ảnh
+          const mY = sH > stageH ? (sH - stageH) / 2 + 60 : Math.max(0, (stageH - sH) * 0.15);
+
+          panX = Math.min(Math.max(panX, -mX), mX);
+          panY = Math.min(Math.max(panY, -mY), mY);
+        } else {
+          // GIỮ NGUYÊN 100% CHO ĐIỆN THOẠI
+          const sW = fitW * scale, sH = fitH * scale;
+          const mX = Math.max(0, (sW - stageW) / 2 + stageW * 0.1);
+          const mY = Math.max(0, (sH - stageH) / 2 + stageH * 0.1);
+          panX = Math.min(Math.max(panX, -mX), mX);
+          panY = Math.min(Math.max(panY, -mY), mY);
+        }
       }
 
-      // ═══ CANVAS ZOOM ENGINE (only active when zoomed > 1x) ═══
+      // ═══ CANVAS ZOOM ENGINE (only active when zoomed > 1x on mobile) ═══
       const lbCanvas = document.getElementById('lb-canvas');
       const ctx = lbCanvas ? lbCanvas.getContext('2d', { alpha: false }) : null;
       let canvasRafId = null;
@@ -1903,28 +1962,44 @@
         canvasRafId = requestAnimationFrame(() => { canvasRafId = null; renderCanvasZoom(); });
       }
 
-      // ═══ APPLY TRANSFORM — Lightweight at 1x, Canvas at >1x ═══
+      // ═══ APPLY TRANSFORM — Lightweight at 1x, Canvas at >1x on mobile, GPU CSS on desktop ═══
       function applyTransform(animate) {
         clampPan();
         const { fitW, fitH } = getFitDimensions();
+        const isDesktop = (lbStage.clientWidth || window.innerWidth) > 768;
 
-        if (scale <= 1.02) {
+        if (isDesktop) {
+          // ── TRÊN MÁY TÍNH: Dùng CSS GPU Transform trực tiếp trên ảnh gốc 24MP ──
+          // Cho phép kéo thả 1:1 mượt mà, cuộn chuột scroll khắp ảnh, không bị co cột hẹp
           lbImage.style.display = 'block';
           if (lbCanvas) lbCanvas.style.display = 'none';
           lbImage.style.width = fitW + 'px';
           lbImage.style.height = fitH + 'px';
           lbImage.style.maxWidth = fitW + 'px';
           lbImage.style.maxHeight = fitH + 'px';
-          lbImageContainer.style.transition = animate ? 'transform .2s ease' : 'none';
-          lbImageContainer.style.transform = 'translate3d(' + panX + 'px,' + panY + 'px,0)';
-          lbStage.classList.remove('grabbing');
+          lbImageContainer.style.transition = animate ? 'transform .2s cubic-bezier(0.2, 0, 0, 1)' : 'none';
+          lbImageContainer.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${scale})`;
+          lbStage.classList.toggle('grabbing', isDragging);
         } else {
-          lbImage.style.display = 'none';
-          if (lbCanvas) lbCanvas.style.display = 'block';
-          lbImageContainer.style.transition = 'none';
-          lbImageContainer.style.transform = 'none';
-          scheduleCanvasRender();
-          lbStage.classList.add('grabbing');
+          // ── GIỮ NGUYÊN 100% CHO ĐIỆN THOẠI (Mobile Canvas Engine) ──
+          if (scale <= 1.02) {
+            lbImage.style.display = 'block';
+            if (lbCanvas) lbCanvas.style.display = 'none';
+            lbImage.style.width = fitW + 'px';
+            lbImage.style.height = fitH + 'px';
+            lbImage.style.maxWidth = fitW + 'px';
+            lbImage.style.maxHeight = fitH + 'px';
+            lbImageContainer.style.transition = animate ? 'transform .2s ease' : 'none';
+            lbImageContainer.style.transform = 'translate3d(' + panX + 'px,' + panY + 'px,0)';
+            lbStage.classList.remove('grabbing');
+          } else {
+            lbImage.style.display = 'none';
+            if (lbCanvas) lbCanvas.style.display = 'block';
+            lbImageContainer.style.transition = 'none';
+            lbImageContainer.style.transform = 'none';
+            scheduleCanvasRender();
+            lbStage.classList.add('grabbing');
+          }
         }
         lbZoomLevel.textContent = scale.toFixed(1) + 'x';
       }
@@ -2414,19 +2489,53 @@
       }
       lbBtnFullscreen.addEventListener('click', () => toggleStageFullscreen());
 
-      // ═══ MOUSE WHEEL ZOOM ═══
+      // ═══ MOUSE WHEEL ZOOM & PAN TRÊN MÁY TÍNH ═══
       lbStage.addEventListener('wheel', (e) => {
         if (!isLightboxOpen) return;
-        e.preventDefault();
-        setScale(scale + (e.deltaY < 0 ? 0.4 : -0.4), true);
+        const isDesktop = (lbStage.clientWidth || window.innerWidth) > 768;
+
+        if (isDesktop) {
+          e.preventDefault();
+
+          // 1. Giữ phím Ctrl / Cmd (hoặc pinch trên trackpad): Thu phóng mượt mà
+          if (e.ctrlKey || e.metaKey) {
+            const zoomStep = e.deltaY < 0 ? 0.3 : -0.3;
+            setScale(scale + zoomStep, false);
+            return;
+          }
+
+          // 2. Khi đang phóng to (> 1.02x): Cuộn chuột = Scroll di chuyển mượt mà khắp phạm vi ảnh
+          if (scale > 1.02) {
+            panX -= e.deltaX * 1.0;
+            panY -= e.deltaY * 1.0;
+            applyTransform(false);
+            return;
+          }
+
+          // 3. Khi đang ở 1x: Cuộn chuột lên nhẹ = Phóng to nhanh
+          if (e.deltaY < -20) {
+            setScale(scale + 0.5, true);
+          }
+        } else {
+          // GIỮ NGUYÊN 100% CHO ĐIỆN THOẠI
+          e.preventDefault();
+          setScale(scale + (e.deltaY < 0 ? 0.4 : -0.4), true);
+        }
       }, { passive: false });
 
       // ═══ DOUBLE TAP / DOUBLE CLICK ZOOM ═══
       let lastTapTime = 0;
       lbStage.addEventListener('click', (e) => {
         if (e.target.closest('.lb-btn,.lb-nav-btn,.lb-bottom-toolbar')) return;
+        const isDesktop = (lbStage.clientWidth || window.innerWidth) > 768;
         const now = Date.now();
-        if (now - lastTapTime < 300) { scale > 1.2 ? resetZoom(true) : setScale(3.5, true); }
+        if (now - lastTapTime < 300) {
+          if (scale > 1.2) {
+            resetZoom(true);
+          } else {
+            setScale(isDesktop ? 2.5 : 3.5, true);
+          }
+        }
         lastTapTime = now;
       });
 
@@ -2446,6 +2555,7 @@
       function startDrag(x, y) {
         isDragging = true;
         dragStartX = x; dragStartY = y;
+        pendingX = x; pendingY = y;
         panStartX = panX; panStartY = panY;
         lbStage.classList.add('grabbing');
       }
@@ -2480,6 +2590,13 @@
       });
       window.addEventListener('mousemove', (e) => { if (isDragging) { e.preventDefault(); doDrag(e.clientX, e.clientY); } });
       window.addEventListener('mouseup', () => { if (isDragging) stopDrag(); });
+
+      // Lắng nghe thay đổi kích thước màn hình để tự căn chỉnh ảnh
+      window.addEventListener('resize', () => {
+        if (isLightboxOpen) {
+          applyTransform(false);
+        }
+      });
 
       // ═══ MOBILE TOUCH — ZERO-LAG SWIPE + SMOOTH PINCH ═══
       let swipeDeltaX = 0, swipeRafPending = false;
