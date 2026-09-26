@@ -56,7 +56,7 @@ function doGet(e) {
     const action = String(params.action || '').toLowerCase();
 
     // 1. Thao tác Like / Unlike qua GET
-    if (action === 'like' || action === 'unlike' || action === 'album_like' || action === 'album_unlike') {
+    if (action === 'like' || action === 'unlike' || action === 'album_like' || action === 'album_unlike' || action === 'delete') {
       return handleLikeAction(sheet, params);
     }
 
@@ -112,6 +112,8 @@ function handleLikeAction(sheet, data) {
       delta = parseInt(data.delta, 10);
     } else if (action === 'unlike' || action === 'album_unlike') {
       delta = -1;
+    } else if (action === 'delete') {
+      delta = -999999; // Lớn hơn mọi số lượt thích để xoá luôn
     }
 
     if (!rawId && !rawName) {

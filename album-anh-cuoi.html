@@ -680,6 +680,19 @@
       color: #140f0a;
     }
 
+    .lb-btn-delete {
+      background: rgba(231, 76, 60, 0.2);
+      border: 1px solid rgba(231, 76, 60, 0.5);
+      color: #ff6b6b;
+    }
+
+    .lb-btn-delete:hover {
+      background: rgba(231, 76, 60, 0.9);
+      color: #fff;
+      border-color: #e74c3c;
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+    }
+
     .lb-btn-close {
       width: 40px;
       padding: 0;
@@ -887,7 +900,7 @@
       .lb-next { right: 8px; }
       .lb-header { padding: 10px 14px; }
       .lb-btn-text { display: none; }
-      .lb-btn-download { width: 40px; padding: 0; border-radius: 50%; }
+      .lb-btn-download, .lb-btn-delete { width: 40px; padding: 0; border-radius: 50%; }
       .lb-bottom-toolbar { bottom: 14px; padding: 4px 10px; }
       .lb-hint-text { font-size: 0.7rem; }
     }
@@ -1382,6 +1395,12 @@
           <span class="lb-btn-text" id="lb-fs-text">Full Màn Ảnh</span>
         </button>
 
+        <!-- Delete Button (Xóa khỏi Sheet) -->
+        <button id="lb-btn-delete" class="lb-btn lb-btn-delete" type="button" title="Xóa luôn ảnh này khỏi Google Sheet">
+          <span id="lb-del-icon">🗑️</span>
+          <span class="lb-btn-text" id="lb-del-text">Xóa Khỏi Sheet</span>
+        </button>
+
         <!-- Download Button -->
         <button id="lb-btn-download" class="lb-btn lb-btn-download" type="button" title="Tải ảnh gốc 24MP này về máy">
           <span id="lb-dl-icon">📥</span>
@@ -1504,6 +1523,7 @@
       const lbBtnFav = document.getElementById('lb-btn-fav');
       const lbFavIcon = document.getElementById('lb-fav-icon');
       const lbFavText = document.getElementById('lb-fav-text');
+      const lbBtnDelete = document.getElementById('lb-btn-delete');
       const lbBtnDownload = document.getElementById('lb-btn-download');
       const lbBtnFullscreen = document.getElementById('lb-btn-fullscreen');
       const lbFsIcon = document.getElementById('lb-fs-icon');
@@ -1539,7 +1559,7 @@
       // ════ GOOGLE SHEETS ONLINE LIKES CONFIGURATION (TRANG TÍNH MỚI) ════
       const GOOGLE_ALBUM_SHEET_ID = '1IsgJXQ_QzPfXk0iqZGp9zssxqr-A6MB3KKtra8UBS04';
       // URL Web App của Trang tính mới sau khi Deploy file google_apps_script_album.gs:
-      let GOOGLE_ALBUM_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyzfXOm2_VtWz3HQe4vHgRvvTWbfMTGvu6Y_rW-e93QPQ3S-Ps9HScfcW4IwHlpsIDWQ/exec';
+      let GOOGLE_ALBUM_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIuYIR9QqdfRWwpsgfAVLq6HOtkfxStFipv_CdsKbMzfppkdt1gQpWFs_SJNHldSFYrQ/exec';
 
       // Lưu trữ lượt thích online từ Google Sheet: { 'DSC04840.JPG': 5, ... }
       let photoLikesMap = {};
@@ -1740,7 +1760,10 @@
       function sendLikeToOnlineSheet(photoId, photoLink, filename, delta) {
         if (!GOOGLE_ALBUM_SCRIPT_URL) return;
 
-        const actionName = delta > 0 ? 'like' : 'unlike';
+        let actionName = 'unlike';
+        if (delta > 0) actionName = 'like';
+        if (delta === -999999) actionName = 'delete';
+
         const payload = {
           action: actionName,
           delta: delta,
@@ -2245,6 +2268,45 @@
           openSavePhotoModal(filename, pn, absUrl);
         }
       }
+      if (lbBtnDelete) {
+        lbBtnDelete.addEventListener('click', () => {
+          if (!displayedImages.length || currentIndex < 0 || currentIndex >= displayedImages.length) return;
+          const filename = displayedImages[currentIndex];
+          const oi = allImages.indexOf(filename);
+          const pn = oi >= 0 ? oi + 1 : currentIndex + 1;
+          const photoLink = getImageFullUrl(filename);
+          
+          if (confirm(`Bạn có chắc chắn muốn XOÁ VĨNH VIỄN ảnh #${pn} khỏi danh sách trên Google Sheet không?`)) {
+            // Cập nhật trạng thái local
+            userLikedSet.delete(filename);
+            delete photoLikesMap[filename];
+            saveUserLikedSet();
+            updateCounters();
+            updateCardFavUI(filename);
+            updateLightboxFavButton(filename);
+            
+            showToast(`🗑️ Đang xoá ảnh #${pn} khỏi Google Sheet...`, 'info', '🗑️', 3000);
+            
+            // Gửi API xoá với delta = -999999
+            sendLikeToOnlineSheet(pn, photoLink, filename, -999999);
+            
+            // Cập nhật lại grid nếu đang ở tab Favorites
+            if (activeFilterMode === 'favorites') {
+              displayedImages = getLikedImagesSorted();
+              renderGrid();
+              
+              if (displayedImages.length > 0) {
+                // Hiển thị ảnh khác
+                if (currentIndex >= displayedImages.length) currentIndex = displayedImages.length - 1;
+                showImageInLightbox(currentIndex);
+              } else {
+                closeLightbox();
+              }
+            }
+          }
+        });
+      }
+
       lbBtnDownload.addEventListener('click', handleDownloadCurrentPhoto);
 
       // ═══ GRID RENDERING ═══
