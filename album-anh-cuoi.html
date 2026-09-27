@@ -1602,6 +1602,21 @@
         if (pillFavCount) pillFavCount.textContent = likedCount.toLocaleString('vi-VN');
       }
 
+      // Sau khi re-sort displayedImages, cập nhật lại currentIndex để trỏ đúng ảnh đang xem
+      // Tránh bug: danh sách thay đổi thứ tự nhưng currentIndex giữ nguyên → next/prev nhảy sai ảnh
+      function preserveCurrentIndex(filename) {
+        if (!filename || !isLightboxOpen) return;
+        const newIdx = displayedImages.indexOf(filename);
+        if (newIdx >= 0) {
+          currentIndex = newIdx;
+        } else {
+          // Ảnh đang xem đã bị xoá khỏi danh sách (VD: bị unlike)
+          if (currentIndex >= displayedImages.length) {
+            currentIndex = Math.max(0, displayedImages.length - 1);
+          }
+        }
+      }
+
       // Kiểm tra ảnh đã được thiết bị này thích chưa
       function isUserLiked(filename) {
         return userLikedSet.has(filename);
@@ -1684,7 +1699,9 @@
         updateCounters();
         refreshAllCardBadges();
         if (activeFilterMode === 'favorites') {
+          const currentFilename = isLightboxOpen && displayedImages[currentIndex] ? displayedImages[currentIndex] : null;
           displayedImages = getLikedImagesSorted();
+          preserveCurrentIndex(currentFilename);
           renderGrid();
         }
       }
@@ -1700,7 +1717,9 @@
         updateCounters();
         refreshAllCardBadges();
         if (activeFilterMode === 'favorites') {
+          const currentFilename = isLightboxOpen && displayedImages[currentIndex] ? displayedImages[currentIndex] : null;
           displayedImages = getLikedImagesSorted();
+          preserveCurrentIndex(currentFilename);
           renderGrid();
         }
       }
@@ -1751,7 +1770,9 @@
 
         // Nếu đang ở tab lọc 'favorites' (Đã thích), cập nhật lại danh sách sắp xếp theo nhiều like
         if (activeFilterMode === 'favorites') {
+          const currentFilename = isLightboxOpen && displayedImages[currentIndex] ? displayedImages[currentIndex] : null;
           displayedImages = getLikedImagesSorted();
+          preserveCurrentIndex(currentFilename);
           renderGrid();
         }
       }
@@ -2283,25 +2304,40 @@
             saveUserLikedSet();
             updateCounters();
             updateCardFavUI(filename);
-            updateLightboxFavButton(filename);
             
-            showToast(`🗑️ Đang xoá ảnh #${pn} khỏi Google Sheet...`, 'info', '🗑️', 3000);
+            showToast(`🗑️ Đã xoá ảnh #${pn} khỏi Google Sheet!`, 'info', '🗑️', 3000);
             
             // Gửi API xoá với delta = -999999
             sendLikeToOnlineSheet(pn, photoLink, filename, -999999);
             
-            // Cập nhật lại grid nếu đang ở tab Favorites
+            // Lưu lại vị trí hiện tại trước khi cập nhật danh sách
+            const deletedIndex = currentIndex;
+            
+            // Cập nhật lại danh sách hiển thị
             if (activeFilterMode === 'favorites') {
               displayedImages = getLikedImagesSorted();
-              renderGrid();
-              
-              if (displayedImages.length > 0) {
-                // Hiển thị ảnh khác
-                if (currentIndex >= displayedImages.length) currentIndex = displayedImages.length - 1;
-                showImageInLightbox(currentIndex);
+            }
+            // Render lại grid bên dưới (không ảnh hưởng lightbox)
+            renderGrid();
+            
+            // Ở lại trong lightbox, chuyển sang ảnh tiếp theo
+            if (displayedImages.length > 0) {
+              // Nếu index vượt quá danh sách mới, lùi về ảnh cuối
+              if (deletedIndex >= displayedImages.length) {
+                currentIndex = displayedImages.length - 1;
               } else {
-                closeLightbox();
+                currentIndex = deletedIndex; // ảnh tiếp theo đã tự nhảy vào vị trí này
               }
+              resetZoom(false);
+              showImageInLightbox(currentIndex);
+              // Cập nhật counter
+              const newFn = displayedImages[currentIndex];
+              const newOi = allImages.indexOf(newFn);
+              const newPn = newOi >= 0 ? newOi + 1 : currentIndex + 1;
+              lbCounter.textContent = 'Ảnh ' + (currentIndex + 1) + ' / ' + displayedImages.length + ' (#' + newPn + ')';
+            } else {
+              // Không còn ảnh nào → đóng lightbox
+              closeLightbox();
             }
           }
         });
@@ -2529,12 +2565,16 @@
       // ═══ NAVIGATION ═══
       function nextImage() {
         if (!displayedImages.length || !acquireNavLock()) return;
+        // Luôn reset zoom trước khi chuyển ảnh để tránh nhảy lung tung
+        scale = 1.0; panX = 0; panY = 0;
         currentIndex = (currentIndex + 1) % displayedImages.length;
         showImageInLightbox(currentIndex);
       }
 
       function prevImage() {
         if (!displayedImages.length || !acquireNavLock()) return;
+        // Luôn reset zoom trước khi chuyển ảnh để tránh nhảy lung tung
+        scale = 1.0; panX = 0; panY = 0;
         currentIndex = (currentIndex - 1 + displayedImages.length) % displayedImages.length;
         showImageInLightbox(currentIndex);
       }
