@@ -2394,7 +2394,14 @@
           frag.appendChild(card);
         });
         gridContainer.appendChild(frag);
-        if (displayedImages.length > 0) updateSelection(0, false);
+        // Khi lightbox đang mở, giữ nguyên currentIndex (không reset về 0)
+        if (displayedImages.length > 0 && !isLightboxOpen) {
+          updateSelection(0, false);
+        } else if (displayedImages.length > 0 && isLightboxOpen) {
+          // Chỉ cập nhật highlight trên grid mà KHÔNG thay đổi currentIndex
+          const tc = document.getElementById('card-' + currentIndex);
+          if (tc) tc.classList.add('selected');
+        }
       }
 
       // ═══ GRID SELECTION ═══
