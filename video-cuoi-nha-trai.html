@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Cưới Nhà Trai</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        /* Kỹ thuật CSS để ép Youtube iframe hoạt động y như object-fit: cover */
+        .video-container {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            pointer-events: none; /* Xuyên qua để bắt click bằng overlay */
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100vw;
+            height: 56.25vw; /* Tỷ lệ 16:9 */
+            min-height: 100vh;
+            min-width: 177.77vh; /* Tỷ lệ 16:9 */
+            transform: translate(-50%, -50%);
+            border: none;
+        }
+        
+        /* Lớp phủ màn hình để bắt toàn bộ thao tác click chuột */
+        #clickOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            cursor: pointer;
+        }
+
+        /* Giao diện nút báo click bật tiếng */
+        #unmuteOverlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.2rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: none; /* Không bắt click để clickOverlay nhận */
+            transition: opacity 0.5s ease;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: pulse 2s infinite ease-in-out;
+        }
+        #unmuteOverlay svg {
+            width: 24px;
+            height: 24px;
+        }
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Container chứa video Youtube -->
+    <div class="video-container">
+        <div id="player"></div>
+    </div>
+    
+    <!-- Vùng bắt click của người dùng -->
+    <div id="clickOverlay"></div>
+
+    <!-- Nút UI thông báo mờ ảo -->
+    <div id="unmuteOverlay">
+        <svg fill="currentColor" viewBox="0 0 16 16">
+            <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+            <path d="M10.121 12.596A6.475 6.475 0 0 0 12.025 8a6.475 6.475 0 0 0-1.904-4.596l-.707.707A5.476 5.476 0 0 1 11.025 8a5.476 5.476 0 0 1-1.61 3.89l.706.706z"/>
+            <path d="M8.707 11.182A4.475 4.475 0 0 0 10.025 8a4.475 4.475 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+        </svg>
+        Click để bật âm thanh
+    </div>
+
+    <script>
+        // Tải API của Youtube
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        // Hàm này tự động chạy khi Youtube API đã sẵn sàng
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'gqXl86zieMQ', // ID video từ link của bạn
+                host: 'https://www.youtube-nocookie.com', // Sửa lỗi 153 chặn phát
+                playerVars: {
+                    'autoplay': 1,      // Tự động phát
+                    'controls': 0,      // Ẩn thanh công cụ
+                    'disablekb': 1,     // Tắt phím tắt
+                    'modestbranding': 1,// Ẩn logo Youtube
+                    'rel': 0,           // Không hiện video liên quan
+                    'showinfo': 0,      
+                    'mute': 1,          // BẮT BUỘC MUTE ĐỂ AUTOPLAY TRÊN TRÌNH DUYỆT
+                    'loop': 1,          // Lặp lại video
+                    'playlist': 'gqXl86zieMQ', // Bắt buộc có để loop youtube chạy đúng
+                    'playsinline': 1,   // Phát mượt trên điện thoại
+                    'origin': 'https://localhost' // Khắc phục lỗi 153 khi chạy trên file://
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        // Khi video load xong
+        function onPlayerReady(event) {
+            event.target.playVideo();
+        }
+
+        // Biến lưu trạng thái đang phát
+        var isPlaying = true;
+        
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                isPlaying = true;
+            } else if (event.data == YT.PlayerState.PAUSED) {
+                isPlaying = false;
+            }
+        }
+
+        // Xử lý sự kiện click của người dùng
+        const overlay = document.getElementById('unmuteOverlay');
+        const clickArea = document.getElementById('clickOverlay');
+        let isFirstClick = true;
+
+        clickArea.addEventListener('click', () => {
+            if (!player || typeof player.unMute !== 'function') return; // Chờ Youtube API load xong
+
+            if (isFirstClick) {
+                // Click lần đầu: Mở tiếng, tua lại từ đầu và tắt nút thông báo
+                player.unMute();
+                player.seekTo(0);
+                player.playVideo();
+                overlay.style.opacity = '0';
+                isFirstClick = false;
+            } else {
+                // Các click tiếp theo: Dừng hoặc phát tiếp
+                if (isPlaying) {
+                    player.pauseVideo();
+                } else {
+                    player.playVideo();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
