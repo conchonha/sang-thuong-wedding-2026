@@ -10,7 +10,7 @@
   <meta property="og:url" content="https://conchonha.github.io/sang-thuong-wedding-2026/album-anh-cuoi.html">
   <meta property="og:title" content="Album Ảnh Cưới | Thái Bá Sang &amp; Phạm Thị Thương">
   <meta property="og:description" content="Trọn bộ album ảnh cưới 1.479 khoảnh khắc hạnh phúc của Thái Bá Sang &amp; Phạm Thị Thương. Tìm kiếm, thả tim lưu ảnh yêu thích và tải về máy.">
-  <meta property="og:image" content="album_anh_cuoi_thumbs/DSC04862okkkkk.jpg">
+  <meta property="og:image" content="anh-cuoi-web/DSC04862okkkkk.jpg">
   <meta name="description" content="Album ảnh cưới trọn bộ của Thái Bá Sang &amp; Phạm Thị Thương với 33 hình ảnh sắc nét. Trình chiếu phóng to 10x độ nét gốc 24MP, click chuột &amp; vuốt di chuyển tự do khi zoom, chế độ xem full màn ảnh ẩn nút chuyển, thả tim lưu danh sách yêu thích và tải ảnh chất lượng gốc.">
 
   <!-- Favicon -->
@@ -1588,9 +1588,9 @@
         try {
           const loc = window.location;
           const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/') + 1);
-          return `${loc.origin}${basePath}album_anh_cuoi/${filename}`;
+          return `${loc.origin}${basePath}anh-cuoi/${filename}`;
         } catch (e) {
-          return `album_anh_cuoi/${filename}`;
+          return `anh-cuoi/${filename}`;
         }
       }
 
@@ -2244,7 +2244,7 @@
         const filename = displayedImages[currentIndex];
         const oi = allImages.indexOf(filename);
         const pn = oi >= 0 ? oi + 1 : currentIndex + 1;
-        const relPath = 'album_anh_cuoi/' + filename;
+        const relPath = 'anh-cuoi/' + filename;
         const absUrl = new URL(relPath, window.location.href).href;
         const dlI = document.getElementById('lb-dl-icon');
         const dlT = document.getElementById('lb-dl-text');
@@ -2380,7 +2380,7 @@
               <span class="card-fav-icon">${heartIcon}</span>${countHtml}
             </button>
             <div class="card-img-wrapper">
-              <img src="album_anh_cuoi_thumbs/${filename}" onerror="this.onerror=null;this.src='album_anh_cuoi/${filename}';" alt="Ảnh cưới #${pn}" loading="lazy" decoding="async" />
+              <img src="anh-cuoi-web/${filename}" onerror="this.onerror=null;this.src='anh-cuoi/${filename}';" alt="Ảnh cưới #${pn}" loading="lazy" decoding="async" />
               <div class="card-number-badge">#${pn}</div>
               <div class="card-overlay">
                 <span class="card-overlay-icon">🔍</span>
@@ -2456,7 +2456,7 @@
           const fn = displayedImages[i];
           if (fn && !thumbCache[fn]) {
             const im = new Image();
-            im.src = 'album_anh_cuoi_thumbs/' + fn;
+            im.src = 'anh-cuoi-web/' + fn;
             thumbCache[fn] = im;
           }
         });
@@ -2466,7 +2466,7 @@
         const nextFn = displayedImages[nextIdx];
         if (nextFn && !highResCache[nextFn]) {
           const hr = new Image();
-          hr.src = 'album_anh_cuoi/' + nextFn;
+          hr.src = 'anh-cuoi/' + nextFn;
           highResCache[nextFn] = hr;
         }
       }
@@ -2476,8 +2476,8 @@
         const filename = displayedImages[index];
         const oi = allImages.indexOf(filename);
         const pn = oi >= 0 ? oi + 1 : index + 1;
-        const thumbPath = 'album_anh_cuoi_thumbs/' + filename;
-        const highResPath = 'album_anh_cuoi/' + filename;
+        const thumbPath = 'anh-cuoi-web/' + filename;
+        const highResPath = 'anh-cuoi/' + filename;
 
         // ── INSTANTLY CLEAR OLD IMAGE → BLACK ──
         scale = 1.0; panX = 0; panY = 0;
