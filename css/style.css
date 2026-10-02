@@ -1903,23 +1903,11 @@ img {
    LUXURY ALBUM CAROUSEL SLIDER (TOUCH & MOUSE DRAG)
    ═══════════════════════════════════════════════════════════════════════════ */
 .album-carousel-wrapper {
-  position: fixed;
-  inset: 0;
-  background: rgba(12, 10, 8, 0.98);
-  z-index: 99999;
-  display: flex !important;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-  padding: 20px 0;
-}
-
-.album-carousel-wrapper.active {
-  opacity: 1;
-  visibility: visible;
+  max-width: 850px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  display: none;
 }
 
 .album-carousel-main {

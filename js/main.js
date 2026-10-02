@@ -1005,16 +1005,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // View Mode Switcher
   function switchToSlideView(index, smoothScroll = false) {
+    if (albumModeSlide) albumModeSlide.classList.add('active');
+    if (albumModeGrid) albumModeGrid.classList.remove('active');
+    if (albumCarouselWrapper) albumCarouselWrapper.style.display = 'block';
+    if (albumGridWrapper) albumGridWrapper.style.display = 'none';
+
     const targetIdx = typeof index === 'number' ? index : currentPhotoIndex;
-    openLightbox(targetIdx);
+    goToSlide(targetIdx, false);
+
+    if (smoothScroll && albumCarouselWrapper) {
+      const topOffset = albumCarouselWrapper.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top: topOffset, behavior: 'smooth' });
+    }
   }
 
   function switchToGridView() {
     if (albumModeGrid) albumModeGrid.classList.add('active');
     if (albumModeSlide) albumModeSlide.classList.remove('active');
-    if (albumCarouselWrapper) albumCarouselWrapper.classList.remove('active');
-    document.body.style.overflow = '';
-
+    if (albumCarouselWrapper) albumCarouselWrapper.style.display = 'none';
+    if (albumGridWrapper) albumGridWrapper.style.display = 'block';
   }
 
   if (albumModeSlide && albumModeGrid) {
