@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const elNapTaiDirect = document.getElementById('event-naptai-map-direct');
   if (elNapTaiDirect) elNapTaiDirect.href = DEFAULT_NAPTAI_MAP;
 
-  // 2. Nhà Trai: Lễ Vu Quy
+  // 2. Nhà Trai: Lễ Thành Hôn
   const DEFAULT_VUQUY_TIME = '10:00 • 20.12.2026';
   const DEFAULT_VUQUY_ADDRESS = 'Sân vận động thôn Đại Mỹ, Xã Thượng Đức, Thành Phố Đà Nẵng';
   const DEFAULT_VUQUY_MAP = 'https://maps.app.goo.gl/caDXU6YDqyaPM3Wt9';
@@ -221,9 +221,9 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ==========================================================================
      INTELLIGENT EVENT FILTERING: LỄ NẠP TÀI (NHÀ GÁI) & LỄ VU QUY (NHÀ TRAI)
      "Mời tham dự tiệc nào?" (guestEvent) là yếu tố QUYẾT ĐỊNH hiển thị tiệc trên thiệp!
-     - guestEvent = 'vuquy': Chỉ hiển thị duy nhất Lễ Vu Quy (Nhà Trai), ẩn Lễ Nạp Tài.
-     - guestEvent = 'naptai': Chỉ hiển thị duy nhất Lễ Nạp Tài (Nhà Gái), ẩn Lễ Vu Quy.
-     - guestEvent = 'all' hoặc rỗng: Hiển thị cả 2 tiệc Lễ Nạp Tài & Lễ Vu Quy.
+     - guestEvent = 'vuquy': Chỉ hiển thị duy nhất Lễ Thành Hôn (Nhà Trai), ẩn Lễ Nạp Tài.
+     - guestEvent = 'naptai': Chỉ hiển thị duy nhất Lễ Nạp Tài (Nhà Gái), ẩn Lễ Thành Hôn.
+     - guestEvent = 'all' hoặc rỗng: Hiển thị cả 2 tiệc Lễ Nạp Tài & Lễ Thành Hôn.
      - guestSide (groom/bride/both): Quyết định đại diện kính báo và chọn sẵn phía khách trong RSVP.
      ========================================================================== */
   const cardNapTai = document.getElementById('card-event-naptai');
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (guestEvent === 'vuquy') {
     // === 1. MỜI THAM DỰ LỄ VU QUY (NHÀ TRAI) ===
-    // Quyết định: Chỉ hiện Lễ Vu Quy, ẩn hoàn toàn Lễ Nạp Tài
+    // Quyết định: Chỉ hiện Lễ Thành Hôn, ẩn hoàn toàn Lễ Nạp Tài
     if (cardNapTai) cardNapTai.style.display = 'none';
     if (cardVuQuy) cardVuQuy.style.display = 'flex';
 
@@ -262,12 +262,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (rsvpNapTai) rsvpNapTai.style.display = 'none';
     if (rsvpBoth) rsvpBoth.style.display = 'none';
     if (rsvpVuQuy) rsvpVuQuy.style.display = 'inline-flex';
-    const r = document.querySelector('input[name="rsvp-event"][value="Lễ Thành Hôn"]') || document.querySelector('input[name="rsvp-event"][value="Lễ Vu Quy"]');
+    const r = document.querySelector('input[name="rsvp-event"][value="Lễ Thành Hôn"]') || document.querySelector('input[name="rsvp-event"][value="Lễ Thành Hôn"]');
     if (r) r.checked = true;
 
   } else if (guestEvent === 'naptai') {
     // === 2. MỜI THAM DỰ LỄ NẠP TÀI (NHÀ GÁI) ===
-    // Quyết định: Chỉ hiện Lễ Nạp Tài, ẩn hoàn toàn Lễ Vu Quy
+    // Quyết định: Chỉ hiện Lễ Nạp Tài, ẩn hoàn toàn Lễ Thành Hôn
     if (cardVuQuy) cardVuQuy.style.display = 'none';
     if (cardNapTai) cardNapTai.style.display = 'flex';
 
@@ -1584,7 +1584,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const groomDisplayName = (savedConfig.groomName || 'Bá Sang');
     const brideDisplayName = (savedConfig.brideName && savedConfig.brideName !== 'Thị Thương') ? savedConfig.brideName : 'Kiều Thương';
 
-    // 1. Tiệc Nhà Trai (Lễ Vu Quy): Chỉ hiển thị STK Nhà Trai (Chú Rể)
+    // 1. Tiệc Nhà Trai (Lễ Thành Hôn): Chỉ hiển thị STK Nhà Trai (Chú Rể)
     if (guestEvent === 'vuquy' || (!guestEvent && guestSide === 'groom')) {
       if (giftModalTabs) giftModalTabs.style.display = 'none';
       if (giftModalSubtitle) giftModalSubtitle.innerText = `Mừng Cưới Chú Rể ${groomDisplayName}`;

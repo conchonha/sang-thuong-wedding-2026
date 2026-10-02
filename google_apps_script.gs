@@ -207,7 +207,7 @@ function handleSaveGuest(sheet, data) {
     else if (data.side === 'both') sideText = 'Bạn chung';
 
     let eventText = data.eventChoice || 'Cả Hai Buổi Lễ';
-    if (data.eventChoice === 'vuquy') eventText = 'Lễ Vu Quy (Nhà Trai)';
+    if (data.eventChoice === 'vuquy') eventText = 'Lễ Thành Hôn (Nhà Trai)';
     else if (data.eventChoice === 'naptai') eventText = 'Lễ Nạp Tài (Nhà Gái)';
     else if (data.eventChoice === 'all') eventText = 'Cả Hai Buổi Lễ';
 

@@ -158,11 +158,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const { name, side, eventChoice } = guest;
     const savedCfg = JSON.parse(localStorage.getItem('wedding_custom_config') || '{}');
     const coupleNames = (savedCfg.groomName && savedCfg.brideName) ? `${savedCfg.groomName} & ${savedCfg.brideName}` : 'Bá Sang & Kiều Thương';
-    let eventText = 'Cả Hai Buổi Lễ (Lễ Nạp Tài & Lễ Vu Quy)';
+    let eventText = 'Cả Hai Buổi Lễ (Lễ Nạp Tài & Lễ Thành Hôn)';
     let eventTitleShort = 'Cả Hai Buổi Lễ';
     if (eventChoice === 'vuquy') {
-      eventText = 'Lễ Vu Quy tại Tư gia Nhà Trai';
-      eventTitleShort = 'Lễ Vu Quy (Nhà Trai)';
+      eventText = 'Lễ Thành Hôn tại Tư gia Nhà Trai';
+      eventTitleShort = 'Lễ Thành Hôn (Nhà Trai)';
     } else if (eventChoice === 'naptai') {
       eventText = 'Lễ Nạp Tài tại Tư gia Nhà Gái';
       eventTitleShort = 'Lễ Nạp Tài (Nhà Gái)';
@@ -259,9 +259,9 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     function updateEventOptions() {
       if (!sideSelect || !eventSelect) return;
       eventSelect.innerHTML = `
-        <option value="vuquy">Lễ Vu Quy (Nhà Trai)</option>
+        <option value="vuquy">Lễ Thành Hôn (Nhà Trai)</option>
         <option value="naptai">Lễ Nạp Tài (Nhà Gái)</option>
-        <option value="all">Cả Hai Buổi Lễ (Lễ Nạp Tài &amp; Lễ Vu Quy)</option>
+        <option value="all">Cả Hai Buổi Lễ (Lễ Nạp Tài &amp; Lễ Thành Hôn)</option>
       `;
       const currentSide = sideSelect.value;
       if (currentSide === 'groom') {
@@ -307,7 +307,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
       const sideText = guest.side === 'groom' ? 'Nhà Trai' : guest.side === 'bride' ? 'Nhà Gái' : 'Bạn chung';
       const eventText = guest.eventChoice === 'vuquy'
-        ? 'Lễ Vu Quy (Nhà Trai)'
+        ? 'Lễ Thành Hôn (Nhà Trai)'
         : guest.eventChoice === 'naptai'
           ? 'Lễ Nạp Tài (Nhà Gái)'
           : 'Cả Hai Buổi Lễ';
@@ -1218,7 +1218,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       tr.id = 'guest-row-' + g.id;
       const sideText = g.side === 'groom' ? 'Nhà Trai' : g.side === 'bride' ? 'Nhà Gái' : 'Bạn chung';
       const eventText = g.eventChoice === 'vuquy' 
-        ? 'Lễ Vu Quy (Nhà Trai)' 
+        ? 'Lễ Thành Hôn (Nhà Trai)' 
         : g.eventChoice === 'naptai' 
           ? 'Lễ Nạp Tài (Nhà Gái)' 
           : 'Cả Hai Buổi Lễ';
@@ -1416,7 +1416,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         guests.forEach((g, idx) => {
           const sideText = g.side === 'groom' ? 'Nhà Trai' : g.side === 'bride' ? 'Nhà Gái' : 'Bạn chung';
           const eventText = g.eventChoice === 'vuquy' 
-            ? 'Lễ Vu Quy (Nhà Trai)' 
+            ? 'Lễ Thành Hôn (Nhà Trai)' 
             : g.eventChoice === 'naptai' 
               ? 'Lễ Nạp Tài (Nhà Gái)' 
               : 'Cả Hai Buổi Lễ';
@@ -1545,7 +1545,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     if (savedConfig.naptaiAddress) document.getElementById('cfg-naptai-address').value = savedConfig.naptaiAddress;
     if (savedConfig.naptaiMap) document.getElementById('cfg-naptai-map').value = savedConfig.naptaiMap;
 
-    // Lễ Vu Quy (Nhà Trai)
+    // Lễ Thành Hôn (Nhà Trai)
     if (savedConfig.vuquyTime) document.getElementById('cfg-vuquy-time').value = savedConfig.vuquyTime;
     if (savedConfig.vuquyAddress && !savedConfig.vuquyAddress.includes('Đội Cấn') && !savedConfig.vuquyAddress.includes('Trống Đồng') && !savedConfig.vuquyAddress.includes('Quán Sứ') && !savedConfig.vuquyAddress.includes('Hà Nội')) {
       document.getElementById('cfg-vuquy-address').value = savedConfig.vuquyAddress;
@@ -1736,7 +1736,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         csv += 'STT,Tên Khách Mời,Phía Khách,Tiệc Mời,Trạng Thái,Số Người,Lời Chúc,Link Rút Gọn\n';
         guests.forEach((g, idx) => {
           const sideText  = g.side === 'groom' ? 'Nhà Trai' : g.side === 'bride' ? 'Nhà Gái' : 'Bạn Chung';
-          const eventText = g.eventChoice === 'vuquy' ? 'Lễ Vu Quy' : g.eventChoice === 'naptai' ? 'Lễ Nạp Tài' : 'Cả Hai Lễ';
+          const eventText = g.eventChoice === 'vuquy' ? 'Lễ Thành Hôn' : g.eventChoice === 'naptai' ? 'Lễ Nạp Tài' : 'Cả Hai Lễ';
           const effectiveLink = (g.shortUrl && g.shortUrl.startsWith('http')) ? g.shortUrl : g.link;
           const row = [
             idx + 1,
@@ -1797,7 +1797,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       const sideColor = g.side === 'groom' ? '#e8f0ff' : g.side === 'bride' ? '#fce4ec' : '#f1ece5';
       const sideTxt   = g.side === 'groom' ? '#1565c0' : g.side === 'bride' ? '#880e4f' : '#4a3e35';
       const eventText = g.eventChoice === 'vuquy'
-        ? 'Lễ Vu Quy (Nhà Trai)'
+        ? 'Lễ Thành Hôn (Nhà Trai)'
         : g.eventChoice === 'naptai'
           ? 'Lễ Nạp Tài (Nhà Gái)'
           : 'Cả Hai Buổi Lễ';
