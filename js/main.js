@@ -911,6 +911,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Xáo trộn mảng galleryPhotos (Fisher-Yates shuffle)
+  for (let i = galleryPhotos.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [galleryPhotos[i], galleryPhotos[j]] = [galleryPhotos[j], galleryPhotos[i]];
+  }
+
+  // Cập nhật lại DOM với thứ tự đã xáo trộn
+  const tempGridItems = document.querySelectorAll('.gallery-grid .gallery-item');
+  const tempSlides = document.querySelectorAll('.album-track .album-slide');
+  const tempThumbs = document.querySelectorAll('.album-thumbs-container .album-thumb-item');
+
+  galleryPhotos.forEach((data, i) => {
+    // 1. Cập nhật ảnh trong Lưới (Grid)
+    if (tempGridItems[i]) {
+      tempGridItems[i].setAttribute('data-caption', data.caption);
+      const img = tempGridItems[i].querySelector('img');
+      if (img) img.setAttribute('src', data.src);
+    }
+    // 2. Cập nhật ảnh trong Trình Chiếu (Slide)
+    if (tempSlides[i]) {
+      tempSlides[i].setAttribute('data-caption', data.caption);
+      const img = tempSlides[i].querySelector('img');
+      if (img) img.setAttribute('src', data.src);
+      const captionEl = tempSlides[i].querySelector('.album-slide-caption');
+      if (captionEl) captionEl.innerText = data.caption;
+    }
+    // 3. Cập nhật ảnh Thumbnail
+    if (tempThumbs[i]) {
+      const img = tempThumbs[i].querySelector('img');
+      if (img) img.setAttribute('src', data.src);
+    }
+  });
+
   let currentPhotoIndex = 0;
   const totalPhotos = galleryPhotos.length;
 
@@ -1163,8 +1196,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Grid view clicks: open the rich slider (Trình chiếu) as a popup modal
   gridItems.forEach((item, index) => {
-    item.addEventListener('click', () => {
-      switchToSlideView(index, false);
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      openLightbox(index);
     });
   });
 
