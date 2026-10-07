@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image-more/3.2.0/dom-to-image-more.min.js"></script>
+  <style>
+    .card { width: 400px; height: 300px; background: #fdf2f0; position: relative; }
+    .img-blend { mix-blend-mode: multiply; position: absolute; top: 0; left: 0; width: 100px; height: 100px; background: rgba(255,0,0,0.5); border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="img-blend"></div>
+  </div>
+  <img id="out" />
+  <script>
+    setTimeout(() => {
+      domtoimage.toPng(document.getElementById('card'), { bgcolor: '#fdf2f0' }).then(url => {
+        document.getElementById('out').src = url;
+        console.log("SUCCESS");
+      }).catch(console.error);
+    }, 1000);
+  </script>
+</body>
+</html>

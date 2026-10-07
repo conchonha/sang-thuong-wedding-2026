@@ -25,11 +25,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Dancing+Script:wght@500;600;700&family=Ephesis&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&family=Pinyon+Script&family=Allura&display=swap"
-    rel="stylesheet">
+    rel="stylesheet" crossorigin="anonymous">
 
-  <!-- html2canvas for instant export to PNG (300 DPI print quality) -->
-  <script src="./js/html2canvas.min.js"></script>
-  <script>if (typeof html2canvas === 'undefined') { document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>'); }</script>
+  <!-- html-to-image for exact DOM rendering (100% fidelity) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
   <!-- Pre-embedded Base64 Assets for Offline & Local file:// Canvas Export Security -->
   <script src="./js/assets_base64.js"></script>
 
@@ -1043,7 +1042,7 @@
       font-weight: 600;
     }
 
-    .restaurant-name-calligraphy {
+    .restaurant-name-calligraphy { padding-right: 0.2em;
       font-family: 'Dancing Script', 'Ephesis', 'Alex Brush', cursive;
       font-size: 2.55rem;
       font-weight: 700;
@@ -1510,7 +1509,7 @@
       width: 100%;
     }
 
-    .couple-name-calligraphy-announcement {
+    .couple-name-calligraphy-announcement { padding-right: 0.2em;
       font-family: 'Dancing Script', 'Ephesis', 'Alex Brush', cursive;
       font-size: 2.65rem;
       font-weight: 700;
@@ -3572,64 +3571,11 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
      * ======================================================== */
 
     /**
-     * Prepare cloned card elements for html2canvas export:
-     *  - Normalizes mix-blend-mode to avoid browser composition glitches
-     *  - Fixes calligraphy text: html2canvas does not support -webkit-background-clip: text,
-     *    which would render as a solid dark gradient rectangle. We set background to none and apply
-     *    a rich metallic gold text color so calligraphy is sharp, clean and seamless.
-     *  - Ensures all images use transparent PNG base64 assets without any rectangular backgrounds
+     * Prepare cloned card elements for export:
+     * - Ensures unique images use base64 assets to avoid CORS issues
      */
     function prepareCloneForExport(clone) {
-      // Get paper background color for pre-compositing multiply blends
-      var paperBgColor = window.getComputedStyle(clone).backgroundColor || '#faf7f2';
-
-      // 1. Pre-composite watercolor images with multiply blend onto paper background
-      //    html2canvas does NOT support mix-blend-mode, so we must do it manually
-      var multiplyImgs = clone.querySelectorAll('.card-bg-bride, .card-bg-groom, .card-bg-floral-top-left, .card-bg-floral-bottom-right');
-      multiplyImgs.forEach(function(img) {
-        var liveImg = document.querySelector('.' + img.className.split(' ').find(function(c) { return c.startsWith('card-bg-'); }));
-        var srcToUse = null;
-        // Determine best source
-        if (img.className.includes('card-bg-bride') && window.ASSET_BASE64 && window.ASSET_BASE64.bride) srcToUse = window.ASSET_BASE64.bride;
-        else if (img.className.includes('card-bg-groom') && window.ASSET_BASE64 && window.ASSET_BASE64.groom) srcToUse = window.ASSET_BASE64.groom;
-        else if (img.className.includes('card-bg-floral-top-left') && window.ASSET_BASE64 && window.ASSET_BASE64.floral_tl) srcToUse = window.ASSET_BASE64.floral_tl;
-        else if (img.className.includes('card-bg-floral-bottom-right') && window.ASSET_BASE64 && window.ASSET_BASE64.floral_br) srcToUse = window.ASSET_BASE64.floral_br;
-        else if (liveImg && liveImg.src) srcToUse = liveImg.src;
-
-        if (srcToUse) {
-          img.src = srcToUse;
-        }
-        // Set blend to normal — the visual result is achieved via opacity
-        img.style.mixBlendMode = 'normal';
-      });
-
-      // 2. Set ALL other elements blend mode to normal
-      clone.querySelectorAll('*').forEach(function(el) {
-        el.style.mixBlendMode = 'normal';
-      });
-
-      // 3. Fix gold gradient text: html2canvas renders -webkit-background-clip: text as an opaque box
-      clone.querySelectorAll('.restaurant-name-calligraphy, .couple-name-calligraphy-announcement, .gold-highlight-text, .cover-couple-names').forEach(function(el) {
-        el.style.setProperty('background', 'none', 'important');
-        el.style.setProperty('-webkit-background-clip', 'border-box', 'important');
-        el.style.setProperty('background-clip', 'border-box', 'important');
-        el.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
-      });
-
-      // 4. Fix badge icon circles: force inline styles so html2canvas renders correctly
-      clone.querySelectorAll('.badge-icon-circle').forEach(function(el) {
-        el.style.setProperty('box-shadow', 'none', 'important');
-        el.style.setProperty('border-radius', '50%', 'important');
-        el.style.setProperty('overflow', 'hidden', 'important');
-        el.style.setProperty('-webkit-mask-image', '-webkit-radial-gradient(white, black)', 'important');
-      });
-
-      // 5. Remove CSS drop-shadow filters that html2canvas renders incorrectly
-      clone.querySelectorAll('.ceremony-qr-img, .invitation-art-img, .cover-bow-arch-img').forEach(function(el) {
-        el.style.setProperty('filter', 'none', 'important');
-      });
-
-      // 6. Ensure unique images use base64 assets
+      // 1. Ensure unique images use base64 assets
       var uniqueImgs = [
         { cloneSel: '#chairArtImg, .invitation-art-img', liveId: 'chairArtImg', key: 'chair' },
         { cloneSel: '#coupleArchImg, .cover-art-img', liveId: 'coupleArchImg', key: 'arch' },
@@ -3643,21 +3589,23 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         if (window.ASSET_BASE64 && window.ASSET_BASE64[item.key]) cloneImg.src = window.ASSET_BASE64[item.key];
       });
 
-      // 7. Remove onerror and crossorigin attributes on all cloned images
-      clone.querySelectorAll('img').forEach(function(img) {
-        img.removeAttribute('onerror');
-        img.removeAttribute('crossorigin');
+      // 2. Fallback base64 for card backgrounds if present
+      var bgSelectors = {
+        '.card-bg-bride': 'bride',
+        '.card-bg-groom': 'groom',
+        '.card-bg-floral-top-left': 'floral_tl',
+        '.card-bg-floral-bottom-right': 'floral_br'
+      };
+      Object.keys(bgSelectors).forEach(function(sel) {
+        clone.querySelectorAll(sel).forEach(function(img) {
+          var key = bgSelectors[sel];
+          if (window.ASSET_BASE64 && window.ASSET_BASE64[key]) {
+            img.src = window.ASSET_BASE64[key];
+          }
+        });
       });
 
-      // 8. Sanitize SVG gradients, defs, and filter references
-      clone.querySelectorAll('.monogram-crest-svg, svg').forEach(function(svg) {
-        svg.querySelectorAll('defs').forEach(function(def) { def.remove(); });
-        svg.querySelectorAll('[stroke*="url("]').forEach(function(el) { el.setAttribute('stroke', '#b8860b'); });
-        svg.querySelectorAll('[fill*="url("]').forEach(function(el) { el.setAttribute('fill', '#b8860b'); });
-        svg.querySelectorAll('[filter*="url("]').forEach(function(el) { el.removeAttribute('filter'); });
-      });
-
-      // 9. Ensure QR code uses inline base64/data URI
+      // 3. Ensure QR code uses inline base64/data URI
       var qrImg = clone.querySelector('#ceremonyQrImg, .ceremony-qr-img');
       if (qrImg) {
         var liveQr = document.getElementById('ceremonyQrImg');
@@ -3677,6 +3625,30 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     }
 
     /* --------------------------------------------------------
+     * Helper to reliably wait for all images to decode before capture
+     * -------------------------------------------------------- */
+    async function waitForImagesToDecode(container) {
+      const images = Array.from(container.querySelectorAll('img'));
+      await Promise.all(images.map(img => {
+        return new Promise(resolve => {
+          const tryDecode = () => {
+            if (img.decode) {
+              img.decode().then(resolve).catch(resolve);
+            } else {
+              resolve();
+            }
+          };
+          if (img.complete) {
+            tryDecode();
+          } else {
+            img.onload = tryDecode;
+            img.onerror = resolve;
+          }
+        });
+      }));
+    }
+
+    /* --------------------------------------------------------
      * Export single card
      * -------------------------------------------------------- */
     function exportCardToPng(elementId, filename, btnEl) {
@@ -3693,29 +3665,31 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
 
       // Clone, prepare, then render
       const clone = cardEl.cloneNode(true);
-      clone.style.cssText += ';position:fixed;left:0;top:0;z-index:-99999;margin:0;box-shadow:none;transform:none;pointer-events:none;box-sizing:border-box;';
+      clone.style.cssText += ';position:absolute;left:0;top:0;z-index:-99999;margin:0;box-shadow:none;transform:none;pointer-events:none;box-sizing:border-box;';
       clone.style.width = cardW + 'px';
       clone.style.height = cardH + 'px';
       clone.style.backgroundColor = paperBg;
       prepareCloneForExport(clone);
       document.body.appendChild(clone);
 
-      setTimeout(() => {
-        html2canvas(clone, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: paperBg,
-          logging: false
-        }).then(canvas => {
-          downloadCanvasAsPng(canvas, filename || 'wedding-card.png');
-        }).catch(err => {
-          console.error('Export error:', err);
-          alert('Lỗi xuất ảnh: ' + (err && err.message ? err.message : err));
-        }).finally(() => {
-          if (document.body.contains(clone)) document.body.removeChild(clone);
-          if (btnEl) { btnEl.innerText = origText; btnEl.style.opacity = '1'; }
+      document.fonts.ready.then(() => {
+        waitForImagesToDecode(clone).then(() => {
+          setTimeout(() => {
+            htmlToImage.toCanvas(clone, {
+              pixelRatio: 3,
+              backgroundColor: paperBg,
+            }).then(canvas => {
+              downloadCanvasAsPng(canvas, filename || 'wedding-card.png');
+            }).catch(err => {
+              console.error('Export error:', err);
+              alert('Lỗi xuất ảnh: ' + (err && err.message ? err.message : err));
+            }).finally(() => {
+              if (document.body.contains(clone)) document.body.removeChild(clone);
+              if (btnEl) { btnEl.innerText = origText; btnEl.style.opacity = '1'; }
+            });
+          });
         });
-      }, 350);
+      });
     }
 
     /* --------------------------------------------------------
@@ -3740,7 +3714,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         'display:flex', 'flex-direction:row', 'align-items:stretch',
         'width:' + totalW + 'px',
         'height:' + cardH + 'px',
-        'position:fixed', 'left:0', 'top:0', 'z-index:-99999', 'pointer-events:none',
+        'position:absolute', 'left:0', 'top:0', 'z-index:-99999', 'pointer-events:none',
         'background:' + paperBg, 'overflow:hidden'
       ].join(';');
 
@@ -3785,21 +3759,13 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       document.body.appendChild(tempSpread);
 
       // Chờ các ảnh load/decode xong rồi mới chụp
-      const images = Array.from(tempSpread.querySelectorAll('img'));
-      Promise.all(images.map(img => {
-        if (img.complete) return Promise.resolve();
-        return new Promise(resolve => {
-          img.onload = resolve;
-          img.onerror = resolve;
-        });
-      })).then(() => {
-        setTimeout(() => {
-          html2canvas(tempSpread, {
-            scale: 3,
-            useCORS: true,
-            backgroundColor: paperBg,
-            logging: false
-          }).then(canvas => {
+      document.fonts.ready.then(() => {
+        waitForImagesToDecode(tempSpread).then(() => {
+          setTimeout(() => {
+            htmlToImage.toCanvas(tempSpread, {
+              pixelRatio: 3,
+              backgroundColor: paperBg,
+            }).then(canvas => {
             const ctx = canvas.getContext('2d');
             const s = 3;
             const mm = 3.7795 * s;
@@ -3830,6 +3796,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
             if (btnEl) { btnEl.innerText = origText; btnEl.style.opacity = '1'; }
           });
         }, 350);
+      });
       });
     }
 
