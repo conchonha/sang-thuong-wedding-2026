@@ -3510,34 +3510,119 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       }
     }
 
-    function printAllCards() {
-      const pItem = document.querySelector('.view-item-party');
-      const cItem = document.querySelector('.view-item-cover');
-      const mItem = document.querySelector('.view-item-ceremony');
-      const combItem = document.querySelector('.view-item-combined');
-
-      if (pItem) pItem.style.display = 'flex';
-      if (cItem) cItem.style.display = 'flex';
-      if (mItem) mItem.style.display = 'flex';
-      if (combItem) combItem.style.display = 'flex';
-
-      syncCombinedSpread();
-
-      const foldCheckbox = document.getElementById('toggleFoldGuideCheckbox');
-      if (foldCheckbox && foldCheckbox.checked) {
-        document.body.classList.add('show-fold-guide-print');
-      } else {
-        document.body.classList.remove('show-fold-guide-print');
+    async function printAllCards() {
+      const btn = document.querySelector('.btn-print');
+      const origText = btn ? btn.innerText : '';
+      if (btn) {
+        btn.innerText = '⏳ Đang tạo bản in nét (Vui lòng đợi 3-5s)...';
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.7';
       }
 
-      window.print();
+      try {
+        await document.fonts.ready;
 
-      // Restore tab view state
-      const activeTab = document.querySelector('.tab-btn.active');
-      const onclickStr = activeTab ? activeTab.getAttribute('onclick') : '';
-      const match = onclickStr ? onclickStr.match(/'([^']+)'/) : null;
-      const viewMode = match ? match[1] : 'all';
-      switchView(viewMode);
+        const pItem = document.querySelector('.view-item-party');
+        const cItem = document.querySelector('.view-item-cover');
+        const mItem = document.querySelector('.view-item-ceremony');
+        const combItem = document.querySelector('.view-item-combined');
+
+        if (pItem) pItem.style.display = 'flex';
+        if (cItem) cItem.style.display = 'flex';
+        if (mItem) mItem.style.display = 'flex';
+        if (combItem) combItem.style.display = 'flex';
+
+        syncCombinedSpread();
+
+        const cardIds = ['cardParty', 'cardCover', 'cardCeremony', 'cardCombinedSpread'];
+        const images = [];
+
+        for (let id of cardIds) {
+          const cardEl = document.getElementById(id);
+          if (!cardEl) continue;
+          
+          const rect = cardEl.getBoundingClientRect();
+          const cardW = Math.round(rect.width);
+          const cardH = Math.round(rect.height);
+          const paperBg = window.getComputedStyle(cardEl).backgroundColor || '#faf7f2';
+          
+          const clone = cardEl.cloneNode(true);
+          clone.style.cssText += ';position:absolute;left:0;top:0;z-index:-99999;margin:0;box-shadow:none;transform:none;pointer-events:none;box-sizing:border-box;';
+          clone.style.width = cardW + 'px';
+          clone.style.height = cardH + 'px';
+          clone.style.backgroundColor = paperBg;
+          
+          prepareCloneForExport(clone);
+          document.body.appendChild(clone);
+          
+          await waitForImagesToDecode(clone);
+          
+          const dataUrl = await htmlToImage.toPng(clone, {
+            pixelRatio: 3,
+            backgroundColor: paperBg
+          });
+          images.push(dataUrl);
+          
+          document.body.removeChild(clone);
+        }
+
+        let printFrame = document.getElementById('printFrame');
+        if (!printFrame) {
+          printFrame = document.createElement('iframe');
+          printFrame.id = 'printFrame';
+          printFrame.style.position = 'fixed';
+          printFrame.style.right = '0';
+          printFrame.style.bottom = '0';
+          printFrame.style.width = '0';
+          printFrame.style.height = '0';
+          printFrame.style.border = '0';
+          document.body.appendChild(printFrame);
+        }
+        
+        const doc = printFrame.contentWindow.document;
+        doc.open();
+        doc.write(`
+          <html>
+          <head>
+            <style>
+              body { margin: 0; padding: 0; background: white; text-align: center; }
+              img { max-width: 100%; height: auto; page-break-after: always; display: block; margin: 0 auto; box-sizing: border-box; }
+              @media print {
+                @page { margin: 0; }
+                body { margin: 0; }
+              }
+            </style>
+          </head>
+          <body>
+            ${images.map(src => `<img src="${src}" />`).join('')}
+          </body>
+          </html>
+        `);
+        doc.close();
+
+        await new Promise(resolve => {
+          printFrame.contentWindow.onload = () => resolve();
+          setTimeout(resolve, 1000); // fallback
+        });
+        
+        printFrame.contentWindow.focus();
+        printFrame.contentWindow.print();
+
+      } catch (err) {
+        console.error('Print error:', err);
+        alert('Lỗi tạo bản in: ' + err.message);
+      } finally {
+        if (btn) {
+          btn.innerText = origText;
+          btn.style.pointerEvents = 'auto';
+          btn.style.opacity = '1';
+        }
+        const activeTab = document.querySelector('.tab-btn.active');
+        const onclickStr = activeTab ? activeTab.getAttribute('onclick') : '';
+        const match = onclickStr ? onclickStr.match(/'([^']+)'/) : null;
+        const viewMode = match ? match[1] : 'all';
+        switchView(viewMode);
+      }
     }
 
     window.addEventListener('beforeprint', () => {
