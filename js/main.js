@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const rawGuestName = urlParams.get('to') || urlParams.get('guest') || urlParams.get('name') || '';
   const rawSideParam = urlParams.get('side') || '';
-  const rawTypeParam = (urlParams.get('type') || urlParams.get('event') || '').trim();
+  const rawTypeParam = (urlParams.get('type') || urlParams.get('.type') || urlParams.get('event') || '').trim();
 
   // Logic phân loại hiển thị sự kiện theo URL:
   // 1. type=VK (hoặc type=vk, naptai, bride, gai, nhagai) -> Chỉ hiển thị Lễ Nạp Tài (Nhà Gái), ẩn Lễ Thành Hôn (Nhà Trai).
@@ -157,10 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ═══ AUTHORITATIVE DEFAULT EVENT CONFIGURATIONS (BỎ LOCALSTORAGE CHO MAP) ═══
   // 1. Nhà Gái: Lễ Nạp Tài
-  const DEFAULT_NAPTAI_TIME = '09:00 • 10.12.2026';
-  const DEFAULT_NAPTAI_ADDRESS = 'Số 68 Phố Huế, Phường Hàng Bài, Quận Hoàn Kiếm, TP. Hà Nội';
-  const DEFAULT_NAPTAI_MAP = 'https://maps.google.com/?q=68+Pho+Hue+Hanoi';
-  const DEFAULT_NAPTAI_EMBED = 'https://maps.google.com/maps?q=68+Pho+Hue+Hoan+Kiem+Hanoi&t=&z=15&ie=UTF8&iwloc=&output=embed';
+  const DEFAULT_NAPTAI_TIME = '10:00 • 10.12.2026';
+  const DEFAULT_NAPTAI_ADDRESS = 'Số 21 đường số 1 Xóm Thắng Thôn Hà Trung, xã Quảng Đức, huyện Quảng Xương, tỉnh Thanh Hoá';
+  const DEFAULT_NAPTAI_MAP = 'https://maps.app.goo.gl/bVgnrTXb4vHFyeZU8';
+  const DEFAULT_NAPTAI_EMBED = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d449.02188624150205!2d105.81176001419148!3d19.712269835962168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313655003102443f%3A0xe13f799bc4613d7e!2zU-G7kSBuaMOgIDIxICzEkcaw4budbmcgc-G7kSAxICx0aMO0biBIw6AgVHJ1bmcsIHjDoyBsxrB1IHbhu4cgLHThu4luaCBUaGFuaCBIw7Nh!5e1!3m2!1svi!2s!4v1791302147748!5m2!1svi!2s';
 
   const elNapTaiTime = document.getElementById('event-naptai-time');
   if (elNapTaiTime) elNapTaiTime.innerText = DEFAULT_NAPTAI_TIME;
@@ -283,6 +283,17 @@ document.addEventListener('DOMContentLoaded', () => {
         honorQuote.innerHTML = `&ldquo;Sự hiện diện của <strong>${guestDisplayName}</strong> là niềm vinh hạnh và hạnh phúc lớn lao nhất đối với Cô Dâu &amp; Gia Đình Nhà Gái.&rdquo;`;
       }
     }
+    
+    // Cập nhật ngày tháng trên bìa và phần footer cho Nhà Gái
+    const heroDateEl = document.getElementById('hero-date-text');
+    if (heroDateEl && !savedConfig.weddingDateText) heroDateEl.innerText = 'THỨ NĂM, NGÀY 10 THÁNG 12 NĂM 2026';
+    
+    const letterDate = document.querySelector('.letter-date');
+    if (letterDate) letterDate.innerText = '10 . 12 . 2026';
+    
+    const footerNote = document.querySelector('.footer-note');
+    if (footerNote) footerNote.innerHTML = 'FOREVER &amp; ALWAYS &bull; 10.12.2026';
+
 
     // RSVP: Chỉ hiển thị Lễ Nạp Tài
     if (rsvpVuQuy) rsvpVuQuy.style.display = 'none';
