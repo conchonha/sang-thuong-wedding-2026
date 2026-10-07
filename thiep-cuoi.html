@@ -3580,9 +3580,14 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
      *  - Ensures all images use transparent PNG base64 assets without any rectangular backgrounds
      */
     function prepareCloneForExport(clone) {
-      // 1. Strip mix-blend-mode to avoid html2canvas composite bugs
+      // 1. Strip mix-blend-mode ONLY on non-watercolor elements
+      //    KEEP multiply on decorative images so export matches on-screen preview
+      const keepBlendSelectors = '.card-bg-bride, .card-bg-groom, .card-bg-floral-top-left, .card-bg-floral-bottom-right';
+      const keepBlendEls = new Set(clone.querySelectorAll(keepBlendSelectors));
       clone.querySelectorAll('*').forEach(el => {
-        el.style.mixBlendMode = 'normal';
+        if (!keepBlendEls.has(el)) {
+          el.style.mixBlendMode = 'normal';
+        }
       });
 
       // 2. Fix gold gradient text: html2canvas renders -webkit-background-clip: text as an opaque box
@@ -3593,31 +3598,52 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         el.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
       });
 
-      // 2b. Remove box-shadow from icons to prevent gray square artifacts in html2canvas
+      // 2b. Remove box-shadow from icons to prevent gray square artifacts
       clone.querySelectorAll('.badge-icon-circle').forEach(el => {
         el.style.setProperty('box-shadow', 'none', 'important');
       });
 
-      // 3. Ensure all cloned images use transparent PNG base64 assets
-      if (window.ASSET_BASE64) {
-        clone.querySelectorAll('.card-bg-floral-top-left').forEach(el => el.src = window.ASSET_BASE64.floral_tl);
-        clone.querySelectorAll('.card-bg-floral-bottom-right').forEach(el => el.src = window.ASSET_BASE64.floral_br);
-        clone.querySelectorAll('.card-bg-bride').forEach(el => el.src = window.ASSET_BASE64.bride);
-        clone.querySelectorAll('.card-bg-groom').forEach(el => el.src = window.ASSET_BASE64.groom);
-        const chairImg = clone.querySelector('#chairArtImg, .invitation-art-img');
-        if (chairImg && window.ASSET_BASE64.chair) chairImg.src = window.ASSET_BASE64.chair;
-        const archImg = clone.querySelector('#coupleArchImg, .cover-art-img');
-        if (archImg && window.ASSET_BASE64.arch) archImg.src = window.ASSET_BASE64.arch;
-        const bowArchImg = clone.querySelector('#coupleBowArchImg, .cover-bow-arch-img');
-        if (bowArchImg && window.ASSET_BASE64.couple_bow_arch) bowArchImg.src = window.ASSET_BASE64.couple_bow_arch;
-      }
-
-      // 4. Remove onerror attributes on all cloned images to prevent external network fallbacks
-      clone.querySelectorAll('img').forEach(img => {
-        img.removeAttribute('onerror');
+      // 2c. Remove CSS drop-shadow filters that html2canvas renders incorrectly
+      clone.querySelectorAll('.ceremony-qr-img, .invitation-art-img, .cover-bow-arch-img').forEach(el => {
+        el.style.setProperty('filter', 'none', 'important');
       });
 
-      // 5. Sanitize SVG gradients, defs, and filter references (url(#...)) to prevent Chromium file:// security blocks
+      // 3. Ensure all cloned images use base64 assets (copy from live DOM first, then fallback to ASSET_BASE64)
+      const imgPairs = [
+        { sel: '.card-bg-floral-top-left', key: 'floral_tl' },
+        { sel: '.card-bg-floral-bottom-right', key: 'floral_br' },
+        { sel: '.card-bg-bride', key: 'bride' },
+        { sel: '.card-bg-groom', key: 'groom' },
+      ];
+      imgPairs.forEach(function(pair) {
+        clone.querySelectorAll(pair.sel).forEach(function(cloneImg) {
+          var liveImg = document.querySelector(pair.sel);
+          if (liveImg && liveImg.src) cloneImg.src = liveImg.src;
+          if (window.ASSET_BASE64 && window.ASSET_BASE64[pair.key]) cloneImg.src = window.ASSET_BASE64[pair.key];
+        });
+      });
+
+      // Handle unique images by ID
+      var uniqueImgs = [
+        { cloneSel: '#chairArtImg, .invitation-art-img', liveId: 'chairArtImg', key: 'chair' },
+        { cloneSel: '#coupleArchImg, .cover-art-img', liveId: 'coupleArchImg', key: 'arch' },
+        { cloneSel: '#coupleBowArchImg, .cover-bow-arch-img', liveId: 'coupleBowArchImg', key: 'couple_bow_arch' },
+      ];
+      uniqueImgs.forEach(function(item) {
+        var cloneImg = clone.querySelector(item.cloneSel);
+        if (!cloneImg) return;
+        var liveImg = document.getElementById(item.liveId);
+        if (liveImg && liveImg.src) cloneImg.src = liveImg.src;
+        if (window.ASSET_BASE64 && window.ASSET_BASE64[item.key]) cloneImg.src = window.ASSET_BASE64[item.key];
+      });
+
+      // 4. Remove onerror and crossorigin attributes on all cloned images
+      clone.querySelectorAll('img').forEach(img => {
+        img.removeAttribute('onerror');
+        img.removeAttribute('crossorigin');
+      });
+
+      // 5. Sanitize SVG gradients, defs, and filter references
       clone.querySelectorAll('.monogram-crest-svg, svg').forEach(svg => {
         svg.querySelectorAll('defs').forEach(def => def.remove());
         svg.querySelectorAll('[stroke*="url("]').forEach(el => el.setAttribute('stroke', '#b8860b'));
@@ -3625,7 +3651,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         svg.querySelectorAll('[filter*="url("]').forEach(el => el.removeAttribute('filter'));
       });
 
-      // 6. Ensure QR code uses inline base64/data URI instead of external http(s) URL
+      // 6. Ensure QR code uses inline base64/data URI
       const qrImg = clone.querySelector('#ceremonyQrImg, .ceremony-qr-img');
       if (qrImg) {
         const liveQr = document.getElementById('ceremonyQrImg');
@@ -3636,12 +3662,10 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
             const cvs = document.createElement('canvas');
             cvs.width = liveQr.naturalWidth;
             cvs.height = liveQr.naturalHeight;
-            const ctx = cvs.getContext('2d');
-            ctx.drawImage(liveQr, 0, 0);
+            const ctx2 = cvs.getContext('2d');
+            ctx2.drawImage(liveQr, 0, 0);
             qrImg.src = cvs.toDataURL('image/png');
-          } catch (e) {
-            qrImg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23ffffff"/><rect x="10" y="10" width="30" height="30" fill="%23111111"/><rect x="15" y="15" width="20" height="20" fill="%23ffffff"/><rect x="20" y="20" width="10" height="10" fill="%23111111"/><rect x="60" y="10" width="30" height="30" fill="%23111111"/><rect x="65" y="15" width="20" height="20" fill="%23ffffff"/><rect x="70" y="20" width="10" height="10" fill="%23111111"/><rect x="10" y="60" width="30" height="30" fill="%23111111"/><rect x="15" y="65" width="20" height="20" fill="%23ffffff"/><rect x="20" y="70" width="10" height="10" fill="%23111111"/><rect x="50" y="50" width="10" height="10" fill="%23111111"/><rect x="70" y="50" width="20" height="10" fill="%23111111"/><rect x="50" y="70" width="15" height="20" fill="%23111111"/><rect x="75" y="75" width="15" height="15" fill="%23111111"/></svg>';
-          }
+          } catch (e) { /* keep existing src */ }
         }
       }
     }
