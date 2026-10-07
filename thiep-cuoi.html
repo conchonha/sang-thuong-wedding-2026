@@ -27,9 +27,8 @@
     href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Dancing+Script:wght@500;600;700&family=Ephesis&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&family=Pinyon+Script&family=Allura&display=swap"
     rel="stylesheet">
 
-  <!-- html2canvas for instant export to PNG (300 DPI print quality) -->
-  <script src="./js/html2canvas.min.js"></script>
-  <script>if (typeof html2canvas === 'undefined') { document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>'); }</script>
+  <!-- dom-to-image-more for instant export to PNG (better CSS support than html2canvas) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image-more/3.2.0/dom-to-image-more.min.js"></script>
   <!-- Pre-embedded Base64 Assets for Offline & Local file:// Canvas Export Security -->
   <script src="./js/assets_base64.js"></script>
 
@@ -3580,56 +3579,24 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
      *  - Ensures all images use transparent PNG base64 assets without any rectangular backgrounds
      */
     function prepareCloneForExport(clone) {
-      // Get paper background color for pre-compositing multiply blends
-      var paperBgColor = window.getComputedStyle(clone).backgroundColor || '#faf7f2';
+      // (Removed html2canvas-specific mix-blend-mode and filter hacks because dom-to-image-more supports them natively)
 
-      // 1. Pre-composite watercolor images with multiply blend onto paper background
-      //    html2canvas does NOT support mix-blend-mode, so we must do it manually
-      var multiplyImgs = clone.querySelectorAll('.card-bg-bride, .card-bg-groom, .card-bg-floral-top-left, .card-bg-floral-bottom-right');
-      multiplyImgs.forEach(function(img) {
-        var liveImg = document.querySelector('.' + img.className.split(' ').find(function(c) { return c.startsWith('card-bg-'); }));
-        var srcToUse = null;
-        // Determine best source
-        if (img.className.includes('card-bg-bride') && window.ASSET_BASE64 && window.ASSET_BASE64.bride) srcToUse = window.ASSET_BASE64.bride;
-        else if (img.className.includes('card-bg-groom') && window.ASSET_BASE64 && window.ASSET_BASE64.groom) srcToUse = window.ASSET_BASE64.groom;
-        else if (img.className.includes('card-bg-floral-top-left') && window.ASSET_BASE64 && window.ASSET_BASE64.floral_tl) srcToUse = window.ASSET_BASE64.floral_tl;
-        else if (img.className.includes('card-bg-floral-bottom-right') && window.ASSET_BASE64 && window.ASSET_BASE64.floral_br) srcToUse = window.ASSET_BASE64.floral_br;
-        else if (liveImg && liveImg.src) srcToUse = liveImg.src;
-
-        if (srcToUse) {
-          img.src = srcToUse;
-        }
-        // Set blend to normal — the visual result is achieved via opacity
-        img.style.mixBlendMode = 'normal';
+      // 1. Ensure all cloned images use base64 assets (copy from live DOM first, then fallback to ASSET_BASE64)
+      const imgPairs = [
+        { sel: '.card-bg-floral-top-left', key: 'floral_tl' },
+        { sel: '.card-bg-floral-bottom-right', key: 'floral_br' },
+        { sel: '.card-bg-bride', key: 'bride' },
+        { sel: '.card-bg-groom', key: 'groom' },
+      ];
+      imgPairs.forEach(function(pair) {
+        clone.querySelectorAll(pair.sel).forEach(function(cloneImg) {
+          var liveImg = document.querySelector(pair.sel);
+          if (liveImg && liveImg.src) cloneImg.src = liveImg.src;
+          if (window.ASSET_BASE64 && window.ASSET_BASE64[pair.key]) cloneImg.src = window.ASSET_BASE64[pair.key];
+        });
       });
 
-      // 2. Set ALL other elements blend mode to normal
-      clone.querySelectorAll('*').forEach(function(el) {
-        el.style.mixBlendMode = 'normal';
-      });
-
-      // 3. Fix gold gradient text: html2canvas renders -webkit-background-clip: text as an opaque box
-      clone.querySelectorAll('.restaurant-name-calligraphy, .couple-name-calligraphy-announcement, .gold-highlight-text, .cover-couple-names').forEach(function(el) {
-        el.style.setProperty('background', 'none', 'important');
-        el.style.setProperty('-webkit-background-clip', 'border-box', 'important');
-        el.style.setProperty('background-clip', 'border-box', 'important');
-        el.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
-      });
-
-      // 4. Fix badge icon circles: force inline styles so html2canvas renders correctly
-      clone.querySelectorAll('.badge-icon-circle').forEach(function(el) {
-        el.style.setProperty('box-shadow', 'none', 'important');
-        el.style.setProperty('border-radius', '50%', 'important');
-        el.style.setProperty('overflow', 'hidden', 'important');
-        el.style.setProperty('-webkit-mask-image', '-webkit-radial-gradient(white, black)', 'important');
-      });
-
-      // 5. Remove CSS drop-shadow filters that html2canvas renders incorrectly
-      clone.querySelectorAll('.ceremony-qr-img, .invitation-art-img, .cover-bow-arch-img').forEach(function(el) {
-        el.style.setProperty('filter', 'none', 'important');
-      });
-
-      // 6. Ensure unique images use base64 assets
+      // Handle unique images by ID
       var uniqueImgs = [
         { cloneSel: '#chairArtImg, .invitation-art-img', liveId: 'chairArtImg', key: 'chair' },
         { cloneSel: '#coupleArchImg, .cover-art-img', liveId: 'coupleArchImg', key: 'arch' },
@@ -3701,11 +3668,9 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       document.body.appendChild(clone);
 
       setTimeout(() => {
-        html2canvas(clone, {
+        domtoimage.toCanvas(clone, {
           scale: 3,
-          useCORS: true,
-          backgroundColor: paperBg,
-          logging: false
+          bgcolor: paperBg
         }).then(canvas => {
           downloadCanvasAsPng(canvas, filename || 'wedding-card.png');
         }).catch(err => {
@@ -3794,11 +3759,9 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         });
       })).then(() => {
         setTimeout(() => {
-          html2canvas(tempSpread, {
+          domtoimage.toCanvas(tempSpread, {
             scale: 3,
-            useCORS: true,
-            backgroundColor: paperBg,
-            logging: false
+            bgcolor: paperBg
           }).then(canvas => {
             const ctx = canvas.getContext('2d');
             const s = 3;
