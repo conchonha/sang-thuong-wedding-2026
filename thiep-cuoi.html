@@ -3579,29 +3579,70 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
      *    a rich metallic gold text color so calligraphy is sharp, clean and seamless.
      *  - Ensures all images use transparent PNG base64 assets without any rectangular backgrounds
      */
-    function prepareCloneForExport(clone) {
+    async function prepareCloneForExport(clone) {
       // Get paper background color for pre-compositing multiply blends
       var paperBgColor = window.getComputedStyle(clone).backgroundColor || '#faf7f2';
+      if (paperBgColor === 'rgba(0, 0, 0, 0)' || paperBgColor === 'transparent') {
+        paperBgColor = '#faf7f2'; // Fallback
+      }
 
       // 1. Pre-composite watercolor images with multiply blend onto paper background
       //    html2canvas does NOT support mix-blend-mode, so we must do it manually
-      var multiplyImgs = clone.querySelectorAll('.card-bg-bride, .card-bg-groom, .card-bg-floral-top-left, .card-bg-floral-bottom-right');
-      multiplyImgs.forEach(function(img) {
-        var liveImg = document.querySelector('.' + img.className.split(' ').find(function(c) { return c.startsWith('card-bg-'); }));
-        var srcToUse = null;
-        // Determine best source
-        if (img.className.includes('card-bg-bride') && window.ASSET_BASE64 && window.ASSET_BASE64.bride) srcToUse = window.ASSET_BASE64.bride;
-        else if (img.className.includes('card-bg-groom') && window.ASSET_BASE64 && window.ASSET_BASE64.groom) srcToUse = window.ASSET_BASE64.groom;
-        else if (img.className.includes('card-bg-floral-top-left') && window.ASSET_BASE64 && window.ASSET_BASE64.floral_tl) srcToUse = window.ASSET_BASE64.floral_tl;
-        else if (img.className.includes('card-bg-floral-bottom-right') && window.ASSET_BASE64 && window.ASSET_BASE64.floral_br) srcToUse = window.ASSET_BASE64.floral_br;
-        else if (liveImg && liveImg.src) srcToUse = liveImg.src;
+      var multiplyImgs = Array.from(clone.querySelectorAll('.card-bg-bride, .card-bg-groom, .card-bg-floral-top-left, .card-bg-floral-bottom-right'));
+      
+      await Promise.all(multiplyImgs.map(function(img) {
+        return new Promise(function(resolve) {
+          var liveImg = document.querySelector('.' + img.className.split(' ').find(function(c) { return c.startsWith('card-bg-'); }));
+          var srcToUse = null;
+          // Determine best source
+          if (img.className.includes('card-bg-bride') && window.ASSET_BASE64 && window.ASSET_BASE64.bride) srcToUse = window.ASSET_BASE64.bride;
+          else if (img.className.includes('card-bg-groom') && window.ASSET_BASE64 && window.ASSET_BASE64.groom) srcToUse = window.ASSET_BASE64.groom;
+          else if (img.className.includes('card-bg-floral-top-left') && window.ASSET_BASE64 && window.ASSET_BASE64.floral_tl) srcToUse = window.ASSET_BASE64.floral_tl;
+          else if (img.className.includes('card-bg-floral-bottom-right') && window.ASSET_BASE64 && window.ASSET_BASE64.floral_br) srcToUse = window.ASSET_BASE64.floral_br;
+          else if (liveImg && liveImg.src) srcToUse = liveImg.src;
 
-        if (srcToUse) {
-          img.src = srcToUse;
-        }
-        // Set blend to normal — the visual result is achieved via opacity
-        img.style.mixBlendMode = 'normal';
-      });
+          if (!srcToUse) {
+            img.style.mixBlendMode = 'normal';
+            resolve();
+            return;
+          }
+
+          var tempImage = new Image();
+          tempImage.onload = function() {
+            try {
+              var cvs = document.createElement('canvas');
+              cvs.width = tempImage.naturalWidth || tempImage.width || 800;
+              cvs.height = tempImage.naturalHeight || tempImage.height || 800;
+              var ctx = cvs.getContext('2d');
+              
+              // 1. Fill background with paper color
+              ctx.fillStyle = paperBgColor;
+              ctx.fillRect(0, 0, cvs.width, cvs.height);
+              
+              // 2. Draw image with multiply and opacity baked in
+              var computedOpacity = liveImg ? (window.getComputedStyle(liveImg).opacity || '1') : '1';
+              ctx.globalAlpha = parseFloat(computedOpacity);
+              ctx.globalCompositeOperation = 'multiply';
+              ctx.drawImage(tempImage, 0, 0, cvs.width, cvs.height);
+              
+              // 3. Replace image source with baked solid image
+              img.src = cvs.toDataURL('image/jpeg', 0.95);
+              img.style.mixBlendMode = 'normal';
+              img.style.opacity = '1';
+            } catch(e) {
+              console.error('Canvas pre-composite failed:', e);
+              img.src = srcToUse;
+              img.style.mixBlendMode = 'normal';
+            }
+            resolve();
+          };
+          tempImage.onerror = function() {
+            img.style.mixBlendMode = 'normal';
+            resolve();
+          };
+          tempImage.src = srcToUse;
+        });
+      }));
 
       // 2. Set ALL other elements blend mode to normal
       clone.querySelectorAll('*').forEach(function(el) {
@@ -3679,7 +3720,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     /* --------------------------------------------------------
      * Export single card
      * -------------------------------------------------------- */
-    function exportCardToPng(elementId, filename, btnEl) {
+    async function exportCardToPng(elementId, filename, btnEl) {
       const cardEl = document.getElementById(elementId);
       if (!cardEl) { alert('Không tìm thấy mặt thiệp!'); return; }
 
@@ -3697,7 +3738,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       clone.style.width = cardW + 'px';
       clone.style.height = cardH + 'px';
       clone.style.backgroundColor = paperBg;
-      prepareCloneForExport(clone);
+      await prepareCloneForExport(clone);
       document.body.appendChild(clone);
 
       setTimeout(() => {
@@ -3721,7 +3762,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     /* --------------------------------------------------------
      * Export combined 240x180mm spread (Card 1 + Card 2)
      * -------------------------------------------------------- */
-    function exportCombinedSpreadToPng(btnEl) {
+    async function exportCombinedSpreadToPng(btnEl) {
       const cardParty = document.getElementById('cardParty');
       const cardCeremony = document.getElementById('cardCeremony');
       if (!cardParty || !cardCeremony) { alert('Không tìm thấy 2 mặt thiệp!'); return; }
@@ -3747,7 +3788,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       const cloneParty = cardParty.cloneNode(true);
       const cloneCeremony = cardCeremony.cloneNode(true);
 
-      [cloneParty, cloneCeremony].forEach(clone => {
+      for (const clone of [cloneParty, cloneCeremony]) {
         clone.style.margin = '0';
         clone.style.boxShadow = 'none';
         clone.style.transform = 'none';
@@ -3758,8 +3799,8 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         clone.style.height = cardH + 'px';
         clone.style.boxSizing = 'border-box';
         clone.style.backgroundColor = paperBg;
-        prepareCloneForExport(clone);
-      });
+        await prepareCloneForExport(clone);
+      }
 
       // Strip individual card frames from the clones so they don't draw vertical lines in the middle
       cloneParty.querySelectorAll('.card-luxury-frame').forEach(f => f.remove());
