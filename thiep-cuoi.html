@@ -3580,50 +3580,56 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
      *  - Ensures all images use transparent PNG base64 assets without any rectangular backgrounds
      */
     function prepareCloneForExport(clone) {
-      // 1. Strip mix-blend-mode ONLY on non-watercolor elements
-      //    KEEP multiply on decorative images so export matches on-screen preview
-      const keepBlendSelectors = '.card-bg-bride, .card-bg-groom, .card-bg-floral-top-left, .card-bg-floral-bottom-right';
-      const keepBlendEls = new Set(clone.querySelectorAll(keepBlendSelectors));
-      clone.querySelectorAll('*').forEach(el => {
-        if (!keepBlendEls.has(el)) {
-          el.style.mixBlendMode = 'normal';
+      // Get paper background color for pre-compositing multiply blends
+      var paperBgColor = window.getComputedStyle(clone).backgroundColor || '#faf7f2';
+
+      // 1. Pre-composite watercolor images with multiply blend onto paper background
+      //    html2canvas does NOT support mix-blend-mode, so we must do it manually
+      var multiplyImgs = clone.querySelectorAll('.card-bg-bride, .card-bg-groom, .card-bg-floral-top-left, .card-bg-floral-bottom-right');
+      multiplyImgs.forEach(function(img) {
+        var liveImg = document.querySelector('.' + img.className.split(' ').find(function(c) { return c.startsWith('card-bg-'); }));
+        var srcToUse = null;
+        // Determine best source
+        if (img.className.includes('card-bg-bride') && window.ASSET_BASE64 && window.ASSET_BASE64.bride) srcToUse = window.ASSET_BASE64.bride;
+        else if (img.className.includes('card-bg-groom') && window.ASSET_BASE64 && window.ASSET_BASE64.groom) srcToUse = window.ASSET_BASE64.groom;
+        else if (img.className.includes('card-bg-floral-top-left') && window.ASSET_BASE64 && window.ASSET_BASE64.floral_tl) srcToUse = window.ASSET_BASE64.floral_tl;
+        else if (img.className.includes('card-bg-floral-bottom-right') && window.ASSET_BASE64 && window.ASSET_BASE64.floral_br) srcToUse = window.ASSET_BASE64.floral_br;
+        else if (liveImg && liveImg.src) srcToUse = liveImg.src;
+
+        if (srcToUse) {
+          img.src = srcToUse;
         }
+        // Set blend to normal — the visual result is achieved via opacity
+        img.style.mixBlendMode = 'normal';
       });
 
-      // 2. Fix gold gradient text: html2canvas renders -webkit-background-clip: text as an opaque box
-      clone.querySelectorAll('.restaurant-name-calligraphy, .couple-name-calligraphy-announcement, .gold-highlight-text, .cover-couple-names').forEach(el => {
+      // 2. Set ALL other elements blend mode to normal
+      clone.querySelectorAll('*').forEach(function(el) {
+        el.style.mixBlendMode = 'normal';
+      });
+
+      // 3. Fix gold gradient text: html2canvas renders -webkit-background-clip: text as an opaque box
+      clone.querySelectorAll('.restaurant-name-calligraphy, .couple-name-calligraphy-announcement, .gold-highlight-text, .cover-couple-names').forEach(function(el) {
         el.style.setProperty('background', 'none', 'important');
         el.style.setProperty('-webkit-background-clip', 'border-box', 'important');
         el.style.setProperty('background-clip', 'border-box', 'important');
         el.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
       });
 
-      // 2b. Remove box-shadow from icons to prevent gray square artifacts
-      clone.querySelectorAll('.badge-icon-circle').forEach(el => {
+      // 4. Fix badge icon circles: force inline styles so html2canvas renders correctly
+      clone.querySelectorAll('.badge-icon-circle').forEach(function(el) {
         el.style.setProperty('box-shadow', 'none', 'important');
+        el.style.setProperty('border-radius', '50%', 'important');
+        el.style.setProperty('overflow', 'hidden', 'important');
+        el.style.setProperty('-webkit-mask-image', '-webkit-radial-gradient(white, black)', 'important');
       });
 
-      // 2c. Remove CSS drop-shadow filters that html2canvas renders incorrectly
-      clone.querySelectorAll('.ceremony-qr-img, .invitation-art-img, .cover-bow-arch-img').forEach(el => {
+      // 5. Remove CSS drop-shadow filters that html2canvas renders incorrectly
+      clone.querySelectorAll('.ceremony-qr-img, .invitation-art-img, .cover-bow-arch-img').forEach(function(el) {
         el.style.setProperty('filter', 'none', 'important');
       });
 
-      // 3. Ensure all cloned images use base64 assets (copy from live DOM first, then fallback to ASSET_BASE64)
-      const imgPairs = [
-        { sel: '.card-bg-floral-top-left', key: 'floral_tl' },
-        { sel: '.card-bg-floral-bottom-right', key: 'floral_br' },
-        { sel: '.card-bg-bride', key: 'bride' },
-        { sel: '.card-bg-groom', key: 'groom' },
-      ];
-      imgPairs.forEach(function(pair) {
-        clone.querySelectorAll(pair.sel).forEach(function(cloneImg) {
-          var liveImg = document.querySelector(pair.sel);
-          if (liveImg && liveImg.src) cloneImg.src = liveImg.src;
-          if (window.ASSET_BASE64 && window.ASSET_BASE64[pair.key]) cloneImg.src = window.ASSET_BASE64[pair.key];
-        });
-      });
-
-      // Handle unique images by ID
+      // 6. Ensure unique images use base64 assets
       var uniqueImgs = [
         { cloneSel: '#chairArtImg, .invitation-art-img', liveId: 'chairArtImg', key: 'chair' },
         { cloneSel: '#coupleArchImg, .cover-art-img', liveId: 'coupleArchImg', key: 'arch' },
@@ -3637,32 +3643,32 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         if (window.ASSET_BASE64 && window.ASSET_BASE64[item.key]) cloneImg.src = window.ASSET_BASE64[item.key];
       });
 
-      // 4. Remove onerror and crossorigin attributes on all cloned images
-      clone.querySelectorAll('img').forEach(img => {
+      // 7. Remove onerror and crossorigin attributes on all cloned images
+      clone.querySelectorAll('img').forEach(function(img) {
         img.removeAttribute('onerror');
         img.removeAttribute('crossorigin');
       });
 
-      // 5. Sanitize SVG gradients, defs, and filter references
-      clone.querySelectorAll('.monogram-crest-svg, svg').forEach(svg => {
-        svg.querySelectorAll('defs').forEach(def => def.remove());
-        svg.querySelectorAll('[stroke*="url("]').forEach(el => el.setAttribute('stroke', '#b8860b'));
-        svg.querySelectorAll('[fill*="url("]').forEach(el => el.setAttribute('fill', '#b8860b'));
-        svg.querySelectorAll('[filter*="url("]').forEach(el => el.removeAttribute('filter'));
+      // 8. Sanitize SVG gradients, defs, and filter references
+      clone.querySelectorAll('.monogram-crest-svg, svg').forEach(function(svg) {
+        svg.querySelectorAll('defs').forEach(function(def) { def.remove(); });
+        svg.querySelectorAll('[stroke*="url("]').forEach(function(el) { el.setAttribute('stroke', '#b8860b'); });
+        svg.querySelectorAll('[fill*="url("]').forEach(function(el) { el.setAttribute('fill', '#b8860b'); });
+        svg.querySelectorAll('[filter*="url("]').forEach(function(el) { el.removeAttribute('filter'); });
       });
 
-      // 6. Ensure QR code uses inline base64/data URI
-      const qrImg = clone.querySelector('#ceremonyQrImg, .ceremony-qr-img');
+      // 9. Ensure QR code uses inline base64/data URI
+      var qrImg = clone.querySelector('#ceremonyQrImg, .ceremony-qr-img');
       if (qrImg) {
-        const liveQr = document.getElementById('ceremonyQrImg');
+        var liveQr = document.getElementById('ceremonyQrImg');
         if (liveQr && liveQr.src && liveQr.src.startsWith('data:')) {
           qrImg.src = liveQr.src;
         } else if (liveQr && liveQr.complete && liveQr.naturalWidth > 0) {
           try {
-            const cvs = document.createElement('canvas');
+            var cvs = document.createElement('canvas');
             cvs.width = liveQr.naturalWidth;
             cvs.height = liveQr.naturalHeight;
-            const ctx2 = cvs.getContext('2d');
+            var ctx2 = cvs.getContext('2d');
             ctx2.drawImage(liveQr, 0, 0);
             qrImg.src = cvs.toDataURL('image/png');
           } catch (e) { /* keep existing src */ }
