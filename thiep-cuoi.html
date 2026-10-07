@@ -3593,6 +3593,11 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         el.style.setProperty('-webkit-text-fill-color', 'initial', 'important');
       });
 
+      // 2b. Remove box-shadow from icons to prevent gray square artifacts in html2canvas
+      clone.querySelectorAll('.badge-icon-circle').forEach(el => {
+        el.style.setProperty('box-shadow', 'none', 'important');
+      });
+
       // 3. Ensure all cloned images use transparent PNG base64 assets
       if (window.ASSET_BASE64) {
         clone.querySelectorAll('.card-bg-floral-top-left').forEach(el => el.src = window.ASSET_BASE64.floral_tl);
@@ -3749,43 +3754,53 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
 
       document.body.appendChild(tempSpread);
 
-      setTimeout(() => {
-        html2canvas(tempSpread, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: paperBg,
-          logging: false
-        }).then(canvas => {
-          const ctx = canvas.getContext('2d');
-          const s = 3;
-          const mm = 3.7795 * s;
-          const W1 = Math.round(canvas.width / 2);
-
-          // Center fold guideline (only drawn onto export file if user checks "In đường nếp gấp")
-          const shouldDrawFold = document.getElementById('toggleFoldGuideCheckbox') && document.getElementById('toggleFoldGuideCheckbox').checked;
-          if (shouldDrawFold) {
-            ctx.save();
-            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--card-accent').trim() || '#111111';
-            ctx.globalAlpha = 0.25;
-            ctx.lineWidth = Math.max(1, Math.round(0.25 * mm));
-            ctx.setLineDash([4 * s, 4 * s]);
-            ctx.beginPath();
-            ctx.moveTo(W1, 0);
-            ctx.lineTo(W1, canvas.height);
-            ctx.stroke();
-            ctx.restore();
-          }
-
-          window.__latestExportDataUrl = canvas.toDataURL('image/png');
-          downloadCanvasAsPng(canvas, 'thiep_cuoi_ngang_gap_doi_240x180.png');
-        }).catch(err => {
-          console.error('Lỗi tạo file in gập đôi:', err);
-          alert('Không thể xuất file in gập đôi: ' + (err && err.message ? err.message : err));
-        }).finally(() => {
-          if (document.body.contains(tempSpread)) document.body.removeChild(tempSpread);
-          if (btnEl) { btnEl.innerText = origText; btnEl.style.opacity = '1'; }
+      // Chờ các ảnh load/decode xong rồi mới chụp
+      const images = Array.from(tempSpread.querySelectorAll('img'));
+      Promise.all(images.map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve;
         });
-      }, 350);
+      })).then(() => {
+        setTimeout(() => {
+          html2canvas(tempSpread, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: paperBg,
+            logging: false
+          }).then(canvas => {
+            const ctx = canvas.getContext('2d');
+            const s = 3;
+            const mm = 3.7795 * s;
+            const W1 = Math.round(canvas.width / 2);
+
+            // Center fold guideline (only drawn onto export file if user checks "In đường nếp gấp")
+            const shouldDrawFold = document.getElementById('toggleFoldGuideCheckbox') && document.getElementById('toggleFoldGuideCheckbox').checked;
+            if (shouldDrawFold) {
+              ctx.save();
+              ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--card-accent').trim() || '#111111';
+              ctx.globalAlpha = 0.25;
+              ctx.lineWidth = Math.max(1, Math.round(0.25 * mm));
+              ctx.setLineDash([4 * s, 4 * s]);
+              ctx.beginPath();
+              ctx.moveTo(W1, 0);
+              ctx.lineTo(W1, canvas.height);
+              ctx.stroke();
+              ctx.restore();
+            }
+
+            window.__latestExportDataUrl = canvas.toDataURL('image/png');
+            downloadCanvasAsPng(canvas, 'thiep_cuoi_ngang_gap_doi_240x180.png');
+          }).catch(err => {
+            console.error('Lỗi tạo file in gập đôi:', err);
+            alert('Không thể xuất file in gập đôi: ' + (err && err.message ? err.message : err));
+          }).finally(() => {
+            if (document.body.contains(tempSpread)) document.body.removeChild(tempSpread);
+            if (btnEl) { btnEl.innerText = origText; btnEl.style.opacity = '1'; }
+          });
+        }, 350);
+      });
     }
 
     /* --------------------------------------------------------
