@@ -3535,7 +3535,18 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         syncCombinedSpread();
 
         const cardIds = ['cardParty', 'cardCover', 'cardCeremony', 'cardCombinedSpread'];
+        
+        // Define exact physical dimensions to guarantee 100% accurate print size
+        const cardSizes = {
+          'cardParty': 'width: 120mm; height: 180mm;',
+          'cardCover': 'width: 180mm; height: 120mm;',
+          'cardCeremony': 'width: 120mm; height: 180mm;',
+          'cardCombinedSpread': 'width: 240mm; height: 180mm;'
+        };
+        
         const images = [];
+        const foldCheckbox = document.getElementById('toggleFoldGuideCheckbox');
+        const shouldDrawFold = foldCheckbox && foldCheckbox.checked;
 
         for (let id of cardIds) {
           const cardEl = document.getElementById(id);
@@ -3552,6 +3563,16 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           clone.style.height = cardH + 'px';
           clone.style.backgroundColor = paperBg;
           
+          // Manually force the fold line to show if requested
+          if (id === 'cardCombinedSpread' && shouldDrawFold) {
+            const foldLine = clone.querySelector('.card-combined-fold-line');
+            if (foldLine) {
+              foldLine.style.setProperty('display', 'block', 'important');
+              foldLine.style.setProperty('opacity', '0.3', 'important');
+              foldLine.style.setProperty('border-left', '0.5px dashed var(--card-accent)', 'important');
+            }
+          }
+          
           prepareCloneForExport(clone);
           document.body.appendChild(clone);
           
@@ -3561,7 +3582,8 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
             pixelRatio: 3,
             backgroundColor: paperBg
           });
-          images.push(dataUrl);
+          
+          images.push({ src: dataUrl, style: cardSizes[id] });
           
           document.body.removeChild(clone);
         }
@@ -3586,15 +3608,21 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           <head>
             <style>
               body { margin: 0; padding: 0; background: white; text-align: center; }
-              img { max-width: 100%; height: auto; page-break-after: always; display: block; margin: 0 auto; box-sizing: border-box; }
+              .page-break { page-break-after: always; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+              img { display: block; margin: 0 auto; box-sizing: border-box; }
               @media print {
                 @page { margin: 0; }
                 body { margin: 0; }
+                .page-break { min-height: auto; }
               }
             </style>
           </head>
           <body>
-            ${images.map(src => `<img src="${src}" />`).join('')}
+            ${images.map(img => `
+              <div class="page-break">
+                <img src="${img.src}" style="${img.style}" />
+              </div>
+            `).join('')}
           </body>
           </html>
         `);
