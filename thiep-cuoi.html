@@ -165,6 +165,36 @@
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
 
+    /* SIDE SWITCHER (NHÀ TRAI / NHÀ GÁI) */
+    .side-switch-btn {
+      padding: 9px 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border: 1px solid #333a46;
+      background: #181c24;
+      color: #94a3b8;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .side-switch-btn:hover {
+      background: #232936;
+      color: #e2e8f0;
+    }
+
+    .side-switch-btn.active {
+      background: #2b303a;
+      color: #dfbe75;
+      border-color: #dfbe75;
+      box-shadow: 0 2px 8px rgba(223, 190, 117, 0.25);
+    }
+
     /* CONTROL GROUPS */
     .control-group {
       margin-bottom: 18px;
@@ -1042,7 +1072,8 @@
       font-weight: 600;
     }
 
-    .restaurant-name-calligraphy { padding-right: 0.2em;
+    .restaurant-name-calligraphy {
+      padding-right: 0.2em;
       font-family: 'Dancing Script', 'Ephesis', 'Alex Brush', cursive;
       font-size: 2.55rem;
       font-weight: 700;
@@ -1509,7 +1540,8 @@
       width: 100%;
     }
 
-    .couple-name-calligraphy-announcement { padding-right: 0.2em;
+    .couple-name-calligraphy-announcement {
+      padding-right: 0.2em;
       font-family: 'Dancing Script', 'Ephesis', 'Alex Brush', cursive;
       font-size: 2.65rem;
       font-weight: 700;
@@ -2048,6 +2080,16 @@
           hôn.</p>
       </div>
 
+      <!-- Quick Side Switcher: Nhà Trai / Nhà Gái -->
+      <div class="side-switch-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; background: #101215; padding: 5px; border-radius: 8px; border: 1px solid #292d35;">
+        <button type="button" class="side-switch-btn active" id="btnSideGroom" onclick="setWeddingSide('nhatrai')">
+          🎩 Nhà Trai (20.12)
+        </button>
+        <button type="button" class="side-switch-btn" id="btnSideBride" onclick="setWeddingSide('nhagai')">
+          👰 Nhà Gái (10.12)
+        </button>
+      </div>
+
       <!-- Navigation Tabs -->
       <div class="tab-view-selector">
         <button class="tab-btn active" onclick="switchView('all')">Tất Cả (Full Bộ)</button>
@@ -2439,7 +2481,6 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
                 <div class="invitation-body-lead">
                   ĐẾN THAM DỰ BUỔI TIỆC<br>
                   CHUNG VUI CÙNG GIA ĐÌNH CHÚNG TÔI TẠI<br>
-                  NHÀ HÀNG TIỆC CƯỚI
                 </div>
               </div>
 
@@ -3171,6 +3212,12 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       });
     }
 
+    const QR_PRESET_BASE64 = {
+      nhatrai: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWAQMAAAAGz+OhAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABuElEQVRIibWWMY7DIBBFx6KgnBvEF4nMtVxEAmkLX8uRL8LegJLCYvYP7K5SpDKEirzChD//z0D0ZnkRIXsUJl9INvzKXWwlmnnbb4xvz2R3ok7my0xkJOWHk2QPbD7CWI5IEmiWbQjDZWbR9XruSKZaZVc4PxZ61e8i01rydnxDlwVF+K/vSNYMdxLq64TDiwmvMS9llnynpn2+q3FGM6KFcA8RKxKT3ad6j+vMyg6bYCvBReiC8Axna1XHfItWIWGT+pg/IXnz+AJdXKEPMHnGKnvrJTtx7mL2a0dm8Gk9g4OJqtVwVlDfc4JELkquWvUwj1pWJrrRen6ABUTew5PZP9WTN9Wvi00abUQFOUdla44Gs/Wh1kYvUU/C8dWnHUz9B2vDfyectzZdBrMV2U8eViRT6FerPjbhDBfJQiDOpuV8MENZpd7BoHnLOadOhhHL6KdcmxR6oM6ewUxX+/t6bkCO+libW/r54ATzvDANZ2t93mCbjaBxmb9302Wmb5BcezZyDl34Q2zTpwJ6rD4eaADL8B8hoOjZN03OaKbvnHDH2AVLVudZF6u1lPoG0bllIo9nb9YPaE9Td78WvWIAAAAASUVORK5CYII=',
+      nhagai: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6AQMAAACyIsh+AAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACFElEQVRogeWZMY6EMAxFjaagzBE4So6WHI2jcARKCoTX/zsB7exKU4/jZkR4zVjf344R+RRFEYdI2hZdSxXVU2bdE8+1RgHwX1/HvKdNMgA+gmcSBgIsMzgRWSwvRa6JiUPe7DEYMKtuywqRIw9qehgTkLSLZO3xTya/HXDZ624Hq6Xhmk4c/amL6IAnBuW/rJl1cdIN3nzyy4EedrDxf8tEXt4jOIBEnVbv0MP6lL89bm7+YYDrZe3cbU0rRHDOB2Wfm2BGAERRCO57q52o6YG8qnqvDwEUpa1B5wAwyylnOzxWGQYQr4Mj3c196mWCOokCFOocw3qTeR/dN76sowDivnewy60tUYfLQ7xwIgBFUe4Ic3vq3J5tgN2fuhgD4J3FXBC93YYcM39e3MB7okIAIt7FEo5g9uhx3tSsuXOWGwLw0Z0W71MNZ1qOdm3ICQKgqTVbg85bTzPikf0QQFtI+LBuvZ6/aX8KJwYgyAMXMRQAR7nfsh8DuLhn8wVFRRO0Hohev2ivixgAu5jN6ltWTu64kNINtNfFEIB6oBAybmpXc0VeYGsQoAUXDhkjq+fBLyx1HKAwJ23xcgvCt6z3BiMAgBfs5n4xx/uT95UFYB0H8KX6ntrazWdar4sSD+jfUHAhlbZb7v4wHiC3+aO5S3P7CID4twPIQfjtwLeLLvpxgGaDCoLtvO2jngXFEMCn+AF5EHMmGUCyfwAAAABJRU5ErkJggg==',
+      all: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6AQMAAACyIsh+AAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAACBElEQVRogeWZPa6DQAyEjVJQcgSOwtF2j8ZROAIlBcLxjM2P3ouUOt7tFn0pmHj8h8i3UxRnk2EVmeZSRXWXXteBz7VmAfCur80ejaoAeBUZForQEGDK2BMTZpm0Fjk6F26xH9RsAHWYEeTQQS0e2gTElTnPByV/HfCw54vPJsPR7Xj0zxfZAReGwDzRFzv5P3nyx4HHGWe8t3Tk5cPJDECo/QVNTKjb/pYNFhbBJICIHiL9ZsUd9q9A935j2E8eD00Axf5/Vj1EgD1R3MV94UomAUwGa95wZqvu4umALpggU0tAGIFml273q6LYpwG0Q5xH06J36+54bQXA/+/KYIQJoZjtI/lnATzs4XeP8w6yGB9h3wogNIL53XxhTY7aDygUOnmveikABIC/rid7PV5R1Ky4M+wbASINKlv36j2tD7Dz5YsEgETYLx7nUdMuFzQCFHVl6AteGRrDevoiCSBR1IRrt2jlHmHfEnCuH1Hb4RKsZWS8m94UQKQ1rN3YuWMgVd/CSUOA+J4NwkyY1A7PimxpS00CxOljUKuhw+oTSjtAoSbcR10Tq8aW9dpgJAAYD75ltXjQO+mNAGs7QCzVze/0gfe07ouSDjg/FnAglfhy9PhU1ArAnhbp/ehiTscAy2yfA5Dz2wFu6gB7d30UtfxApEH6guU89lHngqIR4Nt5A0qIWUExM8foAAAAAElFTkSuQmCC'
+    };
+
     function updateLiveContent() {
       const groom = document.getElementById('groomNameInput').value;
       const bride = document.getElementById('brideNameInput').value;
@@ -3196,19 +3243,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       const line2 = groomAddrRaw[1] ? groomAddrRaw[1].trim() : '';
       document.getElementById('groomAddressLine1').innerText = line1;
       document.getElementById('groomAddressLine2').innerText = line2;
-
       const fullGroomAddr = [line1, line2].filter(Boolean).join(' - ');
-      const ceremAddrEl = document.getElementById('ceremonyAddressDetailText');
-      const qrDescInput = document.getElementById('ceremonyQrDescInput');
-      if (ceremAddrEl) {
-        if (qrDescInput && qrDescInput.value.trim()) {
-          ceremAddrEl.innerText = qrDescInput.value;
-        } else if (fullGroomAddr) {
-          ceremAddrEl.innerText = `📍 Tư gia nhà trai: ${fullGroomAddr}`;
-        } else {
-          ceremAddrEl.innerText = '📍 Rất hân hạnh được đón tiếp Quý Khách!';
-        }
-      }
 
       // Parents Nhà Gái
       const brideParentsRaw = document.getElementById('brideParentsInput').value.split('/');
@@ -3219,8 +3254,28 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       document.getElementById('brideParentsContainer').innerHTML = brideParentsHtml;
 
       const brideAddrRaw = document.getElementById('brideAddressInput').value.split('/');
-      document.getElementById('brideAddressLine1').innerText = brideAddrRaw[0] ? brideAddrRaw[0].trim() : '';
-      document.getElementById('brideAddressLine2').innerText = brideAddrRaw[1] ? brideAddrRaw[1].trim() : '';
+      const brideLine1 = brideAddrRaw[0] ? brideAddrRaw[0].trim() : '';
+      const brideLine2 = brideAddrRaw[1] ? brideAddrRaw[1].trim() : '';
+      document.getElementById('brideAddressLine1').innerText = brideLine1;
+      document.getElementById('brideAddressLine2').innerText = brideLine2;
+      const fullBrideAddr = [brideLine1, brideLine2].filter(Boolean).join(' - ');
+
+      const ceremAddrEl = document.getElementById('ceremonyAddressDetailText');
+      const qrDescInput = document.getElementById('ceremonyQrDescInput');
+      const placeLeadVal = (document.getElementById('ceremonyPlaceLeadInput')?.value || '').toUpperCase();
+      const isBrideCeremony = placeLeadVal.includes('GÁI') || placeLeadVal.includes('VU QUY') || placeLeadVal.includes('NẠP TÀI');
+
+      if (ceremAddrEl) {
+        if (qrDescInput && qrDescInput.value.trim()) {
+          ceremAddrEl.innerText = qrDescInput.value;
+        } else if (isBrideCeremony && fullBrideAddr) {
+          ceremAddrEl.innerText = `📍 Tư gia nhà gái: ${fullBrideAddr}`;
+        } else if (fullGroomAddr) {
+          ceremAddrEl.innerText = `📍 Tư gia nhà trai: ${fullGroomAddr}`;
+        } else {
+          ceremAddrEl.innerText = '📍 Rất hân hạnh được đón tiếp Quý Khách!';
+        }
+      }
 
       // Ceremony
       document.getElementById('ceremonyPlaceLeadText').innerText = document.getElementById('ceremonyPlaceLeadInput').value;
@@ -3241,19 +3296,31 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         const targetUrl = qrUrlInput.value.trim() || 'https://conchonha.github.io/sang-thuong-wedding-2026/index.html';
         if (qrImg.dataset.lastUrl !== targetUrl) {
           qrImg.dataset.lastUrl = targetUrl;
-          const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(targetUrl)}`;
-          fetch(apiUrl)
-            .then(res => res.blob())
-            .then(blob => {
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                qrImg.src = reader.result;
-              };
-              reader.readAsDataURL(blob);
-            })
-            .catch(() => {
-              qrImg.src = apiUrl;
-            });
+          if (targetUrl.includes('type=VK') && QR_PRESET_BASE64.nhagai) {
+            qrImg.src = QR_PRESET_BASE64.nhagai;
+            syncCombinedSpread();
+          } else if (targetUrl.includes('type=all') && QR_PRESET_BASE64.all) {
+            qrImg.src = QR_PRESET_BASE64.all;
+            syncCombinedSpread();
+          } else if ((targetUrl.endsWith('index.html') || targetUrl.indexOf('type=') === -1) && QR_PRESET_BASE64.nhatrai) {
+            qrImg.src = QR_PRESET_BASE64.nhatrai;
+            syncCombinedSpread();
+          } else {
+            const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(targetUrl)}`;
+            fetch(apiUrl)
+              .then(res => res.blob())
+              .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  qrImg.src = reader.result;
+                  syncCombinedSpread();
+                };
+                reader.readAsDataURL(blob);
+              })
+              .catch(() => {
+                qrImg.src = apiUrl;
+              });
+          }
         }
       }
 
@@ -3364,36 +3431,106 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       }
     }
 
-    function applyQrPreset() {
+    function setWeddingSide(side) {
+      const isNhagai = (side === 'nhagai' || side === 'vk' || side === 'bride');
+
       const select = document.getElementById('ceremonyQrPresetSelect');
       const urlInput = document.getElementById('ceremonyQrUrlInput');
-      if (select && urlInput) {
-        if (select.value !== 'custom') {
-          urlInput.value = select.value;
+      const qrImg = document.getElementById('ceremonyQrImg');
+
+      const partyHallInput = document.getElementById('partyHallInput');
+      const partyAddressInput = document.getElementById('partyAddressInput');
+      const partyDayWeekInput = document.getElementById('partyDayWeekInput');
+      const partyDateNumInput = document.getElementById('partyDateNumInput');
+      const partyLunarInput = document.getElementById('partyLunarInput');
+      const partyWelcomeTimeInput = document.getElementById('partyWelcomeTimeInput');
+      const partyDinnerTimeInput = document.getElementById('partyDinnerTimeInput');
+      const ceremonyDateTimeInput = document.getElementById('ceremonyDateTimeInput');
+      const ceremonyLunarDateInput = document.getElementById('ceremonyLunarDateInput');
+      const coverDateInput = document.getElementById('coverDateInput');
+      const placeLeadInput = document.getElementById('ceremonyPlaceLeadInput');
+      const subtitleInput = document.getElementById('coverSubtitleInput');
+      const restaurantInput = document.getElementById('partyRestaurantInput');
+
+      if (qrImg) {
+        delete qrImg.dataset.customUploaded;
+      }
+
+      if (isNhagai) {
+        if (select) select.value = "https://conchonha.github.io/sang-thuong-wedding-2026/index.html?type=VK";
+        if (urlInput) urlInput.value = "https://conchonha.github.io/sang-thuong-wedding-2026/index.html?type=VK";
+        if (qrImg) {
+          qrImg.src = QR_PRESET_BASE64.nhagai;
+          qrImg.dataset.lastUrl = "https://conchonha.github.io/sang-thuong-wedding-2026/index.html?type=VK";
         }
+        if (partyHallInput) partyHallInput.value = "XÓM THẮNG";
+        if (partyAddressInput) partyAddressInput.value = "Số 21 đường số 1 Xóm Thắng Thôn Hà Trung <br> Quảng Đức - huyện Quảng Xương - Thanh Hoá";
+        if (partyDayWeekInput) partyDayWeekInput.value = "THỨ NĂM";
+        if (partyDateNumInput) partyDateNumInput.value = "10.12";
+        if (partyLunarInput) partyLunarInput.value = "Tức 02.11 Âm lịch";
+        if (partyWelcomeTimeInput) partyWelcomeTimeInput.value = "08 Giờ 00";
+        if (partyDinnerTimeInput) partyDinnerTimeInput.value = "09 Giờ 30";
+        if (ceremonyDateTimeInput) ceremonyDateTimeInput.value = "VÀO LÚC 08 GIỜ 30 | 10.12.2026";
+        if (ceremonyLunarDateInput) ceremonyLunarDateInput.value = "Tức ngày 02 tháng 11 năm Bính Ngọ";
+        if (coverDateInput) coverDateInput.value = "10.12.26";
+        if (placeLeadInput) placeLeadInput.value = "HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ GÁI";
+        if (subtitleInput) subtitleInput.value = "CHUNG VUI NHÀ CÔ DÂU";
+        if (restaurantInput) restaurantInput.value = "Tư Gia Nhà Gái";
+      } else {
+        if (select) select.value = "https://conchonha.github.io/sang-thuong-wedding-2026/index.html";
+        if (urlInput) urlInput.value = "https://conchonha.github.io/sang-thuong-wedding-2026/index.html";
+        if (qrImg) {
+          qrImg.src = QR_PRESET_BASE64.nhatrai;
+          qrImg.dataset.lastUrl = "https://conchonha.github.io/sang-thuong-wedding-2026/index.html";
+        }
+        if (partyHallInput) partyHallInput.value = "SÂN VẬN ĐỘNG THÔN ĐẠI MỸ";
+        if (partyAddressInput) partyAddressInput.value = "Sân vận động thôn Đại Mỹ, Xã Thượng Đức, TP. Đà Nẵng";
+        if (partyDayWeekInput) partyDayWeekInput.value = "CHỦ NHẬT";
+        if (partyDateNumInput) partyDateNumInput.value = "20.12";
+        if (partyLunarInput) partyLunarInput.value = "Tức Ngày 12.11 Âm Lịch";
+        if (partyWelcomeTimeInput) partyWelcomeTimeInput.value = "09 Giờ 30";
+        if (partyDinnerTimeInput) partyDinnerTimeInput.value = "10 Giờ 00";
+        if (ceremonyDateTimeInput) ceremonyDateTimeInput.value = "VÀO LÚC 10 GIỜ 00 | 20.12.2026";
+        if (ceremonyLunarDateInput) ceremonyLunarDateInput.value = "Tức ngày 12 tháng 11 năm Bính Ngọ";
+        if (coverDateInput) coverDateInput.value = "20.12.2026";
+        if (placeLeadInput) placeLeadInput.value = "HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ TRAI";
+        if (subtitleInput) subtitleInput.value = "CHUNG VUI NHÀ CHÚ RỂ";
+        if (restaurantInput) restaurantInput.value = "Tư Gia Nhà Trai";
+      }
+
+      // Update switcher buttons UI
+      const btnGroom = document.getElementById('btnSideGroom');
+      const btnBride = document.getElementById('btnSideBride');
+      if (btnGroom && btnBride) {
+        if (isNhagai) {
+          btnBride.classList.add('active');
+          btnGroom.classList.remove('active');
+        } else {
+          btnGroom.classList.add('active');
+          btnBride.classList.remove('active');
+        }
+      }
+
+      updateLiveContent();
+    }
+
+    function applyQrPreset() {
+      const select = document.getElementById('ceremonyQrPresetSelect');
+      if (!select) return;
+
+      if (select.value.includes('type=VK')) {
+        setWeddingSide('nhagai');
+      } else if (select.selectedIndex === 0 || (select.value.indexOf('type=') === -1 && select.value !== 'custom')) {
+        setWeddingSide('nhatrai');
+      } else if (select.value.includes('type=all')) {
+        const urlInput = document.getElementById('ceremonyQrUrlInput');
+        if (urlInput) urlInput.value = select.value;
         const qrImg = document.getElementById('ceremonyQrImg');
         if (qrImg) {
           delete qrImg.dataset.customUploaded;
+          qrImg.src = QR_PRESET_BASE64.all;
+          qrImg.dataset.lastUrl = select.value;
         }
-
-        // Tự động chuyển thông tin thiệp offline theo lựa chọn QR:
-        // Chọn Lễ Thành Hôn (Nhà Trai) -> Offline là Nhà Trai, Các tùy chọn còn lại -> Offline là Nhà Gái
-        const isNhaTrai = (select.selectedIndex === 0 || (select.value.indexOf('type=') === -1 && select.value !== 'custom'));
-
-        const placeLeadInput = document.getElementById('ceremonyPlaceLeadInput');
-        const subtitleInput = document.getElementById('coverSubtitleInput');
-        const restaurantInput = document.getElementById('partyRestaurantInput');
-
-        if (isNhaTrai) {
-          if (placeLeadInput) placeLeadInput.value = "HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ TRAI";
-          if (subtitleInput) subtitleInput.value = "CHUNG VUI NHÀ CHÚ RỂ";
-          if (restaurantInput && restaurantInput.value.includes('Nhà Gái')) restaurantInput.value = "Tư Gia Nhà Trai";
-        } else {
-          if (placeLeadInput) placeLeadInput.value = "HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ GÁI";
-          if (subtitleInput) subtitleInput.value = "CHUNG VUI NHÀ CÔ DÂU";
-          if (restaurantInput && restaurantInput.value.includes('Nhà Trai')) restaurantInput.value = "Tư Gia Nhà Gái";
-        }
-
         updateLiveContent();
       }
     }
@@ -3408,25 +3545,12 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
 
         const isNhaTrai = (select.selectedIndex === 0 || (val.indexOf('type=VK') === -1 && val.indexOf('type=all') === -1 && val.indexOf('bride') === -1 && val.indexOf('naptai') === -1));
 
-        const placeLeadInput = document.getElementById('ceremonyPlaceLeadInput');
-        const subtitleInput = document.getElementById('coverSubtitleInput');
-        const restaurantInput = document.getElementById('partyRestaurantInput');
-
         if (isNhaTrai) {
-          if (placeLeadInput) placeLeadInput.value = "HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ TRAI";
-          if (subtitleInput) subtitleInput.value = "CHUNG VUI NHÀ CHÚ RỂ";
-          if (restaurantInput && restaurantInput.value.includes('Nhà Gái')) restaurantInput.value = "Tư Gia Nhà Trai";
+          setWeddingSide('nhatrai');
         } else {
-          if (placeLeadInput) placeLeadInput.value = "HÔN LỄ ĐƯỢC CỬ HÀNH TẠI TƯ GIA NHÀ GÁI";
-          if (subtitleInput) subtitleInput.value = "CHUNG VUI NHÀ CÔ DÂU";
-          if (restaurantInput && restaurantInput.value.includes('Nhà Trai')) restaurantInput.value = "Tư Gia Nhà Gái";
+          setWeddingSide('nhagai');
         }
       }
-      const qrImg = document.getElementById('ceremonyQrImg');
-      if (qrImg) {
-        delete qrImg.dataset.customUploaded;
-      }
-      updateLiveContent();
     }
 
     function updateLiveFont() {
@@ -3535,7 +3659,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         syncCombinedSpread();
 
         const cardIds = ['cardParty', 'cardCover', 'cardCeremony', 'cardCombinedSpread'];
-        
+
         // Define exact physical dimensions to guarantee 100% accurate print size
         const cardSizes = {
           'cardParty': 'width: 120mm; height: 180mm;',
@@ -3543,7 +3667,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           'cardCeremony': 'width: 120mm; height: 180mm;',
           'cardCombinedSpread': 'width: 240mm; height: 180mm;'
         };
-        
+
         const images = [];
         const foldCheckbox = document.getElementById('toggleFoldGuideCheckbox');
         const shouldDrawFold = foldCheckbox && foldCheckbox.checked;
@@ -3551,18 +3675,18 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         for (let id of cardIds) {
           const cardEl = document.getElementById(id);
           if (!cardEl) continue;
-          
+
           const rect = cardEl.getBoundingClientRect();
           const cardW = Math.round(rect.width);
           const cardH = Math.round(rect.height);
           const paperBg = window.getComputedStyle(cardEl).backgroundColor || '#faf7f2';
-          
+
           const clone = cardEl.cloneNode(true);
           clone.style.cssText += ';position:absolute;left:0;top:0;z-index:-99999;margin:0;box-shadow:none;transform:none;pointer-events:none;box-sizing:border-box;';
           clone.style.width = cardW + 'px';
           clone.style.height = cardH + 'px';
           clone.style.backgroundColor = paperBg;
-          
+
           // Manually force the fold line to show if requested
           if (id === 'cardCombinedSpread' && shouldDrawFold) {
             const foldLine = clone.querySelector('.card-combined-fold-line');
@@ -3572,19 +3696,19 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
               foldLine.style.setProperty('border-left', '0.5px dashed var(--card-accent)', 'important');
             }
           }
-          
+
           prepareCloneForExport(clone);
           document.body.appendChild(clone);
-          
+
           await waitForImagesToDecode(clone);
-          
+
           const dataUrl = await htmlToImage.toPng(clone, {
             pixelRatio: 3,
             backgroundColor: paperBg
           });
-          
+
           images.push({ src: dataUrl, style: cardSizes[id] });
-          
+
           document.body.removeChild(clone);
         }
 
@@ -3600,7 +3724,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           printFrame.style.border = '0';
           document.body.appendChild(printFrame);
         }
-        
+
         const doc = printFrame.contentWindow.document;
         doc.open();
         doc.write(`
@@ -3632,7 +3756,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
           printFrame.contentWindow.onload = () => resolve();
           setTimeout(resolve, 1000); // fallback
         });
-        
+
         printFrame.contentWindow.focus();
         printFrame.contentWindow.print();
 
@@ -3694,7 +3818,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         { cloneSel: '#coupleArchImg, .cover-art-img', liveId: 'coupleArchImg', key: 'arch' },
         { cloneSel: '#coupleBowArchImg, .cover-bow-arch-img', liveId: 'coupleBowArchImg', key: 'couple_bow_arch' },
       ];
-      uniqueImgs.forEach(function(item) {
+      uniqueImgs.forEach(function (item) {
         var cloneImg = clone.querySelector(item.cloneSel);
         if (!cloneImg) return;
         var liveImg = document.getElementById(item.liveId);
@@ -3709,8 +3833,8 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         '.card-bg-floral-top-left': 'floral_tl',
         '.card-bg-floral-bottom-right': 'floral_br'
       };
-      Object.keys(bgSelectors).forEach(function(sel) {
-        clone.querySelectorAll(sel).forEach(function(img) {
+      Object.keys(bgSelectors).forEach(function (sel) {
+        clone.querySelectorAll(sel).forEach(function (img) {
           var key = bgSelectors[sel];
           if (window.ASSET_BASE64 && window.ASSET_BASE64[key]) {
             img.src = window.ASSET_BASE64[key];
@@ -3879,37 +4003,37 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
               pixelRatio: 3,
               backgroundColor: paperBg,
             }).then(canvas => {
-            const ctx = canvas.getContext('2d');
-            const s = 3;
-            const mm = 3.7795 * s;
-            const W1 = Math.round(canvas.width / 2);
+              const ctx = canvas.getContext('2d');
+              const s = 3;
+              const mm = 3.7795 * s;
+              const W1 = Math.round(canvas.width / 2);
 
-            // Center fold guideline (only drawn onto export file if user checks "In đường nếp gấp")
-            const shouldDrawFold = document.getElementById('toggleFoldGuideCheckbox') && document.getElementById('toggleFoldGuideCheckbox').checked;
-            if (shouldDrawFold) {
-              ctx.save();
-              ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--card-accent').trim() || '#111111';
-              ctx.globalAlpha = 0.25;
-              ctx.lineWidth = Math.max(1, Math.round(0.25 * mm));
-              ctx.setLineDash([4 * s, 4 * s]);
-              ctx.beginPath();
-              ctx.moveTo(W1, 0);
-              ctx.lineTo(W1, canvas.height);
-              ctx.stroke();
-              ctx.restore();
-            }
+              // Center fold guideline (only drawn onto export file if user checks "In đường nếp gấp")
+              const shouldDrawFold = document.getElementById('toggleFoldGuideCheckbox') && document.getElementById('toggleFoldGuideCheckbox').checked;
+              if (shouldDrawFold) {
+                ctx.save();
+                ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--card-accent').trim() || '#111111';
+                ctx.globalAlpha = 0.25;
+                ctx.lineWidth = Math.max(1, Math.round(0.25 * mm));
+                ctx.setLineDash([4 * s, 4 * s]);
+                ctx.beginPath();
+                ctx.moveTo(W1, 0);
+                ctx.lineTo(W1, canvas.height);
+                ctx.stroke();
+                ctx.restore();
+              }
 
-            window.__latestExportDataUrl = canvas.toDataURL('image/png');
-            downloadCanvasAsPng(canvas, 'thiep_cuoi_ngang_gap_doi_240x180.png');
-          }).catch(err => {
-            console.error('Lỗi tạo file in gập đôi:', err);
-            alert('Không thể xuất file in gập đôi: ' + (err && err.message ? err.message : err));
-          }).finally(() => {
-            if (document.body.contains(tempSpread)) document.body.removeChild(tempSpread);
-            if (btnEl) { btnEl.innerText = origText; btnEl.style.opacity = '1'; }
-          });
-        }, 350);
-      });
+              window.__latestExportDataUrl = canvas.toDataURL('image/png');
+              downloadCanvasAsPng(canvas, 'thiep_cuoi_ngang_gap_doi_240x180.png');
+            }).catch(err => {
+              console.error('Lỗi tạo file in gập đôi:', err);
+              alert('Không thể xuất file in gập đôi: ' + (err && err.message ? err.message : err));
+            }).finally(() => {
+              if (document.body.contains(tempSpread)) document.body.removeChild(tempSpread);
+              if (btnEl) { btnEl.innerText = origText; btnEl.style.opacity = '1'; }
+            });
+          }, 350);
+        });
       });
     }
 
@@ -4058,42 +4182,48 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
     window.addEventListener('DOMContentLoaded', () => {
       applyBase64Assets();
 
-      const params = new URLSearchParams(window.location.search);
-      const type = params.get('type');
+      // Read URL parameters safely (supporting ?.type, ?type, ?event, ?.event, ?side, etc.)
+      const search = window.location.search || '';
+      const hash = window.location.hash || '';
+      const fullUrl = window.location.href || '';
+      const params = new URLSearchParams(search);
+      const hashParams = new URLSearchParams(hash.replace(/^#/, ''));
 
-      if (type === 'VK') {
-        const select = document.getElementById('ceremonyQrPresetSelect');
-        if (select) {
-          select.value = "https://conchonha.github.io/sang-thuong-wedding-2026/index.html?type=VK";
+      let rawType = (
+        params.get('type') ||
+        params.get('.type') ||
+        params.get('event') ||
+        params.get('.event') ||
+        params.get('side') ||
+        params.get('.side') ||
+        params.get('guest') ||
+        hashParams.get('type') ||
+        hashParams.get('.type') ||
+        hashParams.get('event') ||
+        ''
+      ).trim();
+
+      if (!rawType) {
+        const upper = decodeURIComponent(search + ' ' + hash + ' ' + fullUrl).toUpperCase();
+        if (upper.includes('TYPE=VK') || upper.includes('.TYPE=VK') || upper.includes('=VK') || upper.includes('TYPE=NAPTAI') || upper.includes('TYPE=NHAGAI') || upper.includes('TYPE=BRIDE') || upper.includes('TYPE=GAI')) {
+          rawType = 'VK';
+        } else if (upper.includes('TYPE=ALL') || upper.includes('.TYPE=ALL') || upper.includes('=ALL')) {
+          rawType = 'ALL';
         }
       }
 
-      applyQrPreset();
+      const type = rawType.toUpperCase();
+      const isNhagai = (type === 'VK' || type === 'NAPTAI' || type === 'BRIDE' || type === 'GAI' || type === 'NHAGAI');
+      const isAll = (type === 'ALL');
 
-      if (type === 'VK') {
-        const partyHallInput = document.getElementById('partyHallInput');
-        if (partyHallInput) partyHallInput.value = "XÓM THẮNG";
-
-        const partyAddressInput = document.getElementById('partyAddressInput');
-        if (partyAddressInput) partyAddressInput.value = "Số 21 đường số 1 Xóm Thắng Thôn Hà Trung <br> Quảng Đức - huyện Quảng Xương - Thanh Hoá";
-
-        const partyDayWeekInput = document.getElementById('partyDayWeekInput');
-        if (partyDayWeekInput) partyDayWeekInput.value = "THỨ NĂM";
-
-        const partyDateNumInput = document.getElementById('partyDateNumInput');
-        if (partyDateNumInput) partyDateNumInput.value = "10.12";
-
-        const partyLunarInput = document.getElementById('partyLunarInput');
-        if (partyLunarInput) partyLunarInput.value = "Tức 02.11 Âm lịch";
-
-        const ceremonyDateTimeInput = document.getElementById('ceremonyDateTimeInput');
-        if (ceremonyDateTimeInput) ceremonyDateTimeInput.value = "VÀO LÚC 10 GIỜ 00 | 10.12.2026";
-
-        const ceremonyLunarDateInput = document.getElementById('ceremonyLunarDateInput');
-        if (ceremonyLunarDateInput) ceremonyLunarDateInput.value = "Tức ngày 02 tháng 11 năm Bính Ngọ";
-
-        const coverDateInput = document.getElementById('coverDateInput');
-        if (coverDateInput) coverDateInput.value = "10.12.26";
+      if (isNhagai) {
+        setWeddingSide('nhagai');
+      } else if (isAll) {
+        const select = document.getElementById('ceremonyQrPresetSelect');
+        if (select) select.value = "https://conchonha.github.io/sang-thuong-wedding-2026/index.html?type=all";
+        applyQrPreset();
+      } else {
+        setWeddingSide('nhatrai');
       }
 
       updateLiveContent();

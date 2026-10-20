@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ═══ AUTHORITATIVE DEFAULT EVENT CONFIGURATIONS (BỎ LOCALSTORAGE CHO MAP) ═══
   // 1. Nhà Gái: Lễ Nạp Tài
-  const DEFAULT_NAPTAI_TIME = '10:00 • 10.12.2026';
+  const DEFAULT_NAPTAI_TIME = '08:00 • 10.12.2026';
   const DEFAULT_NAPTAI_ADDRESS = 'Số 21 đường số 1 Xóm Thắng Thôn Hà Trung, xã Quảng Đức, huyện Quảng Xương, tỉnh Thanh Hoá';
   const DEFAULT_NAPTAI_MAP = 'https://maps.app.goo.gl/bVgnrTXb4vHFyeZU8';
   const DEFAULT_NAPTAI_EMBED = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d449.02188624150205!2d105.81176001419148!3d19.712269835962168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313655003102443f%3A0xe13f799bc4613d7e!2zU-G7kSBuaMOgIDIxICzEkcaw4budbmcgc-G7kSAxICx0aMO0biBIw6AgVHJ1bmcsIHjDoyBsxrB1IHbhu4cgLHThu4luaCBUaGFuaCBIw7Nh!5e1!3m2!1svi!2s!4v1791302147748!5m2!1svi!2s';
@@ -285,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Cập nhật ngày tháng trên bìa và phần footer cho Nhà Gái
+    targetWeddingTime = '2026-12-10T08:00:00+07:00';
     const heroDateEl = document.getElementById('hero-date-text');
     if (heroDateEl && !savedConfig.weddingDateText) heroDateEl.innerText = 'THỨ NĂM, NGÀY 10 THÁNG 12 NĂM 2026';
     

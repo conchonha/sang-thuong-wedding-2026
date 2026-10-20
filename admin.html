@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bảng Quản Trị Thiệp Cưới | Dành Riêng Cho Cô Dâu &amp; Chú Rể</title>
-  
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body class="admin-body">
 
   <!-- PIN Protection Screen -->
@@ -69,14 +74,16 @@
       <div class="admin-card">
         <h3>💌 Tạo Link Thiệp Mời Riêng Cho Khách</h3>
         <p class="desc">
-          Nhập tên khách mời bên dưới, hệ thống sẽ tạo đường link độc bản hiển thị đúng tên người đó trên thiệp cưới. Khách A và Khách B xem hai link hoàn toàn khác nhau, không bị trùng hay đổi tên lẫn nhau!
+          Nhập tên khách mời bên dưới, hệ thống sẽ tạo đường link độc bản hiển thị đúng tên người đó trên thiệp cưới.
+          Khách A và Khách B xem hai link hoàn toàn khác nhau, không bị trùng hay đổi tên lẫn nhau!
         </p>
 
         <form id="guest-create-form">
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="guest-name">Danh xưng &amp; Tên khách mời *</label>
-              <input type="text" id="guest-name" class="form-control" placeholder="Ví dụ: Chị Nguyễn Văn A, Anh Hoàng Long &amp; Bạn gái, Bác Tuấn..." required>
+              <input type="text" id="guest-name" class="form-control"
+                placeholder="Ví dụ: Chị Nguyễn Văn A, Anh Hoàng Long &amp; Bạn gái, Bác Tuấn..." required>
             </div>
             <div class="form-group">
               <label class="form-label" for="guest-side">Khách của bên nào? *</label>
@@ -96,7 +103,8 @@
               <label class="form-label" for="guest-event" style="color: var(--gold-dark); font-weight: 700;">
                 Mời tham dự tiệc nào? * (Quyết định hiển thị tiệc trên thiệp)
               </label>
-              <select id="guest-event" class="form-control" style="border-color: var(--gold-primary); font-weight: 600;">
+              <select id="guest-event" class="form-control"
+                style="border-color: var(--gold-primary); font-weight: 600;">
                 <option value="vuquy">Lễ Thành Hôn (Nhà Trai)</option>
                 <option value="naptai">Lễ Nạp Tài (Nhà Gái)</option>
                 <option value="all">Cả Hai Buổi Lễ (Lễ Nạp Tài &amp; Lễ Thành Hôn)</option>
@@ -107,11 +115,13 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="guest-note">Ghi chú riêng (không bắt buộc)</label>
-              <input type="text" id="guest-note" class="form-control" placeholder="Ví dụ: Đồng nghiệp cty, Bạn cấp 3...">
+              <input type="text" id="guest-note" class="form-control"
+                placeholder="Ví dụ: Đồng nghiệp cty, Bạn cấp 3...">
             </div>
           </div>
 
-          <button type="submit" id="guest-create-btn" class="btn-luxury btn-gold" style="padding: 12px 30px; margin-top: 5px; display: inline-flex; align-items: center; gap: 8px; justify-content: center;">
+          <button type="submit" id="guest-create-btn" class="btn-luxury btn-gold"
+            style="padding: 12px 30px; margin-top: 5px; display: inline-flex; align-items: center; gap: 8px; justify-content: center;">
             <span id="guest-create-btn-icon">✨</span>
             <span id="guest-create-btn-text">Tạo Link Mời Khách Này</span>
           </button>
@@ -137,9 +147,11 @@
 
           <!-- Formatted Invitation Preview Card -->
           <div class="invite-preview-card">
-            <div class="invite-preview-ribbon" style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="invite-preview-ribbon"
+              style="display: flex; align-items: center; justify-content: space-between;">
               <span>✨ Xem Trước Tin Nhắn Thiệp Mời</span>
-              <span id="preview-short-status" style="font-size:0.75rem; font-weight:500; letter-spacing:0; text-transform:none;"></span>
+              <span id="preview-short-status"
+                style="font-size:0.75rem; font-weight:500; letter-spacing:0; text-transform:none;"></span>
             </div>
             <div class="invite-preview-body" id="invite-preview-html">
               <!-- Dynamically populated formatted text -->
@@ -151,45 +163,61 @@
 
           <!-- Action Buttons Group: Zalo, Messenger, Copy, View -->
           <div class="share-actions-wrap">
-            <button type="button" id="btn-share-zalo" class="btn-share-btn btn-zalo" title="Sao chép tin nhắn và mở Zalo gửi cho khách">
-              <svg width="18" height="18" viewBox="0 0 48 48" fill="none" style="vertical-align: middle; margin-right: 6px;">
-                <path d="M24 4C12.95 4 4 12.5 4 23C4 28.5 6.5 33.4 10.5 36.8L9 43.5L16 40C18.4 41.3 21.1 42 24 42C35.05 42 44 33.5 44 23C44 12.5 35.05 4 24 4Z" fill="#0068FF"/>
-                <path d="M15 28.5H33V25.5L21.5 17.5H33V14H15V17L26.5 25H15V28.5Z" fill="#FFFFFF"/>
+            <button type="button" id="btn-share-zalo" class="btn-share-btn btn-zalo"
+              title="Sao chép tin nhắn và mở Zalo gửi cho khách">
+              <svg width="18" height="18" viewBox="0 0 48 48" fill="none"
+                style="vertical-align: middle; margin-right: 6px;">
+                <path
+                  d="M24 4C12.95 4 4 12.5 4 23C4 28.5 6.5 33.4 10.5 36.8L9 43.5L16 40C18.4 41.3 21.1 42 24 42C35.05 42 44 33.5 44 23C44 12.5 35.05 4 24 4Z"
+                  fill="#0068FF" />
+                <path d="M15 28.5H33V25.5L21.5 17.5H33V14H15V17L26.5 25H15V28.5Z" fill="#FFFFFF" />
               </svg>
               Chia Sẻ Zalo
             </button>
 
-            <button type="button" id="btn-share-messenger" class="btn-share-btn btn-messenger" title="Sao chép tin nhắn và mở Facebook Messenger">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align: middle; margin-right: 6px;">
-                <path d="M12 2C6.477 2 2 6.145 2 11.258c0 2.914 1.455 5.518 3.735 7.197V22l3.414-1.874c.907.251 1.868.389 2.851.389 5.523 0 10-4.145 10-9.257C22 6.145 17.523 2 12 2zm1.047 12.443l-2.583-2.756-5.043 2.756 5.547-5.887 2.65 2.756 4.976-2.756-5.547 5.887z" fill="url(#msg-grad)"/>
+            <button type="button" id="btn-share-messenger" class="btn-share-btn btn-messenger"
+              title="Sao chép tin nhắn và mở Facebook Messenger">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                style="vertical-align: middle; margin-right: 6px;">
+                <path
+                  d="M12 2C6.477 2 2 6.145 2 11.258c0 2.914 1.455 5.518 3.735 7.197V22l3.414-1.874c.907.251 1.868.389 2.851.389 5.523 0 10-4.145 10-9.257C22 6.145 17.523 2 12 2zm1.047 12.443l-2.583-2.756-5.043 2.756 5.547-5.887 2.65 2.756 4.976-2.756-5.547 5.887z"
+                  fill="url(#msg-grad)" />
                 <defs>
                   <linearGradient id="msg-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                    <stop stop-color="#00C6FF"/>
-                    <stop offset="1" stop-color="#0078FF"/>
+                    <stop stop-color="#00C6FF" />
+                    <stop offset="1" stop-color="#0078FF" />
                   </linearGradient>
                 </defs>
               </svg>
               Gửi Messenger Facebook
             </button>
 
-            <button type="button" id="btn-copy-message" class="btn-share-btn btn-copy-msg" title="Sao chép toàn bộ tin nhắn để dán vào bất kỳ ứng dụng nào">
+            <button type="button" id="btn-copy-message" class="btn-share-btn btn-copy-msg"
+              title="Sao chép toàn bộ tin nhắn để dán vào bất kỳ ứng dụng nào">
               📋 Sao Chép Tin Nhắn
             </button>
 
-            <button type="button" id="btn-copy-link" class="btn-share-btn btn-copy-link-only" title="Chỉ sao chép đường link thiệp riêng">
+            <button type="button" id="btn-copy-link" class="btn-share-btn btn-copy-link-only"
+              title="Chỉ sao chép đường link thiệp riêng">
               🔗 Sao Chép Link
             </button>
 
-            <a id="btn-open-preview" href="#" target="_blank" class="btn-share-btn btn-view-invite" title="Mở trang thiệp để xem giao diện thực tế">
+            <a id="btn-open-preview" href="#" target="_blank" class="btn-share-btn btn-view-invite"
+              title="Mở trang thiệp để xem giao diện thực tế">
               👁️ Xem Thử Thiệp
             </a>
           </div>
 
           <!-- Unified Link Bar: hiển thị link, tự thay bằng link rút gọn sau khi xong -->
-          <div style="margin-top: 15px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #796E65;">
+          <div
+            style="margin-top: 15px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #796E65;">
             <span style="white-space: nowrap; font-weight: 600; color: var(--gold-dark);">🔗 Link:</span>
-            <span id="link-shorten-badge" style="display:none; font-size:0.75rem; white-space:nowrap; padding: 2px 8px; border-radius: 20px; background:#fff8e1; border:1px solid #ffe082; color:#b7791f; font-weight:600;">⏳ Đang rút gọn...</span>
-            <input type="text" id="result-link-input" class="guest-link-input" style="padding: 6px 12px; font-size: 0.82rem; background: #fffcf0; border-color: var(--gold-primary); font-weight: 600; color: var(--gold-dark);" readonly>
+            <span id="link-shorten-badge"
+              style="display:none; font-size:0.75rem; white-space:nowrap; padding: 2px 8px; border-radius: 20px; background:#fff8e1; border:1px solid #ffe082; color:#b7791f; font-weight:600;">⏳
+              Đang rút gọn...</span>
+            <input type="text" id="result-link-input" class="guest-link-input"
+              style="padding: 6px 12px; font-size: 0.82rem; background: #fffcf0; border-color: var(--gold-primary); font-weight: 600; color: var(--gold-dark);"
+              readonly>
           </div>
         </div>
       </div>
@@ -198,38 +226,52 @@
       <div class="admin-card">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
           <div>
-            <h3 style="margin-bottom: 2px;">📊 Danh Sách Khách Mời Từ Google Sheets (<span id="guest-count-badge">0</span> khách)</h3>
-            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0;">Dữ liệu trực tiếp từ Google Sheet &amp; phản hồi RSVP thời gian thực</p>
+            <h3 style="margin-bottom: 2px;">📊 Danh Sách Khách Mời Từ Google Sheets (<span
+                id="guest-count-badge">0</span> khách)</h3>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0;">Dữ liệu trực tiếp từ Google Sheet
+              &amp; phản hồi RSVP thời gian thực</p>
           </div>
-          <input type="text" id="search-guest-input" class="form-control" placeholder="🔍 Tìm kiếm khách..." style="max-width: 250px; padding: 8px 12px; font-size: 0.85rem;">
+          <input type="text" id="search-guest-input" class="form-control" placeholder="🔍 Tìm kiếm khách..."
+            style="max-width: 250px; padding: 8px 12px; font-size: 0.85rem;">
         </div>
 
         <!-- Google Sheets & Data Toolbar -->
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 18px 0 10px; background: #faf6f0; padding: 12px; border-radius: 8px; border: 1px solid #ebd9c5;">
-          <button type="button" id="btn-load-sheet" class="btn-small btn-small-gold" title="Lấy dữ liệu khách mời và phản hồi mới nhất trực tiếp từ Google Sheets">
+        <div
+          style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 18px 0 10px; background: #faf6f0; padding: 12px; border-radius: 8px; border: 1px solid #ebd9c5;">
+          <button type="button" id="btn-load-sheet" class="btn-small btn-small-gold"
+            title="Lấy dữ liệu khách mời và phản hồi mới nhất trực tiếp từ Google Sheets">
             🔄 Làm Mới Từ Google Sheets
           </button>
-          <a href="https://docs.google.com/spreadsheets/d/1JlN1-utEeoLThwzfsyvnNNIDQovqeocbMTEq_NSeWo4/edit" target="_blank" class="btn-small btn-small-outline" title="Mở file Google Sheets trên trình duyệt">
+          <a href="https://docs.google.com/spreadsheets/d/1JlN1-utEeoLThwzfsyvnNNIDQovqeocbMTEq_NSeWo4/edit"
+            target="_blank" class="btn-small btn-small-outline" title="Mở file Google Sheets trên trình duyệt">
             🌐 Mở Google Sheets
           </a>
-          <button type="button" id="btn-export-excel" class="btn-small btn-small-outline" title="Xuất toàn bộ danh sách khách ra file Excel CSV">
+          <button type="button" id="btn-export-excel" class="btn-small btn-small-outline"
+            title="Xuất toàn bộ danh sách khách ra file Excel CSV">
             📥 Xuất File Excel (CSV)
           </button>
-          <button type="button" id="btn-sync-csv-to-sheet" class="btn-small btn-small-outline" title="Đẩy 5 khách mẫu từ file CSV lên Google Sheet">
+          <button type="button" id="btn-sync-csv-to-sheet" class="btn-small btn-small-outline"
+            title="Đẩy 5 khách mẫu từ file CSV lên Google Sheet">
             ⬆️ Đẩy 5 Khách CSV Lên Sheet
           </button>
-          <button type="button" id="btn-clear-all-guests" class="btn-small btn-small-danger" style="margin-left: auto;" title="Xóa toàn bộ danh sách khách mời trên Google Sheet và bảng">
+          <button type="button" id="btn-clear-all-guests" class="btn-small btn-small-danger" style="margin-left: auto;"
+            title="Xóa toàn bộ danh sách khách mời trên Google Sheet và bảng">
             🗑️ Xóa Sạch Trên Google Sheet
           </button>
         </div>
 
         <!-- Bộ Lọc Phía Khách -->
         <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 14px 0 6px;">
-          <span style="font-size: 0.78rem; color: #888; font-weight: 600; margin-right: 2px; white-space: nowrap;">🔽 Lọc phía:</span>
-          <button type="button" id="filter-side-all"   class="btn-filter-side active" data-side="">🎊 Tất Cả <span class="filter-count" id="filter-count-all"></span></button>
-          <button type="button" id="filter-side-groom" class="btn-filter-side"        data-side="groom">🤵 Nhà Trai <span class="filter-count" id="filter-count-groom"></span></button>
-          <button type="button" id="filter-side-bride" class="btn-filter-side"        data-side="bride">👰 Nhà Gái <span class="filter-count" id="filter-count-bride"></span></button>
-          <button type="button" id="filter-side-both"  class="btn-filter-side"        data-side="both">🤝 Bạn Chung <span class="filter-count" id="filter-count-both"></span></button>
+          <span style="font-size: 0.78rem; color: #888; font-weight: 600; margin-right: 2px; white-space: nowrap;">🔽
+            Lọc phía:</span>
+          <button type="button" id="filter-side-all" class="btn-filter-side active" data-side="">🎊 Tất Cả <span
+              class="filter-count" id="filter-count-all"></span></button>
+          <button type="button" id="filter-side-groom" class="btn-filter-side" data-side="groom">🤵 Nhà Trai <span
+              class="filter-count" id="filter-count-groom"></span></button>
+          <button type="button" id="filter-side-bride" class="btn-filter-side" data-side="bride">👰 Nhà Gái <span
+              class="filter-count" id="filter-count-bride"></span></button>
+          <button type="button" id="filter-side-both" class="btn-filter-side" data-side="both">🤝 Bạn Chung <span
+              class="filter-count" id="filter-count-both"></span></button>
         </div>
 
         <div class="guest-table-wrap">
@@ -267,12 +309,14 @@
       <div class="admin-card">
         <h3>🗺️ Cài Đặt Địa Chỉ, Thời Gian &amp; Link Google Maps</h3>
         <p class="desc">
-          Cô dâu &amp; Chú rể có thể tự điền địa chỉ và dán đường link Google Maps của từng địa điểm vào đây. Trang thiệp cưới sẽ tự động cập nhật đúng ngày giờ, địa chỉ và nút chỉ đường Google Maps!
+          Cô dâu &amp; Chú rể có thể tự điền địa chỉ và dán đường link Google Maps của từng địa điểm vào đây. Trang
+          thiệp cưới sẽ tự động cập nhật đúng ngày giờ, địa chỉ và nút chỉ đường Google Maps!
         </p>
 
         <form id="config-form">
           <!-- Thông tin cơ bản -->
-          <h4 style="color: var(--gold-dark); margin: 20px 0 12px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+          <h4
+            style="color: var(--gold-dark); margin: 20px 0 12px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
             1. Thông Tin Đôi Uyên Ương &amp; Ngày Cưới
           </h4>
           <div class="form-row">
@@ -292,12 +336,14 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="cfg-wedding-date-text">Dòng Chữ Ngày Cưới Hiển Thị Trên Hero</label>
-              <input type="text" id="cfg-wedding-date-text" class="form-control" value="CHỦ NHẬT, NGÀY 20 THÁNG 12 NĂM 2026">
+              <input type="text" id="cfg-wedding-date-text" class="form-control"
+                value="CHỦ NHẬT, NGÀY 20 THÁNG 12 NĂM 2026">
             </div>
           </div>
 
           <!-- Lễ Nạp Tài (Nhà Gái) -->
-          <h4 style="color: var(--gold-dark); margin: 25px 0 12px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+          <h4
+            style="color: var(--gold-dark); margin: 25px 0 12px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
             2. Lễ Nạp Tài (Nhà Gái)
           </h4>
           <div class="form-row">
@@ -307,16 +353,19 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="cfg-naptai-address">Địa chỉ tư gia Nhà Gái</label>
-              <input type="text" id="cfg-naptai-address" class="form-control" value="Số 68 Phố Huế, Phường Hàng Bài, Quận Hoàn Kiếm, TP. Hà Nội">
+              <input type="text" id="cfg-naptai-address" class="form-control"
+                value="Số 68 Phố Huế, Phường Hàng Bài, Quận Hoàn Kiếm, TP. Hà Nội">
             </div>
           </div>
           <div class="form-group">
             <label class="form-label" for="cfg-naptai-map">Link Google Maps Nhà Gái *</label>
-            <input type="url" id="cfg-naptai-map" class="form-control" value="https://maps.google.com/?q=68+Pho+Hue+Hanoi">
+            <input type="url" id="cfg-naptai-map" class="form-control"
+              value="https://maps.google.com/?q=68+Pho+Hue+Hanoi">
           </div>
 
           <!-- Lễ Thành Hôn (Nhà Trai) -->
-          <h4 style="color: var(--gold-dark); margin: 25px 0 12px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+          <h4
+            style="color: var(--gold-dark); margin: 25px 0 12px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
             3. Lễ Thành Hôn (Nhà Trai)
           </h4>
           <div class="form-row">
@@ -326,7 +375,8 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="cfg-vuquy-address">Địa chỉ tư gia Nhà Trai</label>
-              <input type="text" id="cfg-vuquy-address" class="form-control" value="Sân vận động thôn Đại Mỹ, Xã Thượng Đức, Thành Phố Đà Nẵng">
+              <input type="text" id="cfg-vuquy-address" class="form-control"
+                value="Sân vận động thôn Đại Mỹ, Xã Thượng Đức, Thành Phố Đà Nẵng">
             </div>
           </div>
           <div class="form-group">
@@ -335,7 +385,8 @@
           </div>
 
           <!-- Tài khoản ngân hàng -->
-          <h4 style="color: var(--gold-dark); margin: 25px 0 12px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+          <h4
+            style="color: var(--gold-dark); margin: 25px 0 12px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
             4. Tài Khoản Ngân Hàng Mừng Cưới (VietQR)
           </h4>
           <div class="form-row">
@@ -360,31 +411,18 @@
           </div>
 
           <!-- 5. Hành Trình Chung Đôi -->
-          <h4 style="color: var(--gold-dark); margin: 25px 0 12px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
+          <h4
+            style="color: var(--gold-dark); margin: 25px 0 12px; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 6px;">
             5. Hành Trình Chung Đôi (6 Mốc Kỷ Niệm Tình Yêu)
           </h4>
           <p style="font-size: 0.85rem; color: #796E65; margin-bottom: 15px;">
             Cô dâu &amp; Chú rể có thể tùy chỉnh ngày tháng và lời tự sự cho từng dấu mốc ý nghĩa:
           </p>
 
-          <!-- Mốc 1: Lần đầu quen nhau -->
-          <div style="background: #fdfbf7; border: 1px solid #ebd8bf; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-            <strong style="color: var(--gold-dark); font-size: 0.95rem;">1. Lần Đầu Quen Nhau</strong>
-            <div class="form-row" style="margin-top: 10px;">
-              <div class="form-group">
-                <label class="form-label" for="cfg-story-date-1">Thời gian</label>
-                <input type="text" id="cfg-story-date-1" class="form-control" value="Tháng 08 Năm 2025">
-              </div>
-              <div class="form-group" style="flex: 2;">
-                <label class="form-label" for="cfg-story-desc-1">Lời tự sự kỷ niệm</label>
-                <input type="text" id="cfg-story-desc-1" class="form-control" value="Không có ánh nhìn vô tình giữa quán quen, chỉ có một notification xuất hiện đúng thời điểm. Dòng tin nhắn ngập ngừng ngày ấy đã viết nên khởi đầu cho câu chuyện tình yêu đẹp nhất của hai đứa.">
-              </div>
-            </div>
-          </div>
-
-          <!-- Mốc 2: Lời Hẹn Ước Đầu Tiên -->
-          <div style="background: #fdfbf7; border: 1px solid #ebd8bf; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-            <strong style="color: var(--gold-dark); font-size: 0.95rem;">2. Lời Hẹn Ước Đầu Tiên</strong>
+          <!-- Mốc 1: Lời Hẹn Ước Đầu Tiên -->
+          <div
+            style="background: #fdfbf7; border: 1px solid #ebd8bf; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+            <strong style="color: var(--gold-dark); font-size: 0.95rem;">1. Lời Hẹn Ước Đầu Tiên</strong>
             <div class="form-row" style="margin-top: 10px;">
               <div class="form-group">
                 <label class="form-label" for="cfg-story-date-2">Thời gian</label>
@@ -392,14 +430,16 @@
               </div>
               <div class="form-group" style="flex: 2;">
                 <label class="form-label" for="cfg-story-desc-2">Lời tự sự kỷ niệm</label>
-                <input type="text" id="cfg-story-desc-2" class="form-control" value="Dưới ánh đèn dịu dàng và tiếng tim đập rộn ràng, lời ngỏ: 'Làm người yêu anh nhé!' cất lên. Một cái gật đầu e ấp đã mở ra cả một trời hạnh phúc ngập tràn nụ cười.">
+                <input type="text" id="cfg-story-desc-2" class="form-control"
+                  value="Dưới ánh đèn dịu dàng và tiếng tim đập rộn ràng, lời ngỏ: 'Làm người yêu anh nhé!' cất lên. Một cái gật đầu e ấp đã mở ra cả một trời hạnh phúc ngập tràn nụ cười.">
               </div>
             </div>
           </div>
 
-          <!-- Mốc 3: Dặm ngõ -->
-          <div style="background: #fdfbf7; border: 1px solid #ebd8bf; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-            <strong style="color: var(--gold-dark); font-size: 0.95rem;">3. Lễ Dặm Ngõ</strong>
+          <!-- Mốc 2: Dặm ngõ -->
+          <div
+            style="background: #fdfbf7; border: 1px solid #ebd8bf; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+            <strong style="color: var(--gold-dark); font-size: 0.95rem;">2. Lễ Dặm Ngõ</strong>
             <div class="form-row" style="margin-top: 10px;">
               <div class="form-group">
                 <label class="form-label" for="cfg-story-date-3">Thời gian</label>
@@ -407,52 +447,25 @@
               </div>
               <div class="form-group" style="flex: 2;">
                 <label class="form-label" for="cfg-story-desc-3">Lời tự sự kỷ niệm</label>
-                <input type="text" id="cfg-story-desc-3" class="form-control" value="Chiếc nhẫn đeo vào tay thay cho lời hứa hẹn trọn đời, và Lễ dặm ngõ ngày 12/08/2026 chính là lời đáp lại ngọt ngào từ hai gia đình. Bên chén trà ấm cúng, hai bên đã chính thức nhận dâu nhận rể, mở ra chặng đường chuẩn bị cho ngày chung đôi.">
+                <input type="text" id="cfg-story-desc-3" class="form-control"
+                  value="Chiếc nhẫn đeo vào tay thay cho lời hứa hẹn trọn đời, và Lễ dặm ngõ ngày 12/08/2026 chính là lời đáp lại ngọt ngào từ hai gia đình. Bên chén trà ấm cúng, hai bên đã chính thức nhận dâu nhận rể, mở ra chặng đường chuẩn bị cho ngày chung đôi.">
               </div>
             </div>
           </div>
 
-          <!-- Mốc 4: Cầu hôn -->
-          <div style="background: #fdfbf7; border: 1px solid #ebd8bf; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-            <strong style="color: var(--gold-dark); font-size: 0.95rem;">4. Khoảnh Khắc Cầu Hôn</strong>
+          <!-- Mốc 3: Cầu hôn -->
+          <div
+            style="background: #fdfbf7; border: 1px solid #ebd8bf; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+            <strong style="color: var(--gold-dark); font-size: 0.95rem;">3. Khoảnh Khắc Cầu Hôn</strong>
             <div class="form-row" style="margin-top: 10px;">
               <div class="form-group">
                 <label class="form-label" for="cfg-story-date-4">Thời gian</label>
-                <input type="text" id="cfg-story-date-4" class="form-control" value="Tháng 08 Năm 2025">
+                <input type="text" id="cfg-story-date-4" class="form-control" value="Tháng 10 Năm 2026">
               </div>
               <div class="form-group" style="flex: 2;">
                 <label class="form-label" for="cfg-story-desc-4">Lời tự sự kỷ niệm</label>
-                <input type="text" id="cfg-story-desc-4" class="form-control" value="Trước ráng chiều hoàng hôn lãng mạn và tiếng sóng vỗ thì thầm, chiếc nhẫn lấp lánh xuất hiện cùng câu hỏi: &ldquo;Lấy anh nhé?&rdquo; và giọt nước mắt vỡ òa: &ldquo;Em đồng ý!&rdquo;.">
-              </div>
-            </div>
-          </div>
-
-          <!-- Mốc 5: Nạp tài -->
-          <div style="background: #fdfbf7; border: 1px solid #ebd8bf; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-            <strong style="color: var(--gold-dark); font-size: 0.95rem;">5. Lễ Nạp Tài (Ăn Hỏi)</strong>
-            <div class="form-row" style="margin-top: 10px;">
-              <div class="form-group">
-                <label class="form-label" for="cfg-story-date-5">Thời gian</label>
-                <input type="text" id="cfg-story-date-5" class="form-control" value="10/12/2026">
-              </div>
-              <div class="form-group" style="flex: 2;">
-                <label class="form-label" for="cfg-story-desc-5">Lời tự sự kỷ niệm</label>
-                <input type="text" id="cfg-story-desc-5" class="form-control" value="Mâm tráp sơn son thiếp vàng trọn vẹn ân tình, đôi uyên ương thắp nén hương thơm trước bàn thờ gia tiên, chính thức nên duyên vợ chồng trước hai họ.">
-              </div>
-            </div>
-          </div>
-
-          <!-- Mốc 6: Ngày về chung 1 nhà -->
-          <div style="background: #fdfbf7; border: 1px solid #ebd8bf; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
-            <strong style="color: var(--gold-dark); font-size: 0.95rem;">6. Ngày Về Chung Một Nhà</strong>
-            <div class="form-row" style="margin-top: 10px;">
-              <div class="form-group">
-                <label class="form-label" for="cfg-story-date-6">Thời gian</label>
-                <input type="text" id="cfg-story-date-6" class="form-control" value="Ngày 20 Tháng 12 Năm 2026">
-              </div>
-              <div class="form-group" style="flex: 2;">
-                <label class="form-label" for="cfg-story-desc-6">Lời tự sự kỷ niệm</label>
-                <input type="text" id="cfg-story-desc-6" class="form-control" value="Khoác lên mình bộ lễ phục thiêng liêng, đôi ta nắm chặt tay nhau bước vào lễ đường, cùng trao nhau lời hẹn ước trọn đời đồng hành sẻ chia hạnh phúc.">
+                <input type="text" id="cfg-story-desc-4" class="form-control"
+                  value="Trước ráng chiều hoàng hôn lãng mạn và tiếng sóng vỗ thì thầm, chiếc nhẫn lấp lánh xuất hiện cùng câu hỏi: &ldquo;Lấy anh nhé?&rdquo; và giọt nước mắt vỡ òa: &ldquo;Em đồng ý!&rdquo;.">
               </div>
             </div>
           </div>
@@ -494,14 +507,18 @@
       <!-- Bảng tổng hợp khách từ Excel + RSVP -->
       <div class="admin-card">
         <!-- Header -->
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
           <div>
             <h3 style="margin-bottom: 2px;">📊 Danh Sách Phản Hồi Tham Dự (Toàn Bộ Khách)</h3>
-            <p class="desc" style="margin-bottom: 0;">Dữ liệu tự động đồng bộ từ Google Sheets — đầy đủ trạng thái, link rút gọn và lời chúc của từng khách.</p>
+            <p class="desc" style="margin-bottom: 0;">Dữ liệu tự động đồng bộ từ Google Sheets — đầy đủ trạng thái, link
+              rút gọn và lời chúc của từng khách.</p>
           </div>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <input type="text" id="rsvp-search-input" class="form-control" placeholder="🔍 Tìm tên khách..." style="max-width: 200px; padding: 8px 12px; font-size: 0.85rem;">
-            <button id="btn-reload-rsvp" class="btn-small btn-small-outline" title="Tải lại dữ liệu mới nhất từ Google Sheets">🔄 Làm Mới</button>
+            <input type="text" id="rsvp-search-input" class="form-control" placeholder="🔍 Tìm tên khách..."
+              style="max-width: 200px; padding: 8px 12px; font-size: 0.85rem;">
+            <button id="btn-reload-rsvp" class="btn-small btn-small-outline"
+              title="Tải lại dữ liệu mới nhất từ Google Sheets">🔄 Làm Mới</button>
             <button id="btn-export-rsvp-excel" class="btn-small btn-small-gold">📥 Xuất CSV</button>
             <button id="btn-clear-rsvp" class="btn-small btn-small-danger">🗑️ Xóa Tất Cả</button>
           </div>
@@ -512,18 +529,26 @@
           <!-- Hàng 1: Lọc phía -->
           <div class="rsvp-filter-row">
             <span class="rsvp-filter-label">🔽 Lọc phía:</span>
-            <button type="button" class="btn-filter-side active" id="rsvp-filter-all"   data-rsvp-side="">🎊 Tất Cả <span class="filter-count" id="rsvp-cnt-all"></span></button>
-            <button type="button" class="btn-filter-side"        id="rsvp-filter-groom" data-rsvp-side="groom">🤵 Nhà Trai <span class="filter-count" id="rsvp-cnt-groom"></span></button>
-            <button type="button" class="btn-filter-side"        id="rsvp-filter-bride" data-rsvp-side="bride">👰 Nhà Gái <span class="filter-count" id="rsvp-cnt-bride"></span></button>
-            <button type="button" class="btn-filter-side"        id="rsvp-filter-both"  data-rsvp-side="both">🤝 Bạn Chung <span class="filter-count" id="rsvp-cnt-both"></span></button>
+            <button type="button" class="btn-filter-side active" id="rsvp-filter-all" data-rsvp-side="">🎊 Tất Cả <span
+                class="filter-count" id="rsvp-cnt-all"></span></button>
+            <button type="button" class="btn-filter-side" id="rsvp-filter-groom" data-rsvp-side="groom">🤵 Nhà Trai
+              <span class="filter-count" id="rsvp-cnt-groom"></span></button>
+            <button type="button" class="btn-filter-side" id="rsvp-filter-bride" data-rsvp-side="bride">👰 Nhà Gái <span
+                class="filter-count" id="rsvp-cnt-bride"></span></button>
+            <button type="button" class="btn-filter-side" id="rsvp-filter-both" data-rsvp-side="both">🤝 Bạn Chung <span
+                class="filter-count" id="rsvp-cnt-both"></span></button>
           </div>
           <!-- Hàng 2: Lọc trạng thái -->
           <div class="rsvp-filter-row">
             <span class="rsvp-filter-label">📌 Trạng thái:</span>
-            <button type="button" class="btn-filter-side active" id="rsvp-filter-status-all"  data-rsvp-status="">Tất Cả</button>
-            <button type="button" class="btn-filter-side"        id="rsvp-filter-status-yes"  data-rsvp-status="yes">✅ Sẽ Đi</button>
-            <button type="button" class="btn-filter-side"        id="rsvp-filter-status-no"   data-rsvp-status="no">❌ Không Đi</button>
-            <button type="button" class="btn-filter-side"        id="rsvp-filter-status-wait" data-rsvp-status="wait">⏳ Chưa Phản Hồi</button>
+            <button type="button" class="btn-filter-side active" id="rsvp-filter-status-all" data-rsvp-status="">Tất
+              Cả</button>
+            <button type="button" class="btn-filter-side" id="rsvp-filter-status-yes" data-rsvp-status="yes">✅ Sẽ
+              Đi</button>
+            <button type="button" class="btn-filter-side" id="rsvp-filter-status-no" data-rsvp-status="no">❌ Không
+              Đi</button>
+            <button type="button" class="btn-filter-side" id="rsvp-filter-status-wait" data-rsvp-status="wait">⏳ Chưa
+              Phản Hồi</button>
           </div>
         </div>
 
@@ -571,13 +596,16 @@
       <p style="color: #555; font-size: 0.92rem; line-height: 1.5; margin-bottom: 24px;">
         Bạn có chắc chắn muốn xóa toàn bộ danh sách khách mời trên Google Sheet không?
         <br>
-        <span style="font-size: 0.82rem; color: #888;">(Toàn bộ dòng khách trên Google Sheet sẽ được xóa sạch để bạn bắt đầu lại từ đầu).</span>
+        <span style="font-size: 0.82rem; color: #888;">(Toàn bộ dòng khách trên Google Sheet sẽ được xóa sạch để bạn bắt
+          đầu lại từ đầu).</span>
       </p>
       <div style="display: flex; gap: 12px; justify-content: center;">
-        <button type="button" id="btn-cancel-clear-guests" class="btn-small btn-small-outline" style="padding: 10px 22px; font-size: 0.9rem;">
+        <button type="button" id="btn-cancel-clear-guests" class="btn-small btn-small-outline"
+          style="padding: 10px 22px; font-size: 0.9rem;">
           ❌ Hủy Bỏ
         </button>
-        <button type="button" id="btn-confirm-clear-guests" class="btn-small btn-small-danger" style="padding: 10px 22px; font-size: 0.9rem; font-weight: 600;">
+        <button type="button" id="btn-confirm-clear-guests" class="btn-small btn-small-danger"
+          style="padding: 10px 22px; font-size: 0.9rem; font-weight: 600;">
           🗑️ Đồng Ý Xóa Sạch
         </button>
       </div>
@@ -590,24 +618,29 @@
       <div style="font-size: 3rem; margin-bottom: 8px;">⚠️</div>
       <h3 style="color: #b7791f; margin-bottom: 8px; font-size: 1.3rem;">Khách Mời Đã Được Tạo Trước Đó!</h3>
       <p style="color: #555; font-size: 0.93rem; line-height: 1.6; margin-bottom: 16px;">
-        Khách mời <strong id="dup-guest-name" style="color: var(--gold-dark); font-size: 1.05rem;"></strong> đã tồn tại trong danh sách dữ liệu Excel rồi, không thể tạo trùng lặp.
+        Khách mời <strong id="dup-guest-name" style="color: var(--gold-dark); font-size: 1.05rem;"></strong> đã tồn tại
+        trong danh sách dữ liệu Excel rồi, không thể tạo trùng lặp.
       </p>
 
-      <div style="background: #faf6f0; border: 1px solid #ebd9c5; border-radius: 8px; padding: 14px 18px; text-align: left; font-size: 0.88rem; line-height: 1.6; margin-bottom: 20px;">
+      <div
+        style="background: #faf6f0; border: 1px solid #ebd9c5; border-radius: 8px; padding: 14px 18px; text-align: left; font-size: 0.88rem; line-height: 1.6; margin-bottom: 20px;">
         <div style="margin-bottom: 4px;">👤 <strong>Tên khách:</strong> <span id="dup-info-name"></span></div>
         <div style="margin-bottom: 4px;">🏷️ <strong>Phía khách:</strong> <span id="dup-info-side"></span></div>
         <div style="margin-bottom: 4px;">🎉 <strong>Tiệc mời:</strong> <span id="dup-info-event"></span></div>
         <div style="margin-top: 6px; word-break: break-all;">
           🔗 <strong>Link đã tạo:</strong> <br>
-          <a id="dup-info-link" href="#" target="_blank" style="color: var(--gold-dark); text-decoration: underline; font-size: 0.82rem;"></a>
+          <a id="dup-info-link" href="#" target="_blank"
+            style="color: var(--gold-dark); text-decoration: underline; font-size: 0.82rem;"></a>
         </div>
       </div>
 
       <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <button type="button" id="btn-dup-copy-link" class="btn-small btn-small-gold" style="padding: 10px 18px; font-size: 0.88rem;">
+        <button type="button" id="btn-dup-copy-link" class="btn-small btn-small-gold"
+          style="padding: 10px 18px; font-size: 0.88rem;">
           📋 Lấy Lại Link &amp; Tin Nhắn Khách Này
         </button>
-        <button type="button" id="btn-dup-close" class="btn-small btn-small-outline" style="padding: 10px 18px; font-size: 0.88rem;">
+        <button type="button" id="btn-dup-close" class="btn-small btn-small-outline"
+          style="padding: 10px 18px; font-size: 0.88rem;">
           Đóng
         </button>
       </div>
@@ -619,4 +652,5 @@
 
   <script src="js/admin.js?v=2.3"></script>
 </body>
+
 </html>
