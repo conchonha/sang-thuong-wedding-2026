@@ -1102,10 +1102,26 @@
       font-size: 0.72rem;
       color: var(--card-accent-light);
       line-height: 1.45;
-      margin-top: 1mm;
+      margin: 1mm auto 0;
       max-width: 95%;
       font-weight: 500;
       font-style: italic;
+    }
+
+    .venue-address-subtext {
+      font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+      font-size: 0.62rem;
+      color: var(--card-accent-light);
+      line-height: 1.35;
+      margin: 0.5mm auto 0;
+      max-width: 95%;
+      font-weight: 500;
+      font-style: italic;
+      opacity: 0.88;
+    }
+
+    .venue-address-subtext:empty {
+      display: none;
     }
 
     /* Date and Timeline Grid */
@@ -2301,6 +2317,11 @@
           <input type="text" id="partyAddressInput" value="Sân vận động thôn Đại Mỹ, Xã Thượng Đức, TP. Đà Nẵng"
             oninput="updateLiveContent()">
         </div>
+        <div class="form-row">
+          <label>Ghi Chú Địa Chỉ Cũ (Dòng nhỏ bên dưới)</label>
+          <input type="text" id="partyAddressSubInput" value="(Tức Thôn Thạnh Đại - Xã Đại Hưng - Huyện Đại Lộc Cũ)"
+            oninput="updateLiveContent()">
+        </div>
         <div class="form-grid-2 form-row">
           <div>
             <label>Thứ Trong Tuần</label>
@@ -2497,6 +2518,8 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
                 <div class="venue-hall-text" id="partyHallText">SÂN VẬN ĐỘNG THÔN ĐẠI MỸ</div>
                 <div class="venue-address-text" id="partyAddressText">Sân vận động thôn Đại Mỹ, Xã Thượng Đức, TP. Đà
                   Nẵng</div>
+                <div class="venue-address-subtext" id="partyAddressSubText">(Tức Thôn Thạnh Đại - Xã Đại Hưng - Huyện Đại
+                  Lộc Cũ)</div>
               </div>
 
               <!-- Schedule: Date & Times with Divider -->
@@ -3338,6 +3361,12 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
       document.getElementById('partyRestaurantText').innerText = document.getElementById('partyRestaurantInput').value;
       document.getElementById('partyHallText').innerText = document.getElementById('partyHallInput').value;
       document.getElementById('partyAddressText').innerHTML = document.getElementById('partyAddressInput').value;
+      const partyAddressSubEl = document.getElementById('partyAddressSubText');
+      const partyAddressSubVal = (document.getElementById('partyAddressSubInput')?.value || '').trim();
+      if (partyAddressSubEl) {
+        partyAddressSubEl.innerHTML = partyAddressSubVal;
+        partyAddressSubEl.style.display = partyAddressSubVal ? '' : 'none';
+      }
       document.getElementById('partyDayWeekText').innerText = document.getElementById('partyDayWeekInput').value;
       document.getElementById('partyDateNumText').innerText = document.getElementById('partyDateNumInput').value;
       document.getElementById('partyLunarText').innerText = document.getElementById('partyLunarInput').value;
@@ -3440,6 +3469,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
 
       const partyHallInput = document.getElementById('partyHallInput');
       const partyAddressInput = document.getElementById('partyAddressInput');
+      const partyAddressSubInput = document.getElementById('partyAddressSubInput');
       const partyDayWeekInput = document.getElementById('partyDayWeekInput');
       const partyDateNumInput = document.getElementById('partyDateNumInput');
       const partyLunarInput = document.getElementById('partyLunarInput');
@@ -3465,6 +3495,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         }
         if (partyHallInput) partyHallInput.value = "XÓM THẮNG";
         if (partyAddressInput) partyAddressInput.value = "Số 21 đường số 1 Xóm Thắng Thôn Hà Trung <br> Quảng Đức - huyện Quảng Xương - Thanh Hoá";
+        if (partyAddressSubInput) partyAddressSubInput.value = "";
         if (partyDayWeekInput) partyDayWeekInput.value = "THỨ NĂM";
         if (partyDateNumInput) partyDateNumInput.value = "10.12";
         if (partyLunarInput) partyLunarInput.value = "Tức 02.11 Âm lịch";
@@ -3485,6 +3516,7 @@ là niềm vinh hạnh cho gia đình chúng tôi!</textarea>
         }
         if (partyHallInput) partyHallInput.value = "SÂN VẬN ĐỘNG THÔN ĐẠI MỸ";
         if (partyAddressInput) partyAddressInput.value = "Sân vận động thôn Đại Mỹ, Xã Thượng Đức, TP. Đà Nẵng";
+        if (partyAddressSubInput) partyAddressSubInput.value = "(Tức Thôn Thạnh Đại - Xã Đại Hưng - Huyện Đại Lộc Cũ)";
         if (partyDayWeekInput) partyDayWeekInput.value = "CHỦ NHẬT";
         if (partyDateNumInput) partyDateNumInput.value = "20.12";
         if (partyLunarInput) partyLunarInput.value = "Tức Ngày 12.11 Âm Lịch";
