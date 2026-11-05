@@ -138,6 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
       rawCfg.brideName = 'Kiều Thương';
       cfgCleaned = true;
     }
+    if (rawCfg.story && (rawCfg.story.date4 === '20/10/2025' || rawCfg.story.date4 === 'Tháng 10 Năm 2026')) {
+      rawCfg.story.date4 = 'THÁNG 08 NĂM 2025';
+      cfgCleaned = true;
+    }
     if (cfgCleaned) {
       localStorage.setItem('wedding_custom_config', JSON.stringify(rawCfg));
     }
@@ -640,6 +644,20 @@ document.addEventListener('DOMContentLoaded', () => {
         { type: 'image', src: 'assets/images/damngo_4.jpg', badge: 'Ảnh 04 / 06', caption: 'Nụ cười rạng rỡ của đôi uyên ương trong ngày vui' },
         { type: 'image', src: 'assets/images/damngo_5.jpg', badge: 'Ảnh 05 / 06', caption: 'Những lời chúc phúc thân thương từ hai bên gia đình' },
         { type: 'image', src: 'assets/images/damngo_6.jpg', badge: 'Ảnh 06 / 06', caption: 'Kỷ niệm trọn vẹn mở đầu cho ngày chung đôi hạnh phúc' }
+      ]
+    },
+    cauhon: {
+      tag: 'KHOẢNH KHẮC CẦU HÔN • THÁNG 08.2025',
+      title: 'Khoảnh Khắc Cầu Hôn',
+      items: [
+        { type: 'video', src: 'assets/cauhon/video-cau-hon-4k.mp4', poster: 'assets/cauhon/a4.jpg', badge: '🎥 Video Cầu Hôn 4K', caption: 'Video Khoảnh Khắc Cầu Hôn Lãng Mạn (Tháng 08/2025)' },
+        { type: 'image', src: 'assets/cauhon/a1.jpg', badge: 'Ảnh 01 / 07', caption: 'Bữa tối lãng mạn dưới ánh nến và hoa tươi lung linh' },
+        { type: 'image', src: 'assets/cauhon/a2.jpg', badge: 'Ảnh 02 / 07', caption: 'Trái tim hoa hồng đỏ thắm và nơ tình yêu rực rỡ' },
+        { type: 'image', src: 'assets/cauhon/a3.jpg', badge: 'Ảnh 03 / 07', caption: 'Nụ cười dịu dàng trong không gian hẹn ước ngọt ngào' },
+        { type: 'image', src: 'assets/cauhon/a4.jpg', badge: 'Ảnh 04 / 07', caption: 'Khoảnh khắc hạnh phúc ngập tràn của đôi uyên ương' },
+        { type: 'image', src: 'assets/cauhon/a5.jpg', badge: 'Ảnh 05 / 07', caption: 'Thưởng thức bữa tiệc tình yêu ấm cúng bên nhau' },
+        { type: 'image', src: 'assets/cauhon/a6.jpg', badge: 'Ảnh 06 / 07', caption: 'Vẻ đẹp rạng ngời của nàng thơ trong ngày đặc biệt' },
+        { type: 'image', src: 'assets/cauhon/a7.jpg', badge: 'Ảnh 07 / 07', caption: 'Chiếc nhẫn cầu hôn lấp lánh và nụ cười vỡ òa hạnh phúc' }
       ]
     }
   };
