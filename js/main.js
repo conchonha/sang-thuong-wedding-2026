@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (sectionTitle) sectionTitle.innerText = 'LỊCH TRÌNH LỄ NẠP TÀI (NHÀ GÁI)';
     if (sectionSubtitle) {
-      sectionSubtitle.innerText = guestSide === 'groom' ? 'Nhà Trai Kính Báo' : 'Nhà Gái Kính Báo';
+      sectionSubtitle.innerText = guestSide === 'groom' ? 'Nhà Trai Kính Mời' : 'Nhà Gái Kính Mời';
     }
 
     if (honorQuote) {
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cập nhật ngày tháng trên bìa và phần footer cho Nhà Gái
     targetWeddingTime = '2026-12-10T08:00:00+07:00';
     const heroDateEl = document.getElementById('hero-date-text');
-    if (heroDateEl && !savedConfig.weddingDateText) heroDateEl.innerText = 'THỨ NĂM, NGÀY 10 THÁNG 12 NĂM 2026';
+    if (heroDateEl) heroDateEl.innerText = 'THỨ NĂM, NGÀY 10 THÁNG 12 NĂM 2026';
     
     const letterDate = document.querySelector('.letter-date');
     if (letterDate) letterDate.innerText = '10 . 12 . 2026';
@@ -315,9 +315,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (sectionTitle) sectionTitle.innerText = 'LỊCH TRÌNH HÔN LỄ';
     if (sectionSubtitle) {
-      if (guestSide === 'groom') sectionSubtitle.innerText = 'Nhà Trai Kính Báo';
-      else if (guestSide === 'bride') sectionSubtitle.innerText = 'Nhà Gái Kính Báo';
-      else sectionSubtitle.innerText = 'Trân Trọng Kính Báo';
+      if (guestSide === 'groom') sectionSubtitle.innerText = 'Nhà Trai Kính Mời';
+      else if (guestSide === 'bride') sectionSubtitle.innerText = 'Nhà Gái Kính Mời';
+      else sectionSubtitle.innerText = 'Trân Trọng Kính Mời';
     }
 
     if (honorQuote) {
