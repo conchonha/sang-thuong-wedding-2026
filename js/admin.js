@@ -5,7 +5,7 @@
 
 // ══ Cấu hình Google Sheets (phải khớp với main.js) ══
 const GOOGLE_SHEET_ID = '1JlN1-utEeoLThwzfsyvnNNIDQovqeocbMTEq_NSeWo4';
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxN5uazO9DhS9nRjqTBh8tjB9ptRJhV94elpJ78eplz2tN7pNxo8oRQN-NqmqHwK7Bj/exec';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxJqbA7tTx-LTVjSgRvSQ_65xgG7wwQPIBQ_iNRUGjGp9jmsqKpEWY3H3nj_TOq3G3G/exec';
 
 document.addEventListener('DOMContentLoaded', () => {
   const PIN_CODE = '123456';
@@ -61,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ══ NGUỒN DỮ LIỆU DUY NHẤT: phải khai báo TRƯỚC checkAuth() ══
   let liveGuests = [];
   let activeSide = '';
+  const PUBLIC_BASE_URL = 'https://conchonha.github.io/sang-thuong-wedding-2026/index.html';
+  let displayGuestResult = () => {}; // gán trong initGuestGenerator(), dùng chung cho các bảng
+  let activeResultGuest = null;      // khách đang hiện ở khung kết quả
 
   // Dọn dẹp dữ liệu cũ trong localStorage
   try {
@@ -128,6 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
      3. GUEST LINK GENERATOR & LIST
      ========================================================================== */
   function getBaseUrl() {
+    // Mở admin trên máy (localhost / file) vẫn phải ra link mà khách mở được
+    if (/^(localhost|127\.0\.0\.1|)$/.test(window.location.hostname)) return PUBLIC_BASE_URL;
     const origin = window.location.origin;
     let path = window.location.pathname;
 
@@ -137,6 +142,56 @@ document.addEventListener('DOMContentLoaded', () => {
     path = path.replace(/\/$/, '');
 
     return `${origin}${path}/index.html`;
+  }
+
+  // ═══ QUY TẮC DUY NHẤT cho phía khách / tiệc mời / link (mọi nơi trong admin phải dùng) ═══
+  function buildGuestLink(name, side, eventChoice) {
+    return `${getBaseUrl()}?to=${encodeURIComponent(name)}&side=${side}&event=${eventChoice}`;
+  }
+
+  function parseSide(raw) {
+    const t = normalizeVietnamese(String(raw || ''));
+    const groom = /\b(trai|groom)\b/.test(t);
+    const bride = /\b(gai|bride)\b/.test(t);
+    if (groom === bride) return 'both';
+    return groom ? 'groom' : 'bride';
+  }
+
+  // Không nhận ra tiệc (vd. khách báo "Không tham dự") -> lấy tiệc theo phía khách
+  function parseEvent(raw, side) {
+    const t = normalizeVietnamese(String(raw || ''));
+    const naptai = /nap ?tai/.test(t);
+    const vuquy = /thanh hon|vu ?quy/.test(t);
+    if (/\b(ca hai|all)\b/.test(t) || (naptai && vuquy)) return 'all';
+    if (naptai) return 'naptai';
+    if (vuquy) return 'vuquy';
+    return side === 'groom' ? 'vuquy' : side === 'bride' ? 'naptai' : 'all';
+  }
+
+  function sideLabel(side) {
+    return side === 'groom' ? 'Nhà Trai' : side === 'bride' ? 'Nhà Gái' : 'Bạn chung';
+  }
+
+  function eventLabel(eventChoice) {
+    return eventChoice === 'vuquy' ? 'Lễ Thành Hôn (Nhà Trai)' : eventChoice === 'naptai' ? 'Lễ Nạp Tài (Nhà Gái)' : 'Cả Hai Buổi Lễ';
+  }
+
+  function isSideEventMismatch(side, eventChoice) {
+    return (side === 'bride' && eventChoice === 'vuquy') || (side === 'groom' && eventChoice === 'naptai');
+  }
+
+  // Đổi phía/tiệc của khách đã có: link rút gọn cũ trỏ sai bên nên phải bỏ. Trả về true nếu có thay đổi.
+  function changeGuestInvite(guest, side, eventChoice) {
+    const changed = guest.side !== side || guest.eventChoice !== eventChoice;
+    guest.side = side;
+    guest.eventChoice = eventChoice;
+    guest.link = buildGuestLink(guest.name, side, eventChoice);
+    if (changed) {
+      // Nếu rút gọn lại thất bại thì ghi đè link ngắn cũ trên Sheet bằng link đầy đủ
+      guest.mustReplaceShortUrl = !!guest.shortUrl || guest.mustReplaceShortUrl;
+      guest.shortUrl = '';
+    }
+    return changed;
   }
 
   function updateSideFilterCounts() {
@@ -251,7 +306,9 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     const dupInfoLink = document.getElementById('dup-info-link');
     const btnDupCopyLink = document.getElementById('btn-dup-copy-link');
     const btnDupClose = document.getElementById('btn-dup-close');
+    const btnDupChange = document.getElementById('btn-dup-change');
     let currentDupGuest = null;
+    let currentDupWanted = null;
 
     if (!guestForm) return;
 
@@ -259,6 +316,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     function updateEventOptions() {
       if (!sideSelect || !eventSelect) return;
       eventSelect.innerHTML = `
+        <option value="">— Chọn tiệc mời —</option>
         <option value="vuquy">Lễ Thành Hôn (Nhà Trai)</option>
         <option value="naptai">Lễ Nạp Tài (Nhà Gái)</option>
         <option value="all">Cả Hai Buổi Lễ (Lễ Nạp Tài &amp; Lễ Thành Hôn)</option>
@@ -268,18 +326,43 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         eventSelect.value = 'vuquy';
       } else if (currentSide === 'bride') {
         eventSelect.value = 'naptai';
-      } else {
+      } else if (currentSide === 'both') {
         eventSelect.value = 'all';
+      } else {
+        eventSelect.value = '';
       }
+      updateChoiceSummary();
+    }
+
+    // Cho thấy trước thiệp sẽ hiện gì; đổi lựa chọn thì phải xác nhận lại nếu phía và tiệc lệch nhau
+    let confirmedMismatch = '';
+    function updateChoiceSummary() {
+      confirmedMismatch = '';
+      const el = document.getElementById('guest-choice-summary');
+      if (!el) return;
+      const side = sideSelect.value;
+      const eventChoice = eventSelect.value;
+      if (!side || !eventChoice) {
+        el.style.display = 'none';
+        return;
+      }
+      const mismatch = isSideEventMismatch(side, eventChoice);
+      el.style.display = 'block';
+      el.style.background = mismatch ? '#ffebee' : '#e8f5e9';
+      el.style.borderColor = mismatch ? '#ef9a9a' : '#a5d6a7';
+      el.style.color = mismatch ? '#b71c1c' : '#1b5e20';
+      el.textContent = `${mismatch ? '⚠️ Phía khách và tiệc mời khác bên! ' : ''}Thiệp sẽ hiện: ${eventLabel(eventChoice)} — khách của: ${sideLabel(side)}`;
     }
 
     if (sideSelect) {
       sideSelect.addEventListener('change', updateEventOptions);
+      if (eventSelect) eventSelect.addEventListener('change', updateChoiceSummary);
       updateEventOptions();
     }
 
     // Hiển thị kết quả thiệp mời và mẫu tin nhắn
-    function displayGuestResult(guest) {
+    displayGuestResult = function (guest) {
+      activeResultGuest = guest;
       const isAlreadyShort = (guest.shortUrl && guest.shortUrl.startsWith('http'));
       const activeLink = isAlreadyShort ? guest.shortUrl : guest.link;
       const { plainMsg, htmlPreview, sideTitleShort, eventTitleShort } = buildInviteMessage(guest, activeLink, !isAlreadyShort);
@@ -295,30 +378,33 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
 
       // Kích hoạt tiến trình rút gọn link & cập nhật UI
       applyShortLinkToResultBox(guest.link, guest.name, guest);
-    }
+    };
 
     // Hiển thị Dialog cảnh báo nếu khách đã tồn tại trong Excel / danh sách
-    function showDuplicateGuestDialog(guest) {
+    function showDuplicateGuestDialog(guest, wanted) {
       currentDupGuest = guest;
+      currentDupWanted = wanted;
       if (!modalDup) {
         showToast(`Khách mời "${guest.name}" đã được tạo link trước đó rồi!`);
         return;
       }
 
-      const sideText = guest.side === 'groom' ? 'Nhà Trai' : guest.side === 'bride' ? 'Nhà Gái' : 'Bạn chung';
-      const eventText = guest.eventChoice === 'vuquy'
-        ? 'Lễ Thành Hôn (Nhà Trai)'
-        : guest.eventChoice === 'naptai'
-          ? 'Lễ Nạp Tài (Nhà Gái)'
-          : 'Cả Hai Buổi Lễ';
+      const sideText = sideLabel(guest.side);
+      const eventText = eventLabel(guest.eventChoice);
 
       if (dupGuestName) dupGuestName.innerText = guest.name;
       if (dupInfoName) dupInfoName.innerText = guest.name;
       if (dupInfoSide) dupInfoSide.innerText = sideText;
       if (dupInfoEvent) dupInfoEvent.innerText = eventText;
       if (dupInfoLink) {
-        dupInfoLink.href = guest.link;
-        dupInfoLink.innerText = guest.link;
+        const currentLink = (guest.shortUrl && guest.shortUrl.startsWith('http')) ? guest.shortUrl : guest.link;
+        dupInfoLink.href = currentLink;
+        dupInfoLink.innerText = currentLink;
+      }
+      if (btnDupChange) {
+        const differs = guest.side !== wanted.side || guest.eventChoice !== wanted.eventChoice;
+        btnDupChange.style.display = differs ? '' : 'none';
+        btnDupChange.textContent = `🔄 Đổi sang ${sideLabel(wanted.side)} — ${eventLabel(wanted.eventChoice)} & tạo link mới`;
       }
 
       modalDup.classList.add('active');
@@ -350,6 +436,20 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       });
     }
 
+    if (btnDupChange && !btnDupChange.dataset.bound) {
+      btnDupChange.dataset.bound = 'true';
+      btnDupChange.addEventListener('click', () => {
+        if (modalDup) modalDup.classList.remove('active');
+        if (!currentDupGuest || !currentDupWanted) return;
+        changeGuestInvite(currentDupGuest, currentDupWanted.side, currentDupWanted.eventChoice);
+        displayGuestResult(currentDupGuest);
+        renderGuestTable();
+        renderRsvpList();
+        showToast(`Đã đổi "${currentDupGuest.name}" sang ${eventLabel(currentDupGuest.eventChoice)}. Hãy gửi lại link mới cho khách!`);
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+
     if (btnDupCopyLink && !btnDupCopyLink.dataset.bound) {
       btnDupCopyLink.dataset.bound = 'true';
       btnDupCopyLink.addEventListener('click', () => {
@@ -373,6 +473,9 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     // Xử lý gửi Form tạo link khách
     guestForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      // Ẩn kết quả của khách trước để không copy nhầm link khi lần tạo này bị chặn
+      resultBox.style.display = 'none';
+      activeResultGuest = null;
       try {
         const name = document.getElementById('guest-name').value.trim();
         const side = document.getElementById('guest-side').value;
@@ -386,18 +489,28 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
           document.getElementById('guest-name').focus();
           return;
         }
+        if (!side || !eventChoice) {
+          showToast('⚠️ Vui lòng chọn phía khách và tiệc mời!');
+          (side ? eventSelect : sideSelect).focus();
+          return;
+        }
+        const choiceKey = `${name}|${side}|${eventChoice}`;
+        if (isSideEventMismatch(side, eventChoice) && confirmedMismatch !== choiceKey) {
+          confirmedMismatch = choiceKey;
+          showToast(`⚠️ Khách ${sideLabel(side)} nhưng mời ${eventLabel(eventChoice)}. Nếu đúng ý, bấm Tạo Link lần nữa.`);
+          return;
+        }
 
         const guests = liveGuests;
         const existingGuest = guests.find((g) => isExactNameMatching(name, g.name));
 
         if (existingGuest) {
           // Đã tạo trước đó: KHÔNG ĐƯỢC TẠO NỮA, báo dialog cảnh báo!
-          showDuplicateGuestDialog(existingGuest);
+          showDuplicateGuestDialog(existingGuest, { side, eventChoice });
           return;
         }
 
-        const baseUrl = getBaseUrl();
-        const fullLink = `${baseUrl}?to=${encodeURIComponent(name)}&side=${side}&event=${eventChoice}`;
+        const fullLink = buildGuestLink(name, side, eventChoice);
 
         const newGuest = {
           id: Date.now(),
@@ -539,7 +652,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     return lines;
   }
 
-  function parseGuestRowsFromCsv(rows, baseUrl) {
+  function parseGuestRowsFromCsv(rows) {
     if (rows.length <= 1) return [];
     const headerRow = rows[0].map((h) => (h || '').toLowerCase().trim());
     const nameIdx = headerRow.findIndex((h) => h.includes('tên') || h.includes('họ'));
@@ -549,7 +662,6 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     const countIdx = headerRow.findIndex((h) => h.includes('số người') || h.includes('người đi'));
     const wishIdx = headerRow.findIndex((h) => h.includes('lời chúc') || h.includes('chúc'));
     const noteIdx = headerRow.findIndex((h) => h.includes('ghi chú'));
-    const linkIdx = headerRow.findIndex((h) => h.includes('link'));
 
     const parsedGuests = [];
     for (let i = 1; i < rows.length; i++) {
@@ -558,26 +670,16 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       const name = (nameIdx >= 0 ? row[nameIdx] : (row[1] || row[0]))?.trim();
       if (!name || name.toLowerCase().includes('họ và tên') || name.toLowerCase().includes('stt')) continue;
 
-      const sideRaw = (sideIdx >= 0 ? (row[sideIdx] || '') : (row[2] || '')).toLowerCase();
-      const side = sideRaw.includes('trai') ? 'groom' : sideRaw.includes('gái') ? 'bride' : 'both';
-
-      const eventRaw = (eventIdx >= 0 ? (row[eventIdx] || '') : (row[3] || '')).toLowerCase();
-      let eventChoice = 'all';
-      if (eventRaw.includes('vu quy') || eventRaw.includes('vuquy')) eventChoice = 'vuquy';
-      else if (eventRaw.includes('nạp tài') || eventRaw.includes('naptai')) eventChoice = 'naptai';
+      const side = parseSide(sideIdx >= 0 ? row[sideIdx] : row[2]);
+      const eventChoice = parseEvent(eventIdx >= 0 ? row[eventIdx] : row[3], side);
 
       const attending = attendingIdx >= 0 ? (row[attendingIdx] || '').trim() : '';
       const rsvpCount = countIdx >= 0 ? (row[countIdx] || '').trim() : '';
       const wish = wishIdx >= 0 ? (row[wishIdx] || '').trim() : '';
       const note = (noteIdx >= 0 ? (row[noteIdx] || '') : (row[4] || '')).trim();
 
-      let link = linkIdx >= 0 && row[linkIdx] ? row[linkIdx].trim() : '';
-      if (!link || (!link.startsWith('http') && !link.includes('index.html'))) {
-        link = `${baseUrl}?to=${encodeURIComponent(name)}&side=${side}&event=${eventChoice}`;
-      } else if (link.startsWith('index.html')) {
-        const queryString = link.includes('?') ? link.slice(link.indexOf('?')) : '';
-        link = `${baseUrl}${queryString}`;
-      }
+      // Luôn dựng link từ cột Phía + Tiệc; cột link trong file có thể đã cũ
+      const link = buildGuestLink(name, side, eventChoice);
 
       parsedGuests.push({
         id: i,
@@ -687,9 +789,8 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
     // để các dịch vụ rút gọn API (tinyurl, spoo.me) chấp nhận và khách mở được trên điện thoại
     let targetUrl = longUrl;
     if (targetUrl.includes('localhost') || targetUrl.includes('127.0.0.1')) {
-      const publicBase = 'https://conchonha.github.io/sang-thuong-wedding-2026/index.html';
       const queryString = targetUrl.includes('?') ? targetUrl.slice(targetUrl.indexOf('?')) : '';
-      targetUrl = `${publicBase}${queryString}`;
+      targetUrl = `${PUBLIC_BASE_URL}${queryString}`;
     }
 
     const firstName = guestName.trim().split(/\s+/).pop() || guestName.trim();
@@ -799,6 +900,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       .then(shortUrl => {
         // Cập nhật bộ nhớ liveGuests và lưu lên Google Sheet đúng 1 lần với đầy đủ link rút gọn
         if (foundGuest) {
+          if (foundGuest.link !== fullLink) return; // phía/tiệc đã đổi trong lúc chờ: bỏ link cũ
           foundGuest.shortUrl = shortUrl;
           sendGuestToGoogleSheet(foundGuest);
           renderGuestTable(document.getElementById('search-guest-input')?.value.trim() || '');
@@ -806,6 +908,9 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         } else if (guestName) {
           saveShortLinkToGoogleSheet(guestName, shortUrl);
         }
+
+        // Admin đã chuyển sang khách khác trong lúc chờ: không ghi link của khách này lên khung của khách kia
+        if (activeResultGuest !== guestObj) return;
 
         // 1. Tái tạo mẫu tin nhắn và cập nhật "Xem Trước Tin Nhắn Thiệp Mời" với link rút gọn
         const finalMsg = buildInviteMessage(guestObj, shortUrl, false);
@@ -835,10 +940,13 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         console.warn('[Admin] shortenUrl fallback to longUrl:', err.message);
         // Fallback: gửi link gốc lên Google Sheet đúng 1 lần
         if (foundGuest) {
+          if (foundGuest.link !== fullLink) return;
+          if (foundGuest.mustReplaceShortUrl) foundGuest.shortUrl = fullLink;
           sendGuestToGoogleSheet(foundGuest);
           renderGuestTable(document.getElementById('search-guest-input')?.value.trim() || '');
           renderRsvpList();
         }
+        if (activeResultGuest !== guestObj) return;
 
         const fallbackMsg = buildInviteMessage(guestObj, fullLink, false);
         if (msgTextarea) msgTextarea.value = fallbackMsg.plainMsg;
@@ -968,7 +1076,6 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
         // Xác định cột header: GViz có thể không nhận ra header (parsedNumHeaders=0, label='')
         // → tự đọc hàng đầu tiên làm header
         const colsHaveLabels = json.table.cols.some(c => c && c.label && c.label.trim());
-        const baseUrl = getBaseUrl();
         const allRows = json.table.rows || [];
 
         let colNames = [];
@@ -1014,16 +1121,10 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
           if (HEADER_NAMES.has(name.toLowerCase())) return null;
 
           // Phía khách
-          const rawSide = String(rowObj['Phía Khách'] || rowObj['Phía'] || cells[2] || '').toLowerCase();
-          let side = 'both';
-          if (rawSide.includes('trai') || rawSide === 'groom') side = 'groom';
-          else if (rawSide.includes('gái') || rawSide === 'bride') side = 'bride';
+          const side = parseSide(rowObj['Phía Khách'] || rowObj['Phía'] || cells[2]);
 
           // Tiệc mời
-          const rawEvent = String(rowObj['Tiệc Mời'] || rowObj['Tiệc'] || cells[3] || '').toLowerCase();
-          let eventChoice = 'all';
-          if (rawEvent.includes('quy') || rawEvent === 'vuquy') eventChoice = 'vuquy';
-          else if (rawEvent.includes('tài') || rawEvent === 'naptai') eventChoice = 'naptai';
+          const eventChoice = parseEvent(rowObj['Tiệc Mời'] || rowObj['Tiệc'] || cells[3], side);
 
           // Trạng thái RSVP & Link rút gọn
           const attending = String(rowObj['Trạng Thái'] || rowObj['Trạng Thái Đi'] || cells[4] || '').trim();
@@ -1032,7 +1133,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
           const createdAt = String(rowObj['Thời Gian Xác Nhận'] || rowObj['Ngày Tạo'] || cells[7] || '').trim();
           const shortUrl = String(rowObj['Link Rút Gọn'] || rowObj['Link Short'] || rowObj['Short Link'] || cells[8] || '').trim();
 
-          const fullLink = `${baseUrl}?to=${encodeURIComponent(name)}&side=${side}&event=${eventChoice}`;
+          const fullLink = buildGuestLink(name, side, eventChoice);
 
           return {
             id: rowObj['STT'] || (idx + 1),
@@ -1083,6 +1184,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
             if (g.eventChoice && g.eventChoice !== 'all' && existing.eventChoice === 'all') {
               existing.eventChoice = g.eventChoice;
             }
+            existing.link = buildGuestLink(existing.name, existing.side, existing.eventChoice);
           }
         });
 
@@ -1132,7 +1234,6 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       return;
     }
     showToast('Đang đọc 5 khách mẫu từ file CSV và tải lên Google Sheets... ⏳');
-    const baseUrl = getBaseUrl();
     fetch('data/danh_sach_khach_moi.csv?v=' + Date.now())
       .then(res => {
         if (!res.ok) throw new Error('Không thể tải file CSV');
@@ -1140,7 +1241,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
       })
       .then(csvText => {
         const rows = parseCsvRows(csvText);
-        const guests = parseGuestRowsFromCsv(rows, baseUrl);
+        const guests = parseGuestRowsFromCsv(rows);
         if (guests.length === 0) {
           showToast('File CSV không có khách mời nào!');
           return;
@@ -1458,8 +1559,7 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
             return;
           }
 
-          const baseUrl = getBaseUrl();
-          const parsed = parseGuestRowsFromCsv(rows, baseUrl);
+          const parsed = parseGuestRowsFromCsv(rows);
           if (parsed.length === 0) {
             showToast('Không tìm thấy dữ liệu khách mời hợp lệ trong file!');
             return;
@@ -1468,18 +1568,19 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
           const currentGuests = liveGuests;
           let addedCount = 0;
           let updatedCount = 0;
+          const relinkQueue = []; // khách đổi phía/tiệc: phải tạo lại link rút gọn
 
           parsed.forEach((pg) => {
             const normPgName = pg.name.toLowerCase().replace(/\s+/g, ' ');
             const existingIdx = currentGuests.findIndex(cg => (cg.name || '').toLowerCase().replace(/\s+/g, ' ') === normPgName);
             if (existingIdx !== -1) {
-              currentGuests[existingIdx].side = pg.side || currentGuests[existingIdx].side;
-              currentGuests[existingIdx].eventChoice = pg.eventChoice || currentGuests[existingIdx].eventChoice;
+              const inviteChanged = changeGuestInvite(currentGuests[existingIdx], pg.side, pg.eventChoice);
               if (pg.attending) currentGuests[existingIdx].attending = pg.attending;
               if (pg.rsvpCount) currentGuests[existingIdx].rsvpCount = pg.rsvpCount;
               if (pg.wish) currentGuests[existingIdx].wish = pg.wish;
               if (pg.note) currentGuests[existingIdx].note = pg.note;
-              sendGuestToGoogleSheet(currentGuests[existingIdx]);
+              if (inviteChanged) relinkQueue.push(currentGuests[existingIdx]);
+              else sendGuestToGoogleSheet(currentGuests[existingIdx]);
               updatedCount++;
             } else {
               pg.id = Date.now() + Math.floor(Math.random() * 1000);
@@ -1489,6 +1590,15 @@ Sự hiện diện của ${name} là niềm vinh hạnh và hạnh phúc lớn l
               addedCount++;
             }
           });
+
+          relinkQueue.reduce((chain, g) => chain.then(() => shortenUrl(g.link, g.name)
+            .then((shortUrl) => { g.shortUrl = shortUrl; })
+            .catch(() => { if (g.mustReplaceShortUrl) g.shortUrl = g.link; })
+            .then(() => {
+              sendGuestToGoogleSheet(g);
+              renderGuestTable(document.getElementById('search-guest-input')?.value.trim() || '');
+              renderRsvpList();
+            })), Promise.resolve());
 
           renderGuestTable();
           renderRsvpList();

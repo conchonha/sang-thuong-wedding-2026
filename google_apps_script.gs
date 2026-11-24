@@ -235,8 +235,10 @@ function handleSaveGuest(sheet, data) {
         if (wish) sheet.getRange(foundRow, 7).setValue(wish);
         sheet.getRange(foundRow, 8).setValue(nowTime);
       } else {
-        if (sideText) sheet.getRange(foundRow, 3).setValue(sideText);
-        if (eventText) sheet.getRange(foundRow, 4).setValue(eventText);
+        // Chỉ trang admin (gửi mã groom/bride/both) được đổi phía khách & tiệc mời; RSVP của khách thì không
+        const fromAdmin = ['groom', 'bride', 'both'].indexOf(data.side) !== -1;
+        if (sideText && (fromAdmin || !rows[foundRow - 1][2])) sheet.getRange(foundRow, 3).setValue(sideText);
+        if (eventText && (fromAdmin || !rows[foundRow - 1][3])) sheet.getRange(foundRow, 4).setValue(eventText);
         if (data.attending) sheet.getRange(foundRow, 5).setValue(attending);
         if (count) sheet.getRange(foundRow, 6).setValue(count);
         if (wish) sheet.getRange(foundRow, 7).setValue(wish);

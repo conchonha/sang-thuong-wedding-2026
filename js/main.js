@@ -7,7 +7,7 @@
 // ══ Cấu hình Google Sheets ══════════════════════════════════════════════
 // ❗ Dán URL của Google Apps Script vào đây sau khi Deploy
 // Hướng dẫn: xem file google_apps_script.gs
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxN5uazO9DhS9nRjqTBh8tjB9ptRJhV94elpJ78eplz2tN7pNxo8oRQN-NqmqHwK7Bj/exec';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxJqbA7tTx-LTVjSgRvSQ_65xgG7wwQPIBQ_iNRUGjGp9jmsqKpEWY3H3nj_TOq3G3G/exec';
 const GOOGLE_SHEET_ID = '1JlN1-utEeoLThwzfsyvnNNIDQovqeocbMTEq_NSeWo4';
 
 /**
@@ -28,9 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
      0. DYNAMIC CONFIGURATION & GUEST PERSONALIZATION
      ========================================================================== */
   const urlParams = new URLSearchParams(window.location.search);
+  // Một số ứng dụng chat đổi '&' thành '&amp;' nên chấp nhận cả khoá 'amp;...'
+  const getParam = (key) => urlParams.get(key) || urlParams.get('amp;' + key) || '';
   const rawGuestName = urlParams.get('to') || urlParams.get('guest') || urlParams.get('name') || '';
-  const rawSideParam = urlParams.get('side') || '';
-  const rawTypeParam = (urlParams.get('type') || urlParams.get('.type') || urlParams.get('event') || '').trim();
+  const rawSideParam = getParam('side').trim();
+  const rawTypeParam = (getParam('type') || getParam('.type') || getParam('event') || rawSideParam).trim(); // thiếu tiệc -> suy theo phía khách
 
   // Logic phân loại hiển thị sự kiện theo URL:
   // 1. type=VK (hoặc type=vk, naptai, bride, gai, nhagai) -> Chỉ hiển thị Lễ Nạp Tài (Nhà Gái), ẩn Lễ Thành Hôn (Nhà Trai).
@@ -1768,13 +1770,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const attendingText = isAttending ? 'Có tham dự' : 'Không tham dự';
-      const countText = isAttending ? count : '0 người';
-      const eventText = isAttending ? eventChoice : 'Không tham dự';
+      let countText = isAttending ? count : '0 người';
+      let sheetSide = side;
+      let eventText = eventChoice;
+
+      // Link mời riêng: phía khách + tiệc mời là do cô dâu chú rể quyết định, RSVP không được ghi đè trên Sheet
+      if (guestName && (rawSideParam || rawTypeParam)) {
+        sheetSide = guestSide === 'groom' ? 'Nhà Trai' : guestSide === 'bride' ? 'Nhà Gái' : 'Bạn chung';
+        eventText = guestEvent === 'naptai' ? 'Lễ Nạp Tài (Nhà Gái)' : guestEvent === 'vuquy' ? 'Lễ Thành Hôn (Nhà Trai)' : 'Cả Hai Buổi Lễ';
+        // Khách được mời cả hai lễ nhưng chỉ dự một: giữ thông tin đó ở cột Số Người
+        if (isAttending && guestEvent === 'all' && eventChoice !== 'Cả Hai Buổi Lễ') countText += ` - ${eventChoice}`;
+      }
 
       // Gửi RSVP trực tiếp và duy nhất lên Google Sheets
       sendRsvpToGoogleSheet({
         name,
-        side,
+        side: sheetSide,
         eventChoice: eventText,
         attending: attendingText,
         count: countText,

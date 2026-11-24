@@ -7,14 +7,14 @@
 
   <!-- OpenGraph Metadata for Zalo, Facebook, Messenger preview -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://conchonha.github.io/sang-thuong-wedding-2026/">
+  <!-- KHÔNG thêm og:url / canonical: Facebook, Messenger, Zalo sẽ mở địa chỉ đó thay cho link riêng của khách,
+       làm mất ?to=&side=&event= và khách nhà gái bị hiện thiệp nhà trai. -->
   <meta property="og:title" content="Trân Trọng Kính Mời">
   <meta property="og:description" content="Trân trọng kính mời quý khách tới chung vui trong ngày cưới của Thái Bá Sang &amp; Phạm Thị Thương. Sự hiện diện của quý vị là niềm vinh hạnh lớn lao nhất đối với gia đình.">
   <meta property="og:image" content="https://conchonha.github.io/sang-thuong-wedding-2026/anh-cuoi-web/DSC06088okkk.jpg">
   <meta property="og:image:secure_url" content="https://conchonha.github.io/sang-thuong-wedding-2026/anh-cuoi-web/DSC06088okkk.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <link rel="canonical" href="https://conchonha.github.io/sang-thuong-wedding-2026/">
   <meta name="description" content="Thiệp cưới trực tuyến cá nhân hóa của Thái Bá Sang &amp; Phạm Thị Thương. Thông tin lịch trình, bản đồ chỉ đường, album ảnh cưới và xác nhận tham dự.">
 
   <!-- Dynamic Guest Title Script -->
@@ -27,9 +27,21 @@
         document.title = titleText;
         var ogTitle = document.querySelector('meta[property="og:title"]');
         if (ogTitle) ogTitle.setAttribute('content', titleText);
+
+        // Xác định tiệc ngay trong <head> để không nháy thông tin nhà trai khi main.js chưa tải xong
+        // (giữ cùng quy tắc với guestEvent trong js/main.js)
+        var q = function(k) { return params.get(k) || params.get('amp;' + k) || ''; };
+        var type = (q('type') || q('.type') || q('event') || q('side')).trim();
+        if (/^(vk|naptai|bride|gai|nhagai)$/i.test(type)) {
+          document.documentElement.setAttribute('data-guest-event', 'naptai');
+        }
       } catch(e) {}
     })();
+    function setBrideDate(el, text) {
+      if (el && document.documentElement.getAttribute('data-guest-event') === 'naptai') el.textContent = text;
+    }
   </script>
+  <style>html[data-guest-event="naptai"] #card-event-vuquy { display: none; }</style>
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>">
@@ -88,7 +100,7 @@
           </div>
 
           <div class="letter-names">Bá Sang &amp; Kiều Thương</div>
-          <div class="letter-date">20 . 12 . 2026</div>
+          <div class="letter-date">20 . 12 . 2026</div><script>setBrideDate(document.querySelector('.letter-date'), '10 . 12 . 2026');</script>
         </div>
 
         <!-- Envelope front pockets -->
@@ -167,7 +179,7 @@
         <span class="hero-name-item">Kiều Thương</span>
       </h1>
 
-      <div class="hero-date-box" id="hero-date-text">CHỦ NHẬT, NGÀY 20 THÁNG 12 NĂM 2026</div>
+      <div class="hero-date-box" id="hero-date-text">CHỦ NHẬT, NGÀY 20 THÁNG 12 NĂM 2026</div><script>setBrideDate(document.getElementById('hero-date-text'), 'THỨ NĂM, NGÀY 10 THÁNG 12 NĂM 2026');</script>
 
       <!-- Royal Arch Photo Frame -->
       <div class="hero-photo-container">
@@ -1562,6 +1574,6 @@
   </div>
 
   <!-- Main JavaScript -->
-  <script src="js/main.js?v=2.5"></script>
+  <script src="js/main.js?v=2.6"></script>
 </body>
 </html>

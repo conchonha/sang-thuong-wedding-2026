@@ -78,7 +78,7 @@
           Khách A và Khách B xem hai link hoàn toàn khác nhau, không bị trùng hay đổi tên lẫn nhau!
         </p>
 
-        <form id="guest-create-form">
+        <form id="guest-create-form" autocomplete="off">
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="guest-name">Danh xưng &amp; Tên khách mời *</label>
@@ -87,7 +87,8 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="guest-side">Khách của bên nào? *</label>
-              <select id="guest-side" class="form-control">
+              <select id="guest-side" class="form-control" required>
+                <option value="">— Chọn phía khách —</option>
                 <option value="groom">Khách của Nhà Trai (Chú Rể)</option>
                 <option value="bride">Khách của Nhà Gái (Cô Dâu)</option>
                 <option value="both">Bạn chung của Cả Hai</option>
@@ -103,8 +104,9 @@
               <label class="form-label" for="guest-event" style="color: var(--gold-dark); font-weight: 700;">
                 Mời tham dự tiệc nào? * (Quyết định hiển thị tiệc trên thiệp)
               </label>
-              <select id="guest-event" class="form-control"
+              <select id="guest-event" class="form-control" required
                 style="border-color: var(--gold-primary); font-weight: 600;">
+                <option value="">— Chọn tiệc mời —</option>
                 <option value="vuquy">Lễ Thành Hôn (Nhà Trai)</option>
                 <option value="naptai">Lễ Nạp Tài (Nhà Gái)</option>
                 <option value="all">Cả Hai Buổi Lễ (Lễ Nạp Tài &amp; Lễ Thành Hôn)</option>
@@ -119,6 +121,9 @@
                 placeholder="Ví dụ: Đồng nghiệp cty, Bạn cấp 3...">
             </div>
           </div>
+
+          <div id="guest-choice-summary" role="status"
+            style="display: none; border: 1.5px solid; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-weight: 700; font-size: 0.92rem;"></div>
 
           <button type="submit" id="guest-create-btn" class="btn-luxury btn-gold"
             style="padding: 12px 30px; margin-top: 5px; display: inline-flex; align-items: center; gap: 8px; justify-content: center;">
@@ -635,6 +640,8 @@
       </div>
 
       <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button type="button" id="btn-dup-change" class="btn-small btn-small-gold"
+          style="padding: 10px 18px; font-size: 0.88rem; display: none;"></button>
         <button type="button" id="btn-dup-copy-link" class="btn-small btn-small-gold"
           style="padding: 10px 18px; font-size: 0.88rem;">
           📋 Lấy Lại Link &amp; Tin Nhắn Khách Này
@@ -650,7 +657,7 @@
   <!-- Toast Notification -->
   <div id="toast-notice" class="toast-notice"></div>
 
-  <script src="js/admin.js?v=2.3"></script>
+  <script src="js/admin.js?v=2.4"></script>
 </body>
 
 </html>
